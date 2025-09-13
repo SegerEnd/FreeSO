@@ -23,7 +23,7 @@ namespace FSO.Server.Api.Core
         public Shards Shards;
         public IGluonHostPool HostPool;
         public IUpdateUploader UpdateUploader;
-        public IUpdateUploader UpdateUploaderClient;
+        public IUpdateUploader AddonUploader;
         public GithubConfig Github;
 
         public Api()
@@ -34,7 +34,7 @@ namespace FSO.Server.Api.Core
         public void Init(NameValueCollection appSettings)
         {
             Config = new ApiConfig();
-            Config.Maintainance = bool.Parse(appSettings["maintainance"]);
+            Config.Maintenance = bool.Parse(appSettings["maintenance"]);
             Config.AuthTicketDuration = int.Parse(appSettings["authTicketDuration"]);
             Config.Regkey = appSettings["regkey"];
             Config.Secret = appSettings["secret"];

@@ -47,7 +47,7 @@ namespace FSO.Server.Api.Core.Controllers
             user.username = user.username ?? "";
             user.username = user.username.ToLowerInvariant();
             user.email = user.email ?? "";
-            //user.key = user.key ?? "";
+            user.key = user.key ?? "";
 
             string failReason = null;
             if (user.username.Length < 3) failReason = "user_short";
@@ -73,7 +73,6 @@ namespace FSO.Server.Api.Core.Controllers
                 });
             }
 
-            /*
             if (!string.IsNullOrEmpty(api.Config.Regkey) && api.Config.Regkey != user.key)
             {
                 return ApiResponse.Json(HttpStatusCode.OK, new RegistrationError()
@@ -82,7 +81,6 @@ namespace FSO.Server.Api.Core.Controllers
                     error_description = failReason
                 });
             }
-            */
 
             using (var da = api.DAFactory.Get())
             {
@@ -132,8 +130,8 @@ namespace FSO.Server.Api.Core.Controllers
         /// <param name="email"></param>
         /// <returns></returns>
         [HttpPost]
-        [Route("userapi/registration/request")]
-        public IActionResult CreateToken(ConfirmationCreateTokenModel model)
+        [Route("request")]
+        public IActionResult CreateToken([FromForm] ConfirmationCreateTokenModel model)
         {
             Api api = Api.INSTANCE;
 
@@ -230,8 +228,8 @@ namespace FSO.Server.Api.Core.Controllers
         /// <param name="user"></param>
         /// <returns></returns>
         [HttpPost]
-        [Route("userapi/registration/confirm")]
-        public IActionResult CreateUserWithToken(RegistrationUseTokenModel user)
+        [Route("confirm")]
+        public IActionResult CreateUserWithToken([FromForm] RegistrationUseTokenModel user)
         {
             Api api = Api.INSTANCE;
 
@@ -261,7 +259,6 @@ namespace FSO.Server.Api.Core.Controllers
 
                 user.username = user.username ?? "";
                 user.username = user.username.ToLowerInvariant();
-                user.email = user.email ?? "";
                 user.key = user.key ?? "";
 
                 string failReason = null;
@@ -272,7 +269,7 @@ namespace FSO.Server.Api.Core.Controllers
 
                 try
                 {
-                    var addr = new System.Net.Mail.MailAddress(user.email);
+                    var addr = new System.Net.Mail.MailAddress(confirmation.email);
                 }
                 catch
                 {
@@ -321,7 +318,7 @@ namespace FSO.Server.Api.Core.Controllers
                 }
 
                 //create user in db
-                var userModel = api.CreateUser(user.username, user.email, user.password, ip);
+                var userModel = api.CreateUser(user.username, confirmation.email, user.password, ip);
 
                 if (userModel == null)
                 {
@@ -334,214 +331,10 @@ namespace FSO.Server.Api.Core.Controllers
                 else
                 {
                     //send OK email
-                    api.SendEmailConfirmationOKMail(user.username, user.email);
+                    api.SendEmailConfirmationOKMail(user.username, confirmation.email);
                     da.EmailConfirmations.Remove(user.token);
                     return ApiResponse.Json(HttpStatusCode.OK, userModel);
                 }
-            }
-        }
-
-        #endregion
-
-        #region Password reset
-        [HttpPost]
-        [Route("userapi/password")]
-        public IActionResult ChangePassword(PasswordResetModel model)
-        {
-            Api api = Api.INSTANCE;
-
-            if (api.Config.SmtpEnabled)
-            {
-                return ApiResponse.Json(HttpStatusCode.OK, new RegistrationError()
-                {
-                    error = "password_reset_failed",
-                    error_description = "missing_confirmation_token"
-                });
-            }
-
-            // No empty fields
-            if (model.username==null||model.new_password==null||model.old_password==null)
-            {
-                return ApiResponse.Json(HttpStatusCode.OK, new RegistrationError()
-                {
-                    error = "password_reset_failed",
-                    error_description = "missing_fields"
-                });
-            }
-
-            using (var da = api.DAFactory.Get())
-            {
-                var user = da.Users.GetByUsername(model.username);
-
-                if(user==null)
-                {
-                    return ApiResponse.Json(HttpStatusCode.OK, new RegistrationError()
-                    {
-                        error = "password_reset_failed",
-                        error_description = "user_invalid"
-                    });
-                }
-
-                var authSettings = da.Users.GetAuthenticationSettings(user.user_id);
-                var correct = PasswordHasher.Verify(model.old_password, new PasswordHash
-                {
-                    data = authSettings.data,
-                    scheme = authSettings.scheme_class
-                });
-
-                if (!correct)
-                {
-                    return ApiResponse.Json(HttpStatusCode.OK, new RegistrationError()
-                    {
-                        error = "password_reset_failed",
-                        error_description = "incorrect_password"
-                    });
-                }
-
-                api.ChangePassword(user.user_id, model.new_password);
-                api.SendPasswordResetOKMail(user.email, user.username);
-
-                return ApiResponse.Json(HttpStatusCode.OK, new
-                {
-                    status = "success"
-                });
-            }
-        }
-
-        /// <summary>
-        /// Resets a user's password using a confirmation token.
-        /// </summary>
-        /// <param name="model"></param>
-        /// <returns></returns>
-        [HttpPost]
-        [Route("userapi/password/confirm")]
-        public IActionResult ConfirmPwd(PasswordResetUseTokenModel model)
-        {
-            Api api = Api.INSTANCE;
-
-            if(model.token==null||model.new_password==null)
-            {
-                return ApiResponse.Json(HttpStatusCode.OK, new RegistrationError()
-                {
-                    error = "password_reset_failed",
-                    error_description = "missing_fields"
-                });
-            }
-
-            using (var da = api.DAFactory.Get())
-            {
-                EmailConfirmation confirmation = da.EmailConfirmations.GetByToken(model.token);
-
-                if(confirmation==null)
-                {
-                    return ApiResponse.Json(HttpStatusCode.OK, new RegistrationError()
-                    {
-                        error = "password_reset_failed",
-                        error_description = "invalid_token"
-                    });
-                }
-
-                var user = da.Users.GetByEmail(confirmation.email);
-
-                api.ChangePassword(user.user_id, model.new_password);
-                api.SendPasswordResetOKMail(user.email, user.username);
-                da.EmailConfirmations.Remove(model.token);
-
-                return ApiResponse.Json(HttpStatusCode.OK, new
-                {
-                    status = "success"
-                });
-            }
-        }
-
-        /// <summary>
-        /// Creates a password reset token and mails it to the user.
-        /// </summary>
-        /// <param name="model"></param>
-        /// <returns></returns>
-        [HttpPost]
-        [Route("userapi/password/request")]
-        public IActionResult CreatePwdToken(ConfirmationCreateTokenModel model)
-        {  
-            Api api = Api.INSTANCE;
-
-            if (model.confirmation_url == null || model.email == null)
-            {
-                return ApiResponse.Json(HttpStatusCode.OK, new RegistrationError()
-                {
-                    error = "password_reset_failed",
-                    error_description = "missing_fields"
-                });
-            }
-
-            // verify email syntax
-            // To do: check if email address is disposable.
-            try
-            {
-                var addr = new System.Net.Mail.MailAddress(model.email);
-            }
-            catch
-            {
-                return ApiResponse.Json(HttpStatusCode.OK, new RegistrationError()
-                {
-                    error = "password_reset_failed",
-                    error_description = "email_invalid"
-                });
-            }
-
-            using (var da = api.DAFactory.Get())
-            {
-
-                var user = da.Users.GetByEmail(model.email);
-
-                if(user==null)
-                {
-                    return ApiResponse.Json(HttpStatusCode.OK, new RegistrationError()
-                    {
-                        error = "password_reset_failed",
-                        error_description = "email_invalid"
-                    });
-                }
-
-                EmailConfirmation confirm = da.EmailConfirmations.GetByEmail(model.email, ConfirmationType.password);
-
-                // already awaiting a confirmation
-                // to-do: resend?
-                if (confirm != null)
-                {
-                    return ApiResponse.Json(HttpStatusCode.OK, new RegistrationError()
-                    {
-                        error = "registration_failed",
-                        error_description = "confirmation_pending"
-                    });
-                }
-
-                uint expires = Epoch.Now + EMAIL_CONFIRMATION_EXPIRE;
-
-                // create new email confirmation
-                string token = da.EmailConfirmations.Create(new EmailConfirmation
-                {
-                    type = ConfirmationType.password,
-                    email = model.email,
-                    expires = expires
-                });
-
-                // send confirmation email with generated token
-                bool sent = api.SendPasswordResetMail(model.email, user.username, token, model.confirmation_url, expires);
-
-                if (sent)
-                {
-                    return ApiResponse.Json(HttpStatusCode.OK, new
-                    {
-                        status = "success"
-                    });
-                }
-
-                return ApiResponse.Json(HttpStatusCode.OK, new
-                {
-                    // success but email shitfaced
-                    status = "email_failed"
-                });
             }
         }
 
@@ -560,6 +353,7 @@ namespace FSO.Server.Api.Core.Controllers
         public string username { get; set; }
         public string email { get; set; }
         public string password { get; set; }
+        public string key { get; set; }
     }
 
     /// <summary>
@@ -575,23 +369,12 @@ namespace FSO.Server.Api.Core.Controllers
         public string confirmation_url { get; set; }
     }
 
-    public class PasswordResetModel
-    {
-        public string username { get; set; }
-        public string old_password { get; set; }
-        public string new_password { get; set; }
-    }
-
     /// <summary>
     /// Expected request data when trying to register with a token.
     /// </summary>
     public class RegistrationUseTokenModel
     {
         public string username { get; set; }
-        /// <summary>
-        /// User email.
-        /// </summary>
-        public string email { get; set; }
         /// <summary>
         /// User password.
         /// </summary>
@@ -604,12 +387,6 @@ namespace FSO.Server.Api.Core.Controllers
         /// The unique GUID.
         /// </summary>
         public string token { get; set; }
-    }
-
-    public class PasswordResetUseTokenModel
-    {
-        public string token { get; set; }
-        public string new_password { get; set; }
     }
 
     #endregion

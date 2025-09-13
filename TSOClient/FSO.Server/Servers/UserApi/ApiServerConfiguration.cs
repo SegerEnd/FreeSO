@@ -14,11 +14,6 @@ namespace FSO.Server.Servers.UserApi
         /// Hostname bindings
         /// </summary>
         public List<string> Bindings { get; set; }
-
-        /// <summary>
-        /// Indicates which routes to register on the api
-        /// </summary>
-        public List<ApiServerControllers> Controllers { get; set; }
         
         /// <summary>
         /// How long an auth ticket is valid for
@@ -33,7 +28,7 @@ namespace FSO.Server.Servers.UserApi
         /// <summary>
         /// If true, only authentication from moderators and admins will be accepted
         /// </summary>
-        public bool Maintainance { get; set; }
+        public bool Maintenance { get; set; }
         public string UpdateUrl { get; set; }
         public string CDNUrl { get; set; }
 
@@ -41,11 +36,11 @@ namespace FSO.Server.Servers.UserApi
         public int SmtpPort { get; set; }
         public string SmtpPassword { get; set; }
         public string SmtpUser { get; set; }
-        public bool ForceEmailConfirmation { get; set; }
         public bool UseProxy { get; set; } = true;
 
         public AWSConfig AwsConfig { get; set; }
         public GithubConfig GithubConfig { get; set; }
+        public FilesystemConfig FilesystemConfig { get; set; }
     }
 
     public enum ApiServerControllers

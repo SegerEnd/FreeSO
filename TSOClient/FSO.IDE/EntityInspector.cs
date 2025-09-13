@@ -35,6 +35,8 @@ namespace FSO.IDE
                 return;
             }
             Content.Content.Get().Changes.Invoke((Action<List<InspectorEntityMeta>>)GetEntityList, EntityList);
+
+            EntityView.BeginUpdate();
             EntityView.Items.Clear();
 
             foreach (var ent in EntityList)
@@ -47,6 +49,7 @@ namespace FSO.IDE
                 ItemToEnt.Add(item, ent);
             }
 
+            EntityView.EndUpdate();
         }
 
         public void GetEntityList(List<InspectorEntityMeta> list)
@@ -59,7 +62,7 @@ namespace FSO.IDE
                     Entity = entity,
                     ID = entity.ObjectID,
                     Name = entity.ToString(),
-                    MultitileLead = entity.MultitileGroup.BaseObject.ObjectID,
+                    MultitileLead = entity.MultitileGroup.BaseObject?.ObjectID ?? 0,
                     Container = (entity.Container == null) ? (short)0 : entity.Container.ObjectID,
                     Slot = entity.ContainerSlot
                 });
