@@ -9,7 +9,6 @@ namespace FSO.Client.UI.Framework
     public static class Matrix2D
     {
         public static float[] IDENTITY = new float[6] { 1, 0, 0, 1, 0, 0 };
-        public static float[] DEFAULT_SCALE = new float[2] { 1, 1 };
 
         public static float[] Invert(this float[] M)
         {
@@ -98,8 +97,5 @@ namespace FSO.Client.UI.Framework
         {
             return new float[6] { M[0], M[1], M[2], M[3], M[4], M[5] };
         }
-
-
-
     }
 }

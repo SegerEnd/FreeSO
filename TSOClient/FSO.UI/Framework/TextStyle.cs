@@ -3,7 +3,9 @@ using Microsoft.Xna.Framework.Graphics;
 using FSO.Client.UI.Framework.Parser;
 using Microsoft.Xna.Framework;
 using FSO.Client.UI.Model;
+using FSO.Common;
 using FSO.UI.Framework;
+using FSO.UI;
 
 namespace FSO.Client.UI.Framework
 {
@@ -115,8 +117,13 @@ namespace FSO.Client.UI.Framework
                 m_pxSize = value;
 
 
+                // Replace the line with the error
+                System.Diagnostics.Debug.WriteLine("This is vfont: " + VFont);
+                System.Diagnostics.Debug.WriteLine(Font);
+
                 if (VFont != null)
                 {
+                    System.Diagnostics.Debug.WriteLine("VFont is not null");
                     Scale = (m_pxSize * VFont.VectorScale) / 11.5f;
                     BaselineOffset = m_pxSize + 5;
                 }

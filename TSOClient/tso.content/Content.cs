@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using FSO.Files.FAR3;
 using Microsoft.Xna.Framework.Graphics;
@@ -37,11 +38,11 @@ namespace FSO.Content
             INSTANCE = new Content(basepath, ContentMode.CLIENT, device, true);
         }
 
-        public static void Init(string basepath, ContentMode mode)
-        {
-            if (INSTANCE != null) return;
-            INSTANCE = new Content(basepath, mode, null, true);
-        }
+        //public static void Init(string basepath, ContentMode mode)
+        //{
+        //    if (INSTANCE != null) return;
+        //    INSTANCE = new Content(basepath, mode, null, true);
+        //}
 
         public static void InitBasic(string basepath, GraphicsDevice device)
         {
@@ -201,7 +202,7 @@ namespace FSO.Content
         private void InitBasic()
         {
             var contentFiles = new List<string>();
-            _ScanFiles("Content/", contentFiles, "Content/");
+            _ScanFiles(FSOEnvironment.ContentDir, contentFiles, FSOEnvironment.ContentDir);
             ContentFiles = contentFiles.ToArray();
             CustomUI.Init();
             if (!TS1)
@@ -320,6 +321,7 @@ namespace FSO.Content
             var files = Directory.GetFiles(fullPath);
             foreach (var file in files)
             {
+                Debug.WriteLine(baseDir + file.Substring(baseDir.Length));
                 fileList.Add(file.Substring(baseDir.Length));
             }
 

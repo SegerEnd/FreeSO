@@ -964,9 +964,6 @@ namespace FSO.Client.UI.Framework
                         origin, _Scale * scale, _SpriteEffects, 0.0f);
         }
 
-        protected SpriteEffects SprEffects = SpriteEffects.None;
-
-
         public void DrawTiledTexture(SpriteBatch batch, Texture2D texture, Rectangle dest, Color blend)
         {
             //if (!m_IsInvalidated)

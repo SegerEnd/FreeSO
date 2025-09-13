@@ -122,7 +122,6 @@ namespace FSO.Client.UI.Panels
             Background.BlockInput();
             Size = new Vector2(Background.Width, Background.Height); //for caching
 
-
             BackgroundMatchmaker = new UIImage(BackgroundMatchmakerImage);
             BackgroundMatchmaker.Y = 81;
             this.AddAt(0, BackgroundMatchmaker);
@@ -181,8 +180,8 @@ namespace FSO.Client.UI.Panels
             temp.CaptionStyle = temp.CaptionStyle.Clone();
             temp.CaptionStyle.Size = 7;
             temp.CaptionStyle.Shadow = true;
-            Add(temp);
             FloorNumLabel = temp;
+            this.Add(FloorNumLabel);
 
             SetInLot(false);
             SetMode(UCPMode.CityMode);

@@ -29,11 +29,10 @@ namespace FSO.Client.UI
         private SpriteFont m_SprFontSmall;
 
         //For displaying 3D objects (sims).
-        private Matrix m_WorldMatrix, m_ViewMatrix, m_ProjectionMatrix;
         private Dictionary<int, string> m_TextDict;
 
         //for fps counter
-        private Stopwatch fpsStopwatch;
+        //private Stopwatch fpsStopwatch;
 
         /// <summary>
         /// Top most UI container
@@ -47,53 +46,14 @@ namespace FSO.Client.UI
         /** Animation utility **/
         public UITween Tween;
 
-        public Microsoft.Xna.Framework.Game GameComponent
-        {
-            get { return m_G; }
-        }
+        //public Microsoft.Xna.Framework.Game GameComponent
+        //{
+        //    get { return m_G; }
+        //}
 
         public UIContainer Root
         {
             get { return mainUI; }
-        }
-
-        /// <summary>
-        /// A worldmatrix, used to display 3D objects (sims).
-        /// Initialized in the ScreenManager's constructor.
-        /// </summary>
-        public Matrix WorldMatrix
-        {
-            get { return m_WorldMatrix; }
-            set { m_WorldMatrix = value; }
-        }
-
-        /// <summary>
-        /// A viewmatrix, used to display 3D objects (sims).
-        /// Initialized in the ScreenManager's constructor.
-        /// </summary>
-        public Matrix ViewMatrix
-        {
-            get { return m_ViewMatrix; }
-            set { m_WorldMatrix = value; }
-        }
-
-        /// <summary>
-        /// A projectionmatrix, used to display 3D objects (sims).
-        /// Initialized in the ScreenManager's constructor.
-        /// </summary>
-        public Matrix ProjectionMatrix
-        {
-            get { return m_ProjectionMatrix; }
-            set { m_ProjectionMatrix = value; }
-        }
-
-        /// <summary>
-        /// The graphicsdevice that is part of the game instance.
-        /// Used when calling XNA's graphic functions.
-        /// </summary>
-        public GraphicsDevice GraphicsDevice
-        {
-            get { return m_G.GraphicsDevice; }
         }
 
         /// <summary>
@@ -119,17 +79,10 @@ namespace FSO.Client.UI
 
         public UILayer(Microsoft.Xna.Framework.Game G)
         {
-            fpsStopwatch = new Stopwatch();
-            fpsStopwatch.Start();
+            //fpsStopwatch = new Stopwatch();
+            //fpsStopwatch.Start();
 
             m_G = G;
-
-            m_WorldMatrix = Matrix.Identity;
-            m_ViewMatrix = Matrix.CreateLookAt(Vector3.Right * 5, Vector3.Zero, Vector3.Forward);
-            m_ProjectionMatrix = Matrix.CreatePerspectiveFieldOfView(MathHelper.Pi / 4.0f,
-                    (float)GraphicsDevice.PresentationParameters.BackBufferWidth / 
-                    (float)GraphicsDevice.PresentationParameters.BackBufferHeight,
-                    1.0f, 100.0f);
 
             TextStyle.DefaultTitle = new TextStyle {
                 Font = GameFacade.MainFont,
@@ -170,7 +123,7 @@ namespace FSO.Client.UI
             mainUI.Add(dialogContainer);
 
             // Create a new SpriteBatch, which can be used to draw textures.
-            SpriteBatch = new UISpriteBatch(GraphicsDevice, 0);
+            SpriteBatch = new UISpriteBatch(m_G.GraphicsDevice, 0);
             //GameFacade.OnContentLoaderReady += new BasicEventHandler(GameFacade_OnContentLoaderReady);
             m_G.GraphicsDevice.DeviceReset += new EventHandler<EventArgs>(GraphicsDevice_DeviceReset);
         }

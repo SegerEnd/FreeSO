@@ -82,9 +82,9 @@ namespace FSO.Client
             newChange = true;
             var width = Math.Max(1, Window.ClientBounds.Width);
             var height = Math.Max(1, Window.ClientBounds.Height);
-            Graphics.PreferredBackBufferWidth = width;
-            Graphics.PreferredBackBufferHeight = height;
-            Graphics.ApplyChanges();
+            //Graphics.PreferredBackBufferWidth = width;
+            //Graphics.PreferredBackBufferHeight = height;
+            //Graphics.ApplyChanges();
 
             GlobalSettings.Default.GraphicsWidth = width;
             GlobalSettings.Default.GraphicsHeight = height;

@@ -156,7 +156,7 @@ namespace FSO.Client.UI.Panels.Neighborhoods
             DrawLocalTexture(batch, texture, from, to/_Scale-pos, scale/_Scale, blend);
         }
 
-        public void DrawGlobalString(SpriteBatch batch, string text, Vector2 to, TextStyle style, Rectangle bounds, TextAlignment align)
+        public void DrawGlobalString(UISpriteBatch batch, string text, Vector2 to, TextStyle style, Rectangle bounds, TextAlignment align)
         {
             var scale = new Vector2(_ScaleX, _ScaleY);
             _ScaleX = 1 / Parent.Scale.X;

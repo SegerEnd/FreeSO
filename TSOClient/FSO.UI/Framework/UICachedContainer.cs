@@ -44,6 +44,7 @@ namespace FSO.Client.UI.Framework
                 if (Target == null || (int)size.X != Target.Width || (int)size.Y != Target.Height)
                 {
                     Target?.Dispose();
+
                     Target = new RenderTarget2D(gd, (int)size.X, (int)size.Y, UseMip, SurfaceFormat.Color, (UseZ)?DepthFormat.Depth24:DepthFormat.None, (UseMultisample && !FSOEnvironment.DirectX)?4:0, RenderTargetUsage.PreserveContents);
                 }
 
@@ -84,6 +85,15 @@ namespace FSO.Client.UI.Framework
                 if (!InternalBefore) InternalDraw(batch);
                 batch.BatchMatrixStack.Pop();
                 batch.End();
+
+                // save the target as png for debugging
+                // make a stream to save the image
+                using (System.IO.Stream stream = System.IO.File.OpenWrite("newly_seger_example" + GetHashCode() + ".png"))
+                {
+                    // save the render target to the stream
+                    Target.SaveAsPng(stream, Target.Width, Target.Height);
+                }
+
                 gd.SetRenderTarget(null);
                 Invalidated = false;
             }

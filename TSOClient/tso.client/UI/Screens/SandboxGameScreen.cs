@@ -35,7 +35,7 @@ namespace FSO.Client.UI.Screens
         public UIUCP ucp;
         public UIGameTitle Title;
 
-        public UIContainer WindowContainer;
+        //public UIContainer WindowContainer;
         public FSOSandboxServer SandServer;
         public FSOSandboxClient SandCli;
         public UISandboxSelector SandSelect;
@@ -172,8 +172,8 @@ namespace FSO.Client.UI.Screens
             Title.SetTitle("");
             this.Add(Title);
 
-            WindowContainer = new UIContainer();
-            Add(WindowContainer);
+            //WindowContainer = new UIContainer();
+            //Add(WindowContainer);
 
             if (Content.Content.Get().TS1)
             {
@@ -302,7 +302,7 @@ namespace FSO.Client.UI.Screens
             if (World != null)
             {
                 //stub smooth zoom?
-                if (state.NewKeys.Contains(Keys.F11))
+                if (state.NewKeys.Contains(Keys.F11) && !state.PreviousKeyboardState.IsKeyDown(Keys.F11))
                 {
                     //render lot thumbnail test
                     var thumb = World.GetLotThumb(GameFacade.GraphicsDevice, null);

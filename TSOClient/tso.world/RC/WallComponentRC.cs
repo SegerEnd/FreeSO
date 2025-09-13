@@ -10,7 +10,7 @@ using System.Collections.Generic;
 namespace FSO.LotView.RC
 {
     /// <summary>
-    /// This component allows FreeSO to draw walls in 3D. 
+    /// This render component (RC) allows FreeSO to draw walls in 3D. 
     /// This is not enabled in 2D mode due to it misrepresenting certain wall directions.
     /// 
     /// Basically, wall geometry is generated as if the wall were thick around the tile edge. 

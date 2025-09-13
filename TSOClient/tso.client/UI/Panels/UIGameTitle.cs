@@ -38,11 +38,12 @@ namespace FSO.Client.UI.Panels
 
             CancelButton = new UIButton(btnTex);
             CancelButton.Caption = GameFacade.Strings.GetString("f115", "48");
+            //CancelButton.Caption = "Hoi Cancel Button";
             CancelButton.CaptionStyle = btnCaption;
             CancelButton.OnButtonClick += CancelOverride;
             CancelButton.Width = 64;
             CancelButton.Y = 2;
-            Add(CancelButton);
+            this.Add(CancelButton);
 
             SetTitle("Not Blazing Falls");
         }

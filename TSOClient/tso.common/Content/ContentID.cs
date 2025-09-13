@@ -34,6 +34,7 @@
             this.FileID = (uint)(v >> 32);
         }
 
+
         public ulong Shift()
         {
             var fileIDLong = ((ulong)FileID) << 32;
