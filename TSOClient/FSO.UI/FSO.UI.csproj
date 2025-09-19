@@ -34,6 +34,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\tso.common\FSO.Common.csproj" />
+    <ProjectReference Include="..\tso.files\FSO.Files.csproj" />
   </ItemGroup>
 
 </Project>
