@@ -3,6 +3,6 @@
     public class JWTConfiguration
     {
         public byte[] Key;
-        public int TokenDuration = 3600; // seconds
+        public int TokenDuration = 3600;
     }
 }

@@ -1,6 +1,5 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using FSO.Server.Common;
 using Newtonsoft.Json;
-using System.IdentityModel.Tokens.Jwt;
 
 namespace FSO.Server.Servers.Api.JsonWebToken
 {
@@ -21,63 +20,28 @@ namespace FSO.Server.Servers.Api.JsonWebToken
 
         public JWTUser DecodeToken(string token)
         {
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Config.Key;
-
-            var validationParameters = new TokenValidationParameters
-            {
-                ValidateIssuer = false,
-                ValidateAudience = false,
-                ValidateLifetime = true,
-                ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(key)
-            };
-
-            try
-            {
-                var principal = tokenHandler.ValidateToken(token, validationParameters, out SecurityToken validatedToken);
-                var jwtToken = validatedToken as JwtSecurityToken;
-
-                if (jwtToken == null)
-                    return null;
-
-                var dataClaim = jwtToken.Payload["data"]?.ToString();
-                if (dataClaim == null)
-                    return null;
-
-                return JsonConvert.DeserializeObject<JWTUser>(dataClaim);
-            }
-            catch
-            {
-                return null; // token invalid or expired
-            }
+            var payload = JWT.JsonWebToken.Decode(token, Config.Key, true);
+            Dictionary<string, string> payloadParsed = JsonConvert.DeserializeObject<Dictionary<string, string>>(payload);
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<JWTUser>(payloadParsed["data"]);
         }
 
         public JWTInstance CreateToken(JWTUser data)
         {
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Config.Key;
+            var tokenData = Newtonsoft.Json.JsonConvert.SerializeObject(data);
+            return CreateToken(tokenData, Config.TokenDuration);
+        }
 
-            var tokenData = JsonConvert.SerializeObject(data);
-
-            var tokenDescriptor = new SecurityTokenDescriptor
+        private JWTInstance CreateToken(string data, int expiresIn)
+        {
+            var expires = Epoch.Now + expiresIn;
+            var payload = new Dictionary<string, object>()
             {
-                Expires = DateTime.UtcNow.AddSeconds(Config.TokenDuration),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha384Signature),
-                Claims = new Dictionary<string, object>
-                {
-                    { "data", tokenData }
-                }
+                { "exp", expires },
+                { "data", data }
             };
 
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            var tokenString = tokenHandler.WriteToken(token);
-
-            return new JWTInstance
-            {
-                Token = tokenString,
-                ExpiresIn = Config.TokenDuration
-            };
+            var token = JWT.JsonWebToken.Encode(payload, Config.Key, JWT.JwtHashAlgorithm.HS384);
+            return new JWTInstance { Token = token, ExpiresIn = expiresIn };
         }
     }
 }
