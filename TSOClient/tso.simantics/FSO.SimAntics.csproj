@@ -20,12 +20,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="FreeSO.HandEvaluator" Version="1.2.0" />
     <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.4" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\tso.files\FSO.Files.csproj" />
     <ProjectReference Include="..\tso.sound\FSO.HIT.csproj" />
+    <ProjectReference Include="..\tso.world\FSO.LotView.csproj" />
   </ItemGroup>
 
 </Project>
