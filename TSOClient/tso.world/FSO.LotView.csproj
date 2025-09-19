@@ -28,6 +28,7 @@
     <ProjectReference Include="..\tso.content\FSO.Content.csproj" />
     <ProjectReference Include="..\tso.files\FSO.Files.csproj" />
     <ProjectReference Include="..\tso.sound\FSO.HIT.csproj" />
+    <ProjectReference Include="..\tso.vitaboy.engine\FSO.Vitaboy.Engine.csproj" />
     <ProjectReference Include="..\tso.vitaboy.model\FSO.Vitaboy.csproj" />
   </ItemGroup>
 
