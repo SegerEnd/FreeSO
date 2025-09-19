@@ -1,11 +1,22 @@
-﻿using FSO.Server.Common;
-using Nancy;
-using Nancy.Bootstrapper;
-using Nancy.Bootstrappers.Ninject;
-using Nancy.Configuration;
-using Nancy.Hosting.Self;
+﻿using FSO.Server.Servers.Api.Controllers;
 using Ninject;
+using Ninject.Parameters;
 using NLog;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Security.Cryptography.X509Certificates;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+
+using Nancy.Hosting.Self;
+using Nancy.Bootstrappers.Ninject;
+using Nancy.Bootstrapper;
+using Nancy;
+using FSO.Server.Common;
+using FSO.Server.Protocol.Gluon.Model;
 
 namespace FSO.Server.Servers.Api
 {
@@ -17,6 +28,8 @@ namespace FSO.Server.Servers.Api
         private IKernel Kernel;
         private NancyHost Nancy;
 
+        //TODO: connect to shards to do these? right now this assumes the API server is on the same server as all shards.
+        //would mean we could move these out of this class too.
         public event APIRequestShutdownDelegate OnRequestShutdown;
         public event APIBroadcastMessageDelegate OnBroadcastMessage;
 
@@ -25,8 +38,8 @@ namespace FSO.Server.Servers.Api
 
         public ApiServer(ApiServerConfiguration config, IKernel kernel)
         {
-            Config = config;
-            Kernel = kernel;
+            this.Config = config;
+            this.Kernel = kernel;
 
             Kernel.Bind<ApiServer>().ToConstant(this);
             Kernel.Bind<ApiServerConfiguration>().ToConstant(config);
@@ -36,14 +49,14 @@ namespace FSO.Server.Servers.Api
         {
             LOG.Info("Starting API server");
 
-            var configuration = new HostConfiguration
-            {
-                UrlReservations = { CreateAutomatically = true }
-            };
-
+            var configuration = new HostConfiguration();
+            configuration.UrlReservations.CreateAutomatically = true;
             var uris = new List<Uri>();
-            foreach (var path in Config.Bindings)
+
+            foreach(var path in Config.Bindings)
+            {
                 uris.Add(new Uri(path));
+            }
 
             Nancy = new NancyHost(new CustomNancyBootstrap(Kernel), configuration, uris.ToArray());
             Nancy.Start();
@@ -51,7 +64,10 @@ namespace FSO.Server.Servers.Api
 
         public override void Shutdown()
         {
-            Nancy?.Stop();
+            if(Nancy != null)
+            {
+                Nancy.Stop();
+            }
         }
 
         public void RequestShutdown(uint time, ShutdownType type)
@@ -64,19 +80,20 @@ namespace FSO.Server.Servers.Api
             OnBroadcastMessage?.Invoke(sender, title, message);
         }
 
-        public override void AttachDebugger(IServerDebugger debugger) { }
+        public override void AttachDebugger(IServerDebugger debugger)
+        {
+        }
     }
+
 
     class CustomNancyBootstrap : NinjectNancyBootstrapper
     {
-        private readonly IKernel Kernel;
+        private IKernel Kernel;
 
         public CustomNancyBootstrap(IKernel kernel)
         {
-            Kernel = kernel;
+            this.Kernel = kernel;
         }
-
-        protected override IKernel GetApplicationContainer() => Kernel;
 
         protected override void ApplicationStartup(IKernel container, IPipelines pipelines)
         {
@@ -90,20 +107,9 @@ namespace FSO.Server.Servers.Api
             );
         }
 
-        protected override void RegisterNancyEnvironment(IKernel container, INancyEnvironment environment)
+        protected override IKernel GetApplicationContainer()
         {
-        }
-
-        public override INancyEnvironment GetEnvironment()
-        {
-            return new DefaultNancyEnvironment();
-        }
-
-        protected override INancyEnvironmentConfigurator GetEnvironmentConfigurator()
-        {
-            var factory = new DefaultNancyEnvironmentFactory();
-            var providers = new INancyDefaultConfigurationProvider[0]; // empty array if no custom providers
-            return new DefaultNancyEnvironmentConfigurator(factory, providers);
+            return this.Kernel;
         }
     }
 }

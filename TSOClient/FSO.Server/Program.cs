@@ -1,9 +1,9 @@
-﻿using CommandLine;
-using CommandLine.Text;
-using FSO.Server.Database;
+﻿using FSO.Server.Database;
 using FSO.Server.DataService;
 using FSO.Server.Utils;
 using Ninject;
+using Ninject.Parameters;
+using System;
 
 namespace FSO.Server
 {
@@ -11,50 +11,62 @@ namespace FSO.Server
     {
         public static int Main(string[] args)
         {
-            if (args.Length == 0) args = new[] { "run" };
+            Type toolType = null;
+            object toolOptions = null;
 
-            int exitCode = Parser.Default.ParseArguments<
-                RunServerOptions,
-                DatabaseInitOptions,
-                ImportNhoodOptions,
-                RestoreLotsOptions,
-                SqliteImportOptions,
-                DataTrimOptions,
-                ArchiveConvertOptions,
-                ImportArchiveFeaturedOptions>(args)
-                .MapResult(
-                    (RunServerOptions opts) => RunTool<ToolRunServer>(opts),
-                    (DatabaseInitOptions opts) => RunTool<ToolInitDatabase>(opts),
-                    (ImportNhoodOptions opts) => RunTool<ToolImportNhood>(opts),
-                    (RestoreLotsOptions opts) => RunTool<ToolRestoreLots>(opts),
-                    (SqliteImportOptions opts) => RunTool<ToolSqliteImport>(opts),
-                    (DataTrimOptions opts) => RunTool<ToolDataTrim>(opts),
-                    (ArchiveConvertOptions opts) => RunTool<ToolArchiveConvert>(opts),
-                    (ImportArchiveFeaturedOptions opts) => RunTool<ToolImportArchiveFeatured>(opts),
-                    errs =>
+            string[] a2 = args;
+            if (args.Length == 0) a2 = new string[] { "run" };
+
+            var options = new ProgramOptions();
+            var switchIsValid = new CommandLine.Parser().ParseArguments(a2, options,
+                (verb, subOptions) =>
+                {
+                    switch (verb)
                     {
-                        // Here we explicitly pass the ParserResult type
-                        var parserResult = errs as ParserResult<object> ?? null;
-                        var helpText = HelpText.AutoBuild(
-                            parserResult,
-                            h =>
-                            {
-                                h.AdditionalNewLineAfterOption = false;
-                                h.Heading = "FSO.Server Command Line Options";
-                                return h;
-                            },
-                            e => e
-                        );
+                        case "run":
+                            toolType = typeof(ToolRunServer);
+                            toolOptions = subOptions;
+                            break;
+                        case "db-init":
+                            toolType = typeof(ToolInitDatabase);
+                            toolOptions = subOptions;
+                            break;
+                        case "import-nhood":
+                            toolType = typeof(ToolImportNhood);
+                            toolOptions = subOptions;
+                            break;
+                        case "restore-lots":
+                            toolType = typeof(ToolRestoreLots);
+                            toolOptions = subOptions;
+                            break;
+                        case "sqlite-import":
+                            toolType = typeof(ToolSqliteImport);
+                            toolOptions = subOptions;
+                            break;
+                        case "data-trim":
+                            toolType = typeof(ToolDataTrim);
+                            toolOptions = subOptions;
+                            break;
+                        case "archive-convert":
+                            toolType = typeof(ToolArchiveConvert);
+                            toolOptions = subOptions;
+                            break;
+                        case "import-archive-featured":
+                            toolType = typeof(ToolImportArchiveFeatured);
+                            toolOptions = subOptions;
+                            break;
+                        default:
+                            Console.Write(options.GetUsage(verb));
+                            break;
+                    }
+                }
+            );
 
-                        Console.WriteLine(helpText);
-                        return 1;
-                    });
+            if (!switchIsValid || toolType == null)
+            {
+                Environment.Exit(CommandLine.Parser.DefaultExitCodeFail);
+            }
 
-            return exitCode;
-        }
-
-        private static int RunTool<TTool>(object options) where TTool : ITool
-        {
             var kernel = new StandardKernel(
                 new ServerConfigurationModule(),
                 new DatabaseModule(),
@@ -62,8 +74,20 @@ namespace FSO.Server
                 new GluonHostPoolModule()
             );
 
-            var tool = (ITool)kernel.Get(typeof(TTool), new Ninject.Parameters.ConstructorArgument("options", options));
+            //If db init, allow @ variables in the query itself. We could always enable this but for added security
+            //we are conditionally adding it only for db migrations
+            if (toolType == typeof(ToolInitDatabase))
+            {
+                var config = kernel.Get<ServerConfiguration>();
+                if (!config.Database.ConnectionString.EndsWith(";")){
+                    config.Database.ConnectionString += ";";
+                }
+                config.Database.ConnectionString += "Allow User Variables=True";
+            }
+
+            var tool = (ITool)kernel.Get(toolType, new ConstructorArgument("options", toolOptions));
             return tool.Run();
+
         }
     }
 }

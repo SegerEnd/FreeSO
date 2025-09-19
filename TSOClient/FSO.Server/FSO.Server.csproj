@@ -27,11 +27,10 @@
   <ItemGroup>
     <PackageReference Include="CommandLineParser" Version="2.9.1" />
     <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.4" />
-    <PackageReference Include="Nancy" Version="2.0.0" />
-    <PackageReference Include="Nancy.Authentication.Stateless" Version="2.0.0" />
+    <PackageReference Include="Nancy" Version="1.4.5" />
     <PackageReference Include="Nancy.Authentication.Token" Version="1.4.1" />
     <PackageReference Include="Nancy.Bootstrappers.Ninject" Version="1.4.1" />
-    <PackageReference Include="Nancy.Hosting.Self" Version="2.0.0" />
+    <PackageReference Include="Nancy.Hosting.Self" Version="1.4.1" />
     <PackageReference Include="Ninject" Version="3.3.6" />
     <PackageReference Include="NLog" Version="6.0.4" />
     <PackageReference Include="SixLabors.ImageSharp" Version="3.1.11" />
