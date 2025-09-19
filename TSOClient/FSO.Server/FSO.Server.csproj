@@ -9,7 +9,12 @@
     <AssemblyName>server</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <IsAotCompatible>True</IsAotCompatible>
+    <ApplicationIcon>FreeSO.ico</ApplicationIcon>
   </PropertyGroup>
+  
+  <ItemGroup>
+    <Content Include="FreeSO.ico" />
+  </ItemGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <IsAotCompatible>True</IsAotCompatible>
