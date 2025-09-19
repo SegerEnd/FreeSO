@@ -24,6 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\tso.content\FSO.Content.csproj" />
     <ProjectReference Include="..\tso.files\FSO.Files.csproj" />
   </ItemGroup>
 
