@@ -1,19 +1,11 @@
-﻿using FSO.Server.Database.DA;
-using Nancy;
-using Nancy.Authentication.Stateless;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
-using Nancy.Authentication.Token;
-using Nancy.Security;
-using FSO.Server.Common;
-using FSO.Server.Servers.Api.JsonWebToken;
+﻿using FSO.Server.Common;
+using FSO.Server.Database.DA;
 using FSO.Server.Database.DA.Users;
-using FSO.Server.Database.DA.Utils;
+using FSO.Server.Servers.Api.JsonWebToken;
+using Nancy;
 using Nancy.ModelBinding;
+//using Nancy.Authentication.Stateless;
+using Nancy.Security;
 
 namespace FSO.Server.Servers.Api.Controllers
 {
@@ -71,10 +63,11 @@ namespace FSO.Server.Servers.Api.Controllers
                     var offset = this.Request.Query["offset"];
                     var limit = this.Request.Query["limit"];
 
-                    if(offset == null) { offset = 0; }
-                    if(limit == null) { limit = 20; }
+                    if (offset == null) { offset = 0; }
+                    if (limit == null) { limit = 20; }
 
-                    if(limit > 100){
+                    if (limit > 100)
+                    {
                         limit = 100;
                     }
 
@@ -89,7 +82,8 @@ namespace FSO.Server.Servers.Api.Controllers
                 this.DemandModerator();
                 var user = this.Bind<UserCreateModel>();
 
-                if (user.is_admin){
+                if (user.is_admin)
+                {
                     //I need admin claim to do this
                     this.DemandAdmin();
                 }
@@ -125,6 +119,6 @@ namespace FSO.Server.Servers.Api.Controllers
         public bool is_admin;
         public bool is_moderator;
     }
-    
+
 
 }
