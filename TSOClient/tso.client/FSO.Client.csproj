@@ -29,8 +29,19 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Other\libs\MSDFData\MSDFData.csproj" />
+    <ProjectReference Include="..\FSO.Common.DatabaseService\FSO.Common.DatabaseService.csproj" />
+    <ProjectReference Include="..\FSO.Common.Domain\FSO.Common.Domain.csproj" />
+    <ProjectReference Include="..\FSO.Server.Api.Core\FSO.Server.Api.Core.csproj" />
+    <ProjectReference Include="..\FSO.Server.Clients\FSO.Server.Clients.csproj" />
+    <ProjectReference Include="..\FSO.Server.Common\FSO.Server.Common.csproj" />
+    <ProjectReference Include="..\FSO.Server.Database\FSO.Server.Database.csproj" />
+    <ProjectReference Include="..\FSO.Server.DataService\FSO.Common.DataService.csproj" />
+    <ProjectReference Include="..\FSO.Server.Debug\FSO.Server.Debug.csproj" />
+    <ProjectReference Include="..\FSO.Server.Protocol\FSO.Server.Protocol.csproj" />
+    <ProjectReference Include="..\FSO.Server.Updater\FSO.Server.Watchdog.csproj" />
     <ProjectReference Include="..\FSO.UI\FSO.UI.csproj" />
     <ProjectReference Include="..\tso.common\FSO.Common.csproj" />
+    <ProjectReference Include="..\tso.content\FSO.Content.csproj" />
   </ItemGroup>
 
 </Project>
