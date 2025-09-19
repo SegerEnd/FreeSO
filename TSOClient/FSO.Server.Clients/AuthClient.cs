@@ -1,16 +1,16 @@
 ﻿using FSO.Server.Clients.Framework;
 using FSO.Server.Protocol.Authorization;
 using RestSharp;
-using System;
 
 namespace FSO.Server.Clients
 {
     public class AuthClient : AbstractHttpClient
     {
-        public AuthClient(string baseUrl) : base(baseUrl) {
+        public AuthClient(string baseUrl) : base(baseUrl)
+        {
         }
 
-        public AuthResult Authenticate(AuthRequest input)
+        public async Task<AuthResult> Authenticate(AuthRequest input)
         {
             var client = Client();
 
@@ -21,18 +21,17 @@ namespace FSO.Server.Clients
                             .AddQueryParameter("version", input.Version)
                             .AddQueryParameter("clientid", input.ClientID);
 
-            
-            var response = client.Execute(request);
-            var result = new AuthResult();
-            result.Valid = false;
+            var response = await client.ExecuteAsync(request);
+
+            var result = new AuthResult { Valid = false };
 
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
             {
-                var lines = response.Content.Split(new char[] { '\n' });
+                var lines = response.Content.Split('\n');
                 foreach (var line in lines)
                 {
                     var components = line.Trim().Split(new char[] { '=' }, 2);
-                    if (components.Length != 2) { continue; }
+                    if (components.Length != 2) continue;
 
                     switch (components[0])
                     {
@@ -53,7 +52,8 @@ namespace FSO.Server.Clients
                             break;
                     }
                 }
-            } else
+            }
+            else
             {
                 result.ReasonCode = "36 301";
             }

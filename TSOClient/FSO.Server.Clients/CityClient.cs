@@ -2,83 +2,73 @@
 using FSO.Server.Clients.Framework;
 using FSO.Server.Protocol.CitySelector;
 using RestSharp;
-using System;
-using System.Collections.Generic;
 
 namespace FSO.Server.Clients
 {
     public class CityClient : AbstractHttpClient
     {
-        public CityClient(string baseUrl) : base(baseUrl) {
-        }
+        public CityClient(string baseUrl) : base(baseUrl) { }
 
-        public ShardSelectorServletResponse ShardSelectorServlet(ShardSelectorServletRequest input)
+        public async Task<ShardSelectorServletResponse> ShardSelectorServletAsync(ShardSelectorServletRequest input)
         {
             var client = Client();
 
             var request = new RestRequest("cityselector/app/ShardSelectorServlet")
-                            .AddQueryParameter("shardName", input.ShardName)
-                            .AddQueryParameter("avatarId", input.AvatarID);
-            
-            var response = client.Execute(request);
-            if(response.StatusCode != System.Net.HttpStatusCode.OK){
+                .AddQueryParameter("shardName", input.ShardName)
+                .AddQueryParameter("avatarId", input.AvatarID.ToString());
+
+            var response = await client.ExecuteAsync(request);
+
+            if (response.StatusCode != System.Net.HttpStatusCode.OK)
                 throw new Exception("Unknown error during ShardSelectorServlet");
-            }
 
             return XMLUtils.Parse<ShardSelectorServletResponse>(response.Content);
         }
 
-
-        public InitialConnectServletResult InitialConnectServlet(InitialConnectServletRequest input)
+        public async Task<InitialConnectServletResult> InitialConnectServletAsync(InitialConnectServletRequest input)
         {
             var client = Client();
 
             var request = new RestRequest("cityselector/app/InitialConnectServlet")
-                            .AddQueryParameter("ticket", input.Ticket)
-                            .AddQueryParameter("version", input.Version);
+                .AddQueryParameter("ticket", input.Ticket)
+                .AddQueryParameter("version", input.Version);
 
-            var response = client.Execute(request);
+            var response = await client.ExecuteAsync(request);
+
             if (response.StatusCode != System.Net.HttpStatusCode.OK)
-            {
                 throw new Exception("Unknown error during InitialConnectServlet");
-            }
 
             return XMLUtils.Parse<InitialConnectServletResult>(response.Content);
         }
 
-        public List<AvatarData> AvatarDataServlet()
+        public async Task<List<AvatarData>> AvatarDataServletAsync()
         {
             var client = Client();
 
             var request = new RestRequest("cityselector/app/AvatarDataServlet");
 
-            var response = client.Execute(request);
+            var response = await client.ExecuteAsync(request);
+
             if (response.StatusCode != System.Net.HttpStatusCode.OK)
-            {
                 throw new Exception("Unknown error during AvatarDataServlet");
-            }
 
             var aotDummy = new XMLList<AvatarData>();
-            List<AvatarData> result = (List<AvatarData>)XMLUtils.Parse<XMLList<AvatarData>>(response.Content);
-            return result;
+            return (List<AvatarData>)XMLUtils.Parse<XMLList<AvatarData>>(response.Content);
         }
 
-
-        public List<ShardStatusItem> ShardStatus()
+        public async Task<List<ShardStatusItem>> ShardStatusAsync()
         {
             var client = Client();
 
             var request = new RestRequest("cityselector/shard-status.jsp");
 
-            var response = client.Execute(request);
+            var response = await client.ExecuteAsync(request);
+
             if (response.StatusCode != System.Net.HttpStatusCode.OK)
-            {
                 throw new Exception("Unknown error during ShardStatus");
-            }
 
             var aotDummy = new XMLList<ShardStatusItem>();
-            List<ShardStatusItem> result = (List<ShardStatusItem>)XMLUtils.Parse<XMLList<ShardStatusItem>>(response.Content);
-            return result;
+            return (List<ShardStatusItem>)XMLUtils.Parse<XMLList<ShardStatusItem>>(response.Content);
         }
     }
 }
