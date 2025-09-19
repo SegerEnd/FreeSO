@@ -1,9 +1,5 @@
-﻿using Mp3Sharp;
-using System;
-using System.Collections.Generic;
-using Microsoft.Xna.Framework.Audio;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using Microsoft.Xna.Framework.Audio;
+using MP3Sharp;
 
 namespace FSO.Common.Audio
 {
@@ -11,7 +7,7 @@ namespace FSO.Common.Audio
     {
         public static bool NewMode = true;
 
-        private Mp3Stream Stream;
+        private MP3Stream Stream;
         public DynamicSoundEffectInstance Inst;
         private int LastChunkSize = 1; //don't die immediately..
         private Thread DecoderThread;
@@ -51,7 +47,7 @@ namespace FSO.Common.Audio
 
         public void Start()
         {
-            Stream = new Mp3Stream(Path);
+            Stream = new MP3Stream(Path);
             Stream.DecodeFrames(1);
             var freq = Stream.Frequency;
             lock (ControlLock)
