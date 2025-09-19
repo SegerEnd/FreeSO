@@ -1,14 +1,8 @@
-﻿using Nancy;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Nancy.Security;
+﻿using FSO.Common.Utils;
 using FSO.Server.Database.DA.Utils;
-using FSO.Common.Utils;
+using Nancy;
+using Nancy.Security;
 using System.Xml;
-using FSO.Server.Servers.Api.JsonWebToken;
 
 namespace FSO.Server.Servers.Api
 {
@@ -17,14 +11,14 @@ namespace FSO.Server.Servers.Api
         public static void DemandModerator(this NancyModule controller)
         {
             controller.RequiresAuthentication();
-            var user = (JWTUserIdentity)controller.Context.CurrentUser;
+            var user = controller.Context.CurrentUser;
             user.Claims.Contains("moderator");
         }
 
         public static void DemandAdmin(this NancyModule controller)
         {
             controller.RequiresAuthentication();
-            var user = (JWTUserIdentity)controller.Context.CurrentUser;
+            var user = controller.Context.CurrentUser;
             user.Claims.Contains("admin");
         }
 

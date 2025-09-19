@@ -1,14 +1,7 @@
 ﻿using FSO.Server.Database.DA;
-using FSO.Server.Protocol.Gluon.Model;
 using FSO.Server.Servers.Api.JsonWebToken;
 using Nancy;
 using Nancy.ModelBinding;
-using Nancy.Security;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FSO.Server.Servers.Api.Controllers.Admin
 {
@@ -20,7 +13,7 @@ namespace FSO.Server.Servers.Api.Controllers.Admin
         public AdminShardOpController(IDAFactory daFactory, JWTFactory jwt, ApiServer server) : base("/admin/shards")
         {
             JWTTokenAuthentication.Enable(this, jwt);
-            
+
             this.DAFactory = daFactory;
             this.Server = server;
 
