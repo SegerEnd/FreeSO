@@ -1,15 +1,14 @@
-﻿using System;
-using System.Timers;
-using FSO.Client.UI.Controls;
+﻿using FSO.Client.UI.Controls;
 using FSO.Client.UI.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System.Timers;
 
 namespace FSO.Client.UI.Panels.EODs
 {
     public abstract class UIGameshowBuzzerEOD : UIEOD
     {
         //shared assets
-        private Timer InvalidateTimer;
+        private System.Timers.Timer InvalidateTimer;
         protected Texture2D PlayerScoreBackTexture = GetTexture(0x95500000001); // eod_buzzer_playerscoreback
         protected Texture2D PlayersVMPersonButtonBackTex = GetTexture(0x000002B300000001); // EOD_PizzaHeadPlaceholder1.bmp
         protected Texture2D Lightsframe1Tex;
@@ -112,10 +111,10 @@ namespace FSO.Client.UI.Panels.EODs
     internal class ContestantLightsFrame : UIContainer
     {
         private bool TexturesValid;
-        private UIImage Lights1 = new UIImage(); 
+        private UIImage Lights1 = new UIImage();
         private UIImage Lights2 = new UIImage();
         private UIImage LightsBack = new UIImage();
-        private UIImage LightsBlue = new UIImage(); 
+        private UIImage LightsBlue = new UIImage();
         private UIImage LightsRed = new UIImage();
         private System.Timers.Timer FlashTimer;
 

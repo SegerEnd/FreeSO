@@ -25,14 +25,38 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="CommandLineParser" Version="2.9.1" />
     <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.4" />
+    <PackageReference Include="Nancy" Version="2.0.0" />
+    <PackageReference Include="Nancy.Authentication.Stateless" Version="2.0.0" />
+    <PackageReference Include="Nancy.Authentication.Token" Version="1.4.1" />
+    <PackageReference Include="Nancy.Bootstrappers.Ninject" Version="1.4.1" />
+    <PackageReference Include="Nancy.Hosting.Self" Version="2.0.0" />
     <PackageReference Include="Ninject" Version="3.3.6" />
     <PackageReference Include="NLog" Version="6.0.4" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.11" />
+    <PackageReference Include="System.Diagnostics.PerformanceCounter" Version="9.0.9" />
+    <PackageReference Include="System.Runtime.Caching" Version="9.0.9" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\tso.client\FSO.Client.csproj" />
+    <ProjectReference Include="..\FSO.Common.DatabaseService\FSO.Common.DatabaseService.csproj" />
+    <ProjectReference Include="..\FSO.Server.Api.Core\FSO.Server.Api.Core.csproj" />
+    <ProjectReference Include="..\FSO.Server.Clients\FSO.Server.Clients.csproj" />
+    <ProjectReference Include="..\FSO.Server.Common\FSO.Server.Common.csproj" />
+    <ProjectReference Include="..\FSO.Server.Database\FSO.Server.Database.csproj" />
+    <ProjectReference Include="..\FSO.Server.DataService\FSO.Common.DataService.csproj" />
+    <ProjectReference Include="..\FSO.Server.Debug\FSO.Server.Debug.csproj" />
+    <ProjectReference Include="..\FSO.Server.Domain\FSO.Server.Domain.csproj" />
+    <ProjectReference Include="..\FSO.Server.Protocol\FSO.Server.Protocol.csproj" />
+    <ProjectReference Include="..\FSO.Server.Updater\FSO.Server.Watchdog.csproj" />
     <ProjectReference Include="..\tso.simantics\FSO.SimAntics.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Mario">
+      <HintPath>..\tso.world\Mario.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

@@ -1,15 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Timers;
-using FSO.Client.UI.Controls;
+﻿using FSO.Client.UI.Controls;
 using FSO.Client.UI.Framework;
 using FSO.Client.UI.Framework.Parser;
 using FSO.Client.UI.Model;
 using FSO.Client.UI.Panels.EODs.Utils;
 using FSO.Content.Model;
 using FSO.SimAntics.NetPlay.EODs.Handlers;
-using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using System.Timers;
 
 namespace FSO.Client.UI.Panels.EODs
 {
@@ -18,8 +16,8 @@ namespace FSO.Client.UI.Panels.EODs
         private static bool NoteSent;
         private UIScript Script;
         private UIEODLobby Lobby;
-        private Timer SequenceNoteTimer;
-        private Timer SyncTimer;
+        private System.Timers.Timer SequenceNoteTimer;
+        private System.Timers.Timer SyncTimer;
         private byte[] CurrentSequence;
         private int CurrentNote;
 
@@ -185,7 +183,8 @@ namespace FSO.Client.UI.Panels.EODs
                 .WithPlayerUI(new UIEODLobbyPlayer(1, WaitPlayer2, Player2Wait))
                 .WithPlayerUI(new UIEODLobbyPlayer(2, WaitPlayer3, Player3Wait))
                 .WithPlayerUI(new UIEODLobbyPlayer(3, WaitPlayer4, Player4Wait))
-                .WithCaptionProvider((player, avatar) => {
+                .WithCaptionProvider((player, avatar) =>
+                {
                     switch (player.Slot)
                     {
                         case (int)VMEODBandInstrumentTypes.Trumpet:

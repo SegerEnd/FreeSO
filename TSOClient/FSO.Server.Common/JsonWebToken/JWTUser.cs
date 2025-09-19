@@ -4,7 +4,9 @@
     {
         public uint UserID { get; set; }
 
-        public IEnumerable<string> Claims { get; set; }
+        protected List<string> _claims = new List<string>();
+
+        public List<string> ClaimsInternal => _claims;
 
         public string UserName { get; set; }
     }
