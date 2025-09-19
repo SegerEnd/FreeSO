@@ -56,7 +56,7 @@
             // 
             // btnSearch
             // 
-            this.btnSearch.Image = global::FSO.Client.Properties.Resources.magnifier_left;
+            //this.btnSearch.Image = global::FSO.Client.Properties.Resources.magnifier_left;
             this.btnSearch.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnSearch.Location = new System.Drawing.Point(6, 45);
             this.btnSearch.Name = "btnSearch";

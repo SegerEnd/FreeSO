@@ -62,7 +62,7 @@
             // 
             // refreshBtn
             // 
-            this.refreshBtn.Image = global::FSO.Client.Properties.Resources.arrow_circle;
+            //this.refreshBtn.Image = global::FSO.Client.Properties.Resources.arrow_circle;
             this.refreshBtn.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.refreshBtn.Name = "refreshBtn";
             this.refreshBtn.Size = new System.Drawing.Size(66, 22);

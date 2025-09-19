@@ -42,7 +42,7 @@
             // 
             // pictureBox1
             // 
-            this.pictureBox1.Image = global::FSO.Client.Properties.Resources.folder_horizontal;
+            //this.pictureBox1.Image = global::FSO.Client.Properties.Resources.folder_horizontal;
             this.pictureBox1.Location = new System.Drawing.Point(12, 12);
             this.pictureBox1.Name = "pictureBox1";
             this.pictureBox1.Size = new System.Drawing.Size(50, 39);
@@ -81,7 +81,7 @@
             // 
             // btnExportFile
             // 
-            this.btnExportFile.Image = global::FSO.Client.Properties.Resources.folder_export;
+            //this.btnExportFile.Image = global::FSO.Client.Properties.Resources.folder_export;
             this.btnExportFile.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.btnExportFile.Name = "btnExportFile";
             this.btnExportFile.Size = new System.Drawing.Size(143, 22);
