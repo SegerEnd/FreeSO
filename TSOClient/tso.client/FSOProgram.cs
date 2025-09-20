@@ -1,12 +1,6 @@
-﻿using FSO.Client.Utils;
-using FSO.Client.Utils.GameLocator;
+﻿using FSO.Client.Utils.GameLocator;
 using FSO.Common;
 using FSO.UI;
-using System;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Threading;
 
 namespace FSO.Client
 {
@@ -25,7 +19,7 @@ namespace FSO.Client
         {
             string baseDir = AppDomain.CurrentDomain.BaseDirectory;
             Directory.SetCurrentDirectory(baseDir);
-            AppDomain.CurrentDomain.AssemblyResolve += OnAssemblyResolve;
+            //AppDomain.CurrentDomain.AssemblyResolve += OnAssemblyResolve;
             AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
             //AppDomain.CurrentDomain.SetDynamicBase(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Content/JITCache/"));
 
@@ -111,7 +105,8 @@ namespace FSO.Client
 
             #endregion
 
-            UseDX = MonogameLinker.Link(useDX);
+            //UseDX = MonogameLinker.Link(useDX);
+            UseDX = useDX;
 
             var path = gameLocator.FindTheSimsOnline();
 
@@ -120,7 +115,7 @@ namespace FSO.Client
                 //check if this path has tso in it. tuning.dat should be a good indication.
                 if (!File.Exists(Path.Combine(path, "tuning.dat")))
                 {
-                    ShowDialog("The Sims Online appears to be missing. The game expects TSO at directory '"+path+"', but some core files are missing from that folder. If you know you installed TSO into a different directory, please move it into the directory specified.");
+                    ShowDialog("The Sims Online appears to be missing. The game expects TSO at directory '" + path + "', but some core files are missing from that folder. If you know you installed TSO into a different directory, please move it into the directory specified.");
                     return false;
                 }
 
@@ -144,6 +139,7 @@ namespace FSO.Client
             }
         }
 
+        /*
         private static System.Reflection.Assembly OnAssemblyResolve(object sender, ResolveEventArgs args)
         {
             try
@@ -166,6 +162,7 @@ namespace FSO.Client
             }
 
         }
+        */
 
         private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {

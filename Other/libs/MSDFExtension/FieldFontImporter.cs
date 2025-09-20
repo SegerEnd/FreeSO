@@ -1,5 +1,9 @@
 ﻿using Microsoft.Xna.Framework.Content.Pipeline;
 using MSDFData;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 
 namespace MSDFExtension
 {

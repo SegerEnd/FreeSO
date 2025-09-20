@@ -1,13 +1,8 @@
-﻿using System;
-using System.IO;
-using System.Drawing;
+﻿using FSO.Client;
+using FSO.Client.UI.Panels;
+using FSO.Common.Rendering.Framework.IO;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
-using FSO.Common.Rendering.Framework.IO;
-using FSO.Client;
-using FSO.Client.UI.Panels;
-using System.Windows.Forms;
-using System.Runtime.CompilerServices;
 
 namespace FSO.Windows
 {
@@ -33,7 +28,10 @@ namespace FSO.Windows
             };
 
             if ((new FSOProgram()).InitWithArguments(args))
-                (new GameStartProxy()).Start(UseDX);
+            {
+                var startProxy = new GameStartProxy();
+                startProxy.Start(UseDX);
+            }
         }
 
 
@@ -83,7 +81,9 @@ namespace FSO.Windows
                 Console.WriteLine("===== FATAL ERROR =====");
                 Console.WriteLine(e.ExceptionObject.ToString());
                 Environment.Exit(0);
-            } else { 
+            }
+            else
+            {
                 if (exception is OutOfMemoryException)
                 {
                     MessageBox.Show(e.ExceptionObject.ToString(), "Out of Memory! FreeSO needs to close.");
@@ -108,7 +108,7 @@ namespace FSO.Windows
             if (bitmapData.Stride != image.Width * 4)
                 throw new NotImplementedException();
 
-            
+
             for (int i = 0; i < data.Length; i += 4)
             {
                 //if (data[i+3] == 0) { }

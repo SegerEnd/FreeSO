@@ -11,7 +11,16 @@
     <FileAlignment>512</FileAlignment>
     <UseWindowsForms>true</UseWindowsForms>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <ApplicationIcon>fso.ico</ApplicationIcon>
+    <PublishAot>true</PublishAot>
+    <PublishTrimmed>false</PublishTrimmed>
+    <IsAotCompatible>True</IsAotCompatible>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="fso.ico" />
+    <EmbeddedResource Include="Icon.bmp" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.4" />
