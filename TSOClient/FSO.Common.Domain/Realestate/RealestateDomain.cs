@@ -92,8 +92,7 @@ namespace FSO.Common.Domain.Realestate
 
             // All-water lots have nowhere for players to stand.
             var terrain = _Map.GetTerrain(x, y);
-            if (terrain == TerrainType.WATER)
-            {
+            if (terrain == TerrainType.WATER) {
                 // Only openable if any side of the terrain has a road.
                 // TODO: When the terrain restore supports putting the mailbox on corners, allow those too.
 
