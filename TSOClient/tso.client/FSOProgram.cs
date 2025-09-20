@@ -1,4 +1,5 @@
-﻿using FSO.Client.Utils.GameLocator;
+﻿using FSO.Client.Utils;
+using FSO.Client.Utils.GameLocator;
 using FSO.Common;
 using FSO.UI;
 
@@ -105,8 +106,8 @@ namespace FSO.Client
 
             #endregion
 
-            //UseDX = MonogameLinker.Link(useDX);
-            UseDX = useDX;
+            UseDX = MonogameLinker.Link(useDX);
+            //UseDX = useDX;
 
             var path = gameLocator.FindTheSimsOnline();
 

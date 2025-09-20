@@ -12,9 +12,6 @@
     <UseWindowsForms>true</UseWindowsForms>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <ApplicationIcon>fso.ico</ApplicationIcon>
-    <PublishAot>true</PublishAot>
-    <PublishTrimmed>false</PublishTrimmed>
-    <IsAotCompatible>True</IsAotCompatible>
   </PropertyGroup>
 
   <ItemGroup>

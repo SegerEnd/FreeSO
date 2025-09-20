@@ -20,12 +20,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.4" />
+    <!-- <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.4" /> -->
     <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.4" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Content\DX\Textures\" />
     <ProjectReference Include="..\..\Other\libs\MSDFData\MSDFData.csproj" />
     <ProjectReference Include="..\tso.common\FSO.Common.csproj" />
     <ProjectReference Include="..\tso.files\FSO.Files.csproj" />
@@ -33,10 +32,61 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="Content\UIScript.egt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\UI\emojis.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\UI\customemojis.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\UI\LICENSE.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\3D\**\*.*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\MeshReplace\**\*.*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Textures\**\*.*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\iOS\**\*.*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\DX\**\*.*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\OGL\**\*.*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Fonts\**\*.*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\bboxCache.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <None Include="ContentSrc\**\*.*" />
+    <None Include="packages.config" />
+    <None Include="Readme.md" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="ContentSrc\freetype6.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="ContentSrc\msdfgen.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="ContentSrc\TSOClientContent.mgcb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="ContentSrc\TSOClientContentDX.mgcb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="ContentSrc\TSOClientContentiOS.mgcb">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="ContentSrc\zlib1.dll">
