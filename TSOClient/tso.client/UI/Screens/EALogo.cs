@@ -1,7 +1,7 @@
-﻿using FSO.Client.GameContent;
-using FSO.Client.UI.Controls;
+﻿using System.Timers;
 using FSO.Client.UI.Framework;
-using System.Timers;
+using FSO.Client.UI.Controls;
+using FSO.Client.GameContent;
 
 namespace FSO.Client.UI.Screens
 {
@@ -9,7 +9,7 @@ namespace FSO.Client.UI.Screens
     {
         private UIImage m_EALogo;
         private UIContainer BackgroundCtnr;
-        private System.Timers.Timer m_CheckProgressTimer;
+        private Timer m_CheckProgressTimer;
 
         public EALogo()
             : base()

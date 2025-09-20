@@ -6,6 +6,11 @@
     <Nullable>enable</Nullable>
     <ApplicationIcon>fso.ico</ApplicationIcon>
     <IsAotCompatible>True</IsAotCompatible>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>FSO.Client</RootNamespace>
+    <AssemblyName>FSO.Client</AssemblyName>
+    <FileAlignment>512</FileAlignment>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -31,6 +36,7 @@
     <ProjectReference Include="..\..\Other\libs\MSDFData\MSDFData.csproj" />
     <ProjectReference Include="..\FSO.Common.DatabaseService\FSO.Common.DatabaseService.csproj" />
     <ProjectReference Include="..\FSO.Common.Domain\FSO.Common.Domain.csproj" />
+    <ProjectReference Include="..\FSO.Content.TSO\FSO.Content.TSO.csproj" />
     <ProjectReference Include="..\FSO.Server.Api.Core\FSO.Server.Api.Core.csproj" />
     <ProjectReference Include="..\FSO.Server.Clients\FSO.Server.Clients.csproj" />
     <ProjectReference Include="..\FSO.Server.Common\FSO.Server.Common.csproj" />
@@ -42,6 +48,15 @@
     <ProjectReference Include="..\FSO.UI\FSO.UI.csproj" />
     <ProjectReference Include="..\tso.common\FSO.Common.csproj" />
     <ProjectReference Include="..\tso.content\FSO.Content.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="NVorbis">
+      <HintPath>NVorbis.dll</HintPath>
+    </Reference>
+    <Reference Include="OpenTK">
+      <HintPath>OpenTK.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

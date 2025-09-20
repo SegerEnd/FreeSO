@@ -1,10 +1,11 @@
-﻿using FSO.Client.UI.Controls;
+﻿using FSO.Content.Model;
+using FSO.Client.UI.Controls;
 using FSO.Client.UI.Framework;
 using FSO.Client.UI.Framework.Parser;
 using FSO.Client.UI.Panels.EODs.Utils;
-using FSO.Content.Model;
 using FSO.SimAntics.NetPlay.EODs.Handlers;
 using Microsoft.Xna.Framework.Graphics;
+using System;
 using System.Timers;
 
 namespace FSO.Client.UI.Panels.EODs
@@ -115,9 +116,9 @@ namespace FSO.Client.UI.Panels.EODs
         public const int WHEEL_FRAME_CONSTANT = 5;
 
         // timers for animations
-        private System.Timers.Timer OfflineMessageTimer;
-        private System.Timers.Timer LightsTimer;
-        private System.Timers.Timer WheelsSpinTimer;
+        private Timer OfflineMessageTimer;
+        private Timer LightsTimer;
+        private Timer WheelsSpinTimer;
 
         public UISlotsEOD(UIEODController controller) : base(controller)
         {
@@ -489,7 +490,7 @@ namespace FSO.Client.UI.Panels.EODs
                     else if (payBack > 110)
                         payBack = 110;
                     MachineOdds = payBack;
-
+                    
                     MachineBalance = machineBalance;
 
                     // on/off button
@@ -571,7 +572,7 @@ namespace FSO.Client.UI.Panels.EODs
         {
             if (OwnerPanel != null)
             {
-                OwnerPanel.InputFailHandler(evt.Remove(0, 6), message); // truncate "slots_"
+                OwnerPanel.InputFailHandler(evt.Remove(0,6), message); // truncate "slots_"
             }
         }
         private void NewGameHandler(string evt, string message)
@@ -720,7 +721,7 @@ namespace FSO.Client.UI.Panels.EODs
                 if (EODController.EODMessage.Equals(GameFacade.Strings["UIText", "259", "22"])) // "Closed for Maintenance"
                     SetTip(GameFacade.Strings["UIText", "259", "23"]); // "Please play another machine"
                 else
-                    SetTip(GameFacade.Strings["UIText", "259", "22"]); // "Closed for Maintenance"
+                SetTip(GameFacade.Strings["UIText", "259", "22"]); // "Closed for Maintenance"
             }
         }
         private void DrawWheelStops(bool wheelOneAlreadyDone, bool wheelTwoAlreadyDone, bool wheelThreeAlreadyDone)
