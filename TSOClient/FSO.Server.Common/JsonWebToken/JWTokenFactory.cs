@@ -1,5 +1,6 @@
 ﻿using FSO.Server.Common;
 using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace FSO.Server.Servers.Api.JsonWebToken
 {

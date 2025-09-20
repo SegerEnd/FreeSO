@@ -4,7 +4,6 @@ using FSO.Server.Database.DA.Users;
 using FSO.Server.Servers.Api.JsonWebToken;
 using Nancy;
 using Nancy.ModelBinding;
-//using Nancy.Authentication.Stateless;
 using Nancy.Security;
 
 namespace FSO.Server.Servers.Api.Controllers
