@@ -8,6 +8,10 @@
     <RootNamespace>FSO.SimAntics.JIT</RootNamespace>
     <AssemblyName>FSO.SimAntics.JIT</AssemblyName>
     <FileAlignment>512</FileAlignment>
+    <PublishAot>true</PublishAot>
+    <PublishTrimmed>true</PublishTrimmed>
+    <IsAotCompatible>true</IsAotCompatible>
+    <TrimMode>full</TrimMode>
   </PropertyGroup>
 
   <ItemGroup>

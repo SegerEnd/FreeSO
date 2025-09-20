@@ -6,6 +6,10 @@
     <Nullable>enable</Nullable>
     <ApplicationIcon>fso.ico</ApplicationIcon>
     <IsAotCompatible>True</IsAotCompatible>
+    <PublishAot>true</PublishAot>
+    <PublishTrimmed>true</PublishTrimmed>
+    <IsAotCompatible>true</IsAotCompatible>
+    <TrimMode>full</TrimMode>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>FSO.Client</RootNamespace>

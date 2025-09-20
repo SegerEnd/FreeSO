@@ -9,7 +9,10 @@
     <AssemblyName>server</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <ApplicationIcon>FreeSO.ico</ApplicationIcon>
-    <PublishAot>False</PublishAot>
+    <PublishAot>true</PublishAot>
+    <PublishTrimmed>true</PublishTrimmed>
+    <IsAotCompatible>true</IsAotCompatible>
+    <TrimMode>full</TrimMode>
   </PropertyGroup>
   
   <ItemGroup>

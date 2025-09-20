@@ -9,6 +9,10 @@
     <AssemblyName>FSO.Server.Domain</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <IsAotCompatible>True</IsAotCompatible>
+    <PublishAot>true</PublishAot>
+    <PublishTrimmed>true</PublishTrimmed>
+    <IsAotCompatible>true</IsAotCompatible>
+    <TrimMode>full</TrimMode>
   </PropertyGroup>
 
   <ItemGroup>

@@ -9,7 +9,8 @@
     <RootNamespace>FSO.Server.Debug</RootNamespace>
     <AssemblyName>FSO.Server.Debug</AssemblyName>
     <FileAlignment>512</FileAlignment>
-    <IsAotCompatible>True</IsAotCompatible>
+    <IsAotCompatible>false</IsAotCompatible>
+    <TrimMode>partial</TrimMode>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

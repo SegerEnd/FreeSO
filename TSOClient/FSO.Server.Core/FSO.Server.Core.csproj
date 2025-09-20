@@ -7,7 +7,11 @@
     <RuntimeIdentifiers>win-x64;linux-x64</RuntimeIdentifiers>
 	  <ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
     <ApplicationIcon>../FSO.Server/FreeSO.ico</ApplicationIcon>
-    <PublishAot>False</PublishAot>
+    <IsAotCompatible>True</IsAotCompatible>
+    <PublishAot>true</PublishAot>
+    <PublishTrimmed>true</PublishTrimmed>
+    <IsAotCompatible>true</IsAotCompatible>
+    <TrimMode>full</TrimMode>
   </PropertyGroup>
 
   <ItemGroup>

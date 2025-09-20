@@ -8,7 +8,10 @@
     <RootNamespace>FSO.Files</RootNamespace>
     <AssemblyName>FSO.Files</AssemblyName>
     <FileAlignment>512</FileAlignment>
-    <IsAotCompatible>True</IsAotCompatible>
+    <PublishAot>true</PublishAot>
+    <PublishTrimmed>true</PublishTrimmed>
+    <IsAotCompatible>true</IsAotCompatible>
+    <TrimMode>full</TrimMode>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
