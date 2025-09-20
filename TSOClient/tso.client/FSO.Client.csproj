@@ -139,11 +139,13 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageReference Include="Ninject" Version="3.3.6" />
     <PackageReference Include="Open.Nat" Version="2.1.0" />
-    <PackageReference Include="VoronoiLib" Version="0.1.0" />
+    <PackageReference Include="System.IO.FileSystem.Primitives" Version="4.3.0" />
+    <PackageReference Include="System.IO.FileSystem" Version="4.3.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\Other\libs\MSDFData\MSDFData.csproj" />
+    <ProjectReference Include="..\..\Other\libs\VoronoiLib\VoronoiLib.csproj" />
     <ProjectReference Include="..\FSO.Common.DatabaseService\FSO.Common.DatabaseService.csproj" />
     <ProjectReference Include="..\FSO.Common.Domain\FSO.Common.Domain.csproj" />
     <ProjectReference Include="..\FSO.Content.TSO\FSO.Content.TSO.csproj" />

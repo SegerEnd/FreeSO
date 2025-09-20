@@ -14,6 +14,8 @@
     <IsAotCompatible>false</IsAotCompatible>
     <TrimMode>partial</TrimMode>
     <ApplicationIcon>fso.ico</ApplicationIcon>
+    <PublishReadyToRun>true</PublishReadyToRun>
+    <TieredPGO>true</TieredPGO>
   </PropertyGroup>
 
   <ItemGroup>
