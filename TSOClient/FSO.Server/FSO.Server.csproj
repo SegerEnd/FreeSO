@@ -8,21 +8,13 @@
     <RootNamespace>FSO.Server</RootNamespace>
     <AssemblyName>server</AssemblyName>
     <FileAlignment>512</FileAlignment>
-    <IsAotCompatible>True</IsAotCompatible>
     <ApplicationIcon>FreeSO.ico</ApplicationIcon>
+    <PublishAot>False</PublishAot>
   </PropertyGroup>
   
   <ItemGroup>
     <Content Include="FreeSO.ico" />
   </ItemGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <IsAotCompatible>True</IsAotCompatible>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <IsAotCompatible>True</IsAotCompatible>
-  </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="CommandLineParser" Version="1.9.71" />
