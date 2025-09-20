@@ -5,8 +5,6 @@ using FSO.Server.Clients;
 using FSO.Server.Clients.Framework;
 using FSO.Server.Protocol.Authorization;
 using FSO.Server.Protocol.CitySelector;
-using System;
-using System.Collections.Generic;
 
 namespace FSO.Client.Regulators
 {
@@ -17,7 +15,6 @@ namespace FSO.Client.Regulators
     {
         public AuthResult AuthResult { get; internal set; }
         public List<AvatarData> Avatars { get; internal set; } = new List<AvatarData>();
-        //public List<ShardStatusItem> Shards { get; internal set; } = new List<ShardStatusItem>();
         public IShardsDomain Shards;
 
         private AuthClient AuthClient;
@@ -28,7 +25,7 @@ namespace FSO.Client.Regulators
             this.Shards = domain;
             this.AuthClient = authClient;
             this.CityClient = cityClient;
-            
+
             AddState("NotLoggedIn")
                 .Default()
                     .Transition()
@@ -43,26 +40,35 @@ namespace FSO.Client.Regulators
             AddState("UpdateRequired").OnlyTransitionFrom("InitialConnect");
         }
 
-        protected override void OnAfterTransition(RegulatorState oldState, RegulatorState newState, object data)
+        protected override async void OnAfterTransition(RegulatorState oldState, RegulatorState newState, object data)
         {
             switch (newState.Name)
             {
                 case "AuthLogin":
                     var loginData = (AuthRequest)data;
-                    var result = AuthClient.Authenticate(loginData);
+                    AuthResult result = null;
+                    try
+                    {
+                        result = await AuthClient.Authenticate(loginData); // Await the async method
+                    }
+                    catch (Exception ex)
+                    {
+                        base.ThrowErrorAndReset(ex);
+                        return;
+                    }
 
                     if (result == null || !result.Valid)
                     {
-                        if (result.ReasonText != null)
+                        if (!string.IsNullOrEmpty(result?.ReasonText))
                         {
                             base.ThrowErrorAndReset(ErrorMessage.FromLiteral(result.ReasonText));
                         }
-                        else if (result.ReasonCode != null)
+                        else if (!string.IsNullOrEmpty(result?.ReasonCode))
                         {
                             base.ThrowErrorAndReset(ErrorMessage.FromLiteral(
                                 (GameFacade.Strings.GetString("210", result.ReasonCode) ?? "Unknown Error")
                                 .Replace("EA.com", AuthClient.BaseUrl.Substring(7).TrimEnd('/'))
-                                ));
+                            ));
                         }
                         else
                         {
@@ -76,12 +82,15 @@ namespace FSO.Client.Regulators
                     }
                     break;
                 case "InitialConnect":
-                    try {
-                        var connectResult = CityClient.InitialConnectServlet(
-                            new InitialConnectServletRequest {
-                                Ticket = AuthResult.Ticket,
-                                Version = "Version 1.1097.1.0"
-                            });
+                    try
+                    {
+                        var connectResult = await Task.Run(() =>
+                            CityClient.InitialConnectServlet(
+                                new InitialConnectServletRequest
+                                {
+                                    Ticket = AuthResult.Ticket,
+                                    Version = "Version 1.1097.1.0"
+                                }));
 
                         if (connectResult.Status == InitialConnectServletResultType.Authorized)
                         {
@@ -102,16 +111,17 @@ namespace FSO.Client.Regulators
                         {
                             base.ThrowErrorAndReset(ErrorMessage.FromLiteral(connectResult.Error.Code, connectResult.Error.Message));
                         }
-                    }catch(Exception ex)
+                    }
+                    catch (Exception ex)
                     {
                         base.ThrowErrorAndReset(ex);
                     }
                     break;
-                case "UpdateRequired":
-                    break;
+
                 case "AvatarData":
-                    try {
-                        Avatars = CityClient.AvatarDataServlet();
+                    try
+                    {
+                        Avatars = await Task.Run(() => CityClient.AvatarDataServlet());
                         AsyncTransition("ShardStatus");
                     }
                     catch (Exception ex)
@@ -121,8 +131,9 @@ namespace FSO.Client.Regulators
                     break;
 
                 case "ShardStatus":
-                    try {
-                        ((ClientShards)Shards).All = CityClient.ShardStatus();
+                    try
+                    {
+                        ((ClientShards)Shards).All = await Task.Run(() => CityClient.ShardStatus());
                         AsyncTransition("LoggedIn");
                     }
                     catch (Exception ex)
@@ -144,19 +155,14 @@ namespace FSO.Client.Regulators
             var authstr = auth.FSOBranch + "-" + auth.FSOVersion;
 
             return str != authstr;
-
-            /*
-            var split = str.LastIndexOf('-');
-            int verNum = 0;
-            int.TryParse(split.)
-            */
         }
 
         protected override void OnBeforeTransition(RegulatorState oldState, RegulatorState newState, object data)
         {
         }
 
-        public void Login(AuthRequest request){
+        public void Login(AuthRequest request)
+        {
             this.AsyncProcessMessage(request);
         }
 

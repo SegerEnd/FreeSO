@@ -30,6 +30,7 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageReference Include="Ninject" Version="3.3.6" />
     <PackageReference Include="Open.Nat" Version="2.1.0" />
+    <PackageReference Include="VoronoiLib" Version="0.1.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -51,6 +52,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="MIConvexHull">
+      <HintPath>..\packages\MIConvexHull.1.1.17.1019\lib\netstandard1.0\MIConvexHull.dll</HintPath>
+    </Reference>
     <Reference Include="NVorbis">
       <HintPath>NVorbis.dll</HintPath>
     </Reference>
