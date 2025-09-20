@@ -2,8 +2,6 @@
 using FSO.Common.Domain.Shards;
 using FSO.Content.Model;
 using FSO.Server.Protocol.CitySelector;
-using System;
-using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 namespace FSO.Common.Domain.Realestate
@@ -27,8 +25,9 @@ namespace FSO.Common.Domain.Realestate
             _Shards = shards;
             _Content = content;
             _ByShard = new Dictionary<int, ShardRealestateDomain>();
-            
-            foreach(var item in shards.All){
+
+            foreach (var item in shards.All)
+            {
                 GetByShard(item.Id);
             }
         }
@@ -82,10 +81,34 @@ namespace FSO.Common.Domain.Realestate
             return _Pricing.GetPrice(_Map, x, y);
         }
 
+        public bool IsOpenable(ushort x, ushort y)
+        {
+            // Can't open lots out of bounds.
+            if (!MapCoordinates.InBounds(x, y, 1))
+            {
+                //Out of bounds!
+                return false;
+            }
+
+            // All-water lots have nowhere for players to stand.
+            var terrain = _Map.GetTerrain(x, y);
+            if (terrain == TerrainType.WATER)
+            {
+                // Only openable if any side of the terrain has a road.
+                // TODO: When the terrain restore supports putting the mailbox on corners, allow those too.
+
+                var road = _Map.GetRoad(x, y);
+                return (road & 0xF) != 0;
+            }
+
+            return true;
+        }
+
         public bool IsPurchasable(ushort x, ushort y)
         {
             //Cant buy lots on the very edge
-            if(!MapCoordinates.InBounds(x, y, 1)){
+            if (!MapCoordinates.InBounds(x, y, 1))
+            {
                 //Out of bounds!
                 return false;
             }
