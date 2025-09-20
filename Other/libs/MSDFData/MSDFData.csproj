@@ -8,6 +8,10 @@
     <RootNamespace>MSDFData</RootNamespace>
     <AssemblyName>MSDFData</AssemblyName>
     <FileAlignment>512</FileAlignment>
+    <PublishAot>true</PublishAot>
+    <IsAotCompatible>True</IsAotCompatible>
+    <PublishTrimmed>true</PublishTrimmed>
+    <TrimMode>link</TrimMode>
   </PropertyGroup>
 
   <ItemGroup>
