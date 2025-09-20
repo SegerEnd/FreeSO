@@ -110,7 +110,6 @@ namespace FSO.Client
         /// </summary>
         protected override void Initialize()
         {
-            System.Net.ServicePointManager.DefaultConnectionLimit = 32;
             var kernel = new StandardKernel(
                 new RegulatorsModule(),
                 new NetworkModule(),

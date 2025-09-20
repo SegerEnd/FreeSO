@@ -68,6 +68,9 @@
     <Content Include="Content\bboxCache.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Content\UI\**\*.*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="ContentSrc\**\*.*" />
     <None Include="packages.config" />
     <None Include="Readme.md" />
