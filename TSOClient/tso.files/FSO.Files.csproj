@@ -34,6 +34,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Other\libs\TargaImagePCL\TargaImagePCL.csproj" />
     <ProjectReference Include="..\tso.common\FSO.Common.csproj" />
   </ItemGroup>
 </Project>
