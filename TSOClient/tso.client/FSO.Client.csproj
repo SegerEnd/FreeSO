@@ -163,9 +163,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="MIConvexHull">
-      <HintPath>..\packages\MIConvexHull.1.1.17.1019\lib\netstandard1.0\MIConvexHull.dll</HintPath>
-    </Reference>
     <Reference Include="NVorbis">
       <HintPath>NVorbis.dll</HintPath>
     </Reference>
