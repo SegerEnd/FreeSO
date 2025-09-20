@@ -293,17 +293,17 @@ namespace FSO.Client
             GameFacade.Focus = false;
         }
 
-        //protected override void OnExiting(object sender, EventArgs args)
-        //{
-        //    base.OnExiting(sender, args);
-        //    var kernel = FSOFacade.Kernel;
-        //    if (kernel != null)
-        //    {
-        //        kernel.Get<LotConnectionRegulator>()?.Disconnect();
-        //        kernel.Get<CityConnectionRegulator>()?.Disconnect();
-        //    }
-        //    GameThread.SetKilled();
-        //}
+        protected override void OnExiting(object sender, ExitingEventArgs args)
+        {
+            base.OnExiting(sender, args);
+            var kernel = FSOFacade.Kernel;
+            if (kernel != null)
+            {
+                kernel.Get<LotConnectionRegulator>()?.Disconnect();
+                kernel.Get<CityConnectionRegulator>()?.Disconnect();
+            }
+            GameThread.SetKilled();
+        }
 
         /// <summary>
         /// LoadContent will be called once per game and is the place to load
