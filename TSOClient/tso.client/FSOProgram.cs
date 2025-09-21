@@ -2,6 +2,7 @@
 using FSO.Client.Utils.GameLocator;
 using FSO.Common;
 using FSO.UI;
+using System.Reflection;
 
 namespace FSO.Client
 {
@@ -20,7 +21,7 @@ namespace FSO.Client
         {
             string baseDir = AppDomain.CurrentDomain.BaseDirectory;
             Directory.SetCurrentDirectory(baseDir);
-            //AppDomain.CurrentDomain.AssemblyResolve += OnAssemblyResolve;
+            AppDomain.CurrentDomain.AssemblyResolve += OnAssemblyResolve;
             AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
             //AppDomain.CurrentDomain.SetDynamicBase(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Content/JITCache/"));
 
@@ -140,7 +141,6 @@ namespace FSO.Client
             }
         }
 
-        /*
         private static System.Reflection.Assembly OnAssemblyResolve(object sender, ResolveEventArgs args)
         {
             try
@@ -163,7 +163,6 @@ namespace FSO.Client
             }
 
         }
-        */
 
         private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
