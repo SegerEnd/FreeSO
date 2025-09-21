@@ -1,7 +1,7 @@
 
 #----------------------------- Global Properties ----------------------------#
 
-/outputDir:../Content
+/outputDir:../Content/OGL
 /intermediateDir:obj
 /platform:DesktopGL
 /config:
@@ -10,7 +10,6 @@
 
 #-------------------------------- References --------------------------------#
 
-/reference:..\..\..\Other\libs\MSDFExtension\bin\Release\net8.0\MSDFData.dll
 /reference:..\..\..\Other\libs\MSDFExtension\bin\Release\net8.0\MSDFExtension.dll
 
 #---------------------------------- Content ---------------------------------#

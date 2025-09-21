@@ -108,7 +108,6 @@ namespace FSO.Client
             #endregion
 
             UseDX = MonogameLinker.Link(useDX);
-            //UseDX = useDX;
 
             var path = gameLocator.FindTheSimsOnline();
 
