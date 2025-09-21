@@ -47,7 +47,7 @@ namespace FSO.Common.Audio
 
         public void Start()
         {
-            Stream = new MP3Stream(Path);
+            Stream = new MP3Stream(new FileStream(Path, FileMode.Open, FileAccess.Read, FileShare.Read));
             Stream.DecodeFrames(1);
             var freq = Stream.Frequency;
             lock (ControlLock)

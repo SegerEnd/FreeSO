@@ -8,9 +8,9 @@
 	  <ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
     <ApplicationIcon>../FSO.Server/FreeSO.ico</ApplicationIcon>
     <IsAotCompatible>True</IsAotCompatible>
-    <PublishAot>true</PublishAot>
+    <PublishAot>false</PublishAot>
     <PublishTrimmed>true</PublishTrimmed>
-    <IsAotCompatible>true</IsAotCompatible>
+    <IsAotCompatible>false</IsAotCompatible>
     <TrimMode>full</TrimMode>
   </PropertyGroup>
 
