@@ -4,7 +4,7 @@
     <TargetFramework>net9.0-windows</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <OutputType>Exe</OutputType>
+    <OutputType>WinExe</OutputType>
     <RootNamespace>FSO.IDE</RootNamespace>
     <AssemblyName>Volcanic</AssemblyName>
     <FileAlignment>512</FileAlignment>

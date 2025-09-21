@@ -51,12 +51,6 @@ namespace FSO.IDE
                 }
             }
 
-            if (FSOProgram == null)
-            {
-                MessageBox.Show("FSOProgram instantiation failed!");
-                return;
-            }
-
             if (!FSOProgram.InitWithArguments(args)) return;
             (new VolcanicStartProxy()).Start(args);
         }
