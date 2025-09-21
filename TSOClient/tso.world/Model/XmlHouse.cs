@@ -37,11 +37,7 @@ namespace FSO.LotView.Model
         public static XmlHouseData Parse(Stream reader)
         {
             XmlSerializer serializer = new XmlSerializer(typeof(XmlHouseData));
-
-            var settings = new XmlReaderSettings
-            {
-                DtdProcessing = DtdProcessing.Parse 
-            };
+            var settings = new XmlReaderSettings { DtdProcessing = DtdProcessing.Parse };
 
             using (var xmlReader = XmlReader.Create(reader, settings))
             {
