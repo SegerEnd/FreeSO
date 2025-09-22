@@ -11,7 +11,7 @@
     <PublishAot>false</PublishAot>
     <PublishTrimmed>true</PublishTrimmed>
     <IsAotCompatible>false</IsAotCompatible>
-    <TrimMode>full</TrimMode>
+    <TrimMode>partial</TrimMode>
   </PropertyGroup>
 
   <ItemGroup>
@@ -28,5 +28,23 @@
     <ProjectReference Include="..\FSO.Server\FSO.Server.csproj" />
     <ProjectReference Include="..\tso.content\FSO.Content.csproj" />
   </ItemGroup>
+
+  <PropertyGroup>
+    <BuildDocker Condition="'$(BuildDocker)' == ''">false</BuildDocker>
+  </PropertyGroup>
+  <Target Name="BuildDockerImage" AfterTargets="Build" Condition="'$(OS)' == 'Windows_NT' AND '$(Configuration)' == 'Release' AND '$(BuildDocker)' == 'true'">
+    <Copy SourceFiles="$(MSBuildThisFileDirectory)/../FSO.Server/config.sample.json"
+          DestinationFolder="$(MSBuildThisFileDirectory)" 
+          SkipUnchangedFiles="true" />
+    
+    <PropertyGroup>
+      <DockerImageName>fso-server:latest</DockerImageName>
+      <DockerTarPath>$(OutputPath)fso-server.docker.tar</DockerTarPath>
+    </PropertyGroup>
+
+    <Exec Command="docker build --no-cache -f $(MSBuildThisFileDirectory)Dockerfile -t $(DockerImageName) $(MSBuildThisFileDirectory)" />
+
+    <Exec Command="docker save -o &quot;$(DockerTarPath)&quot; $(DockerImageName)" />
+  </Target>
 
 </Project>
