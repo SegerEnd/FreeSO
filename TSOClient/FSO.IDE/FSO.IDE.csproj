@@ -16,6 +16,7 @@
     <ApplicationIcon>IDE.ico</ApplicationIcon>
     <PublishReadyToRun>true</PublishReadyToRun>
     <TieredPGO>true</TieredPGO>
+    <ApplicationDefaultFont>Microsoft Sans Serif, 8.25pt</ApplicationDefaultFont>
   </PropertyGroup>
 
   <ItemGroup>
