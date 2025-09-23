@@ -16,19 +16,11 @@ services:
       DB_USER: fsoserver
       DB_PASSWORD: fsopass
       DB_NAME: fso
-      GAME_LOCATION: /app/game
-      SIM_NFS: /app/nfs
-      USER_API_PORT: 9000
-      CITY_PORT: 33100
-      LOT_PORT: 34100
-      TASK_PORT: 35100
-      CITY_CALLSIGN: ganymede
-      LOT_CALLSIGN: europa
-      TASK_CALLSIGN: callisto
-      SSL_CERT: /app/certs/server.pfx
-      SSL_PASSWORD: password
+      GAME_LOCATION: ./game
+      SIM_NFS: ./nfs
     volumes:
-      - fso-nfs:/app/nfs
+      - "${GAME_PATH}:/app/src/game"
+      - "${NFS_PATH}:/app/src/nfs"
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "fso-db", "-u", "fsoserver", "-pfsopass"]
       interval: 5s
@@ -52,5 +44,3 @@ services:
 
 volumes:
   fso-db-data:
-  fso-nfs:
-  

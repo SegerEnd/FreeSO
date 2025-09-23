@@ -27,6 +27,8 @@
     <ProjectReference Include="..\FSO.Server.Api.Core\FSO.Server.Api.Core.csproj" />
     <ProjectReference Include="..\FSO.Server\FSO.Server.csproj" />
     <ProjectReference Include="..\tso.content\FSO.Content.csproj" />
+    <ProjectReference Include="..\tso.client\FSO.Client.csproj" />
+    <ProjectReference Include="..\tso.common\FSO.Common.csproj" />
   </ItemGroup>
 
   <PropertyGroup>
@@ -44,7 +46,7 @@
 
     <Exec Command="docker build --no-cache -f $(MSBuildThisFileDirectory)Dockerfile -t $(DockerImageName) $(MSBuildThisFileDirectory)" />
 
-    <Exec Command="docker save -o &quot;$(DockerTarPath)&quot; $(DockerImageName)" />
+    <!-- <Exec Command="docker save -o &quot;$(DockerTarPath)&quot; $(DockerImageName)" /> -->
   </Target>
 
 </Project>

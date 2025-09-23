@@ -1,2 +1,3 @@
 config.sample.json
 *.docker.tar
+.env
