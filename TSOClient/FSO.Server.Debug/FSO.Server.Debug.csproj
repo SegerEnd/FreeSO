@@ -4,7 +4,7 @@
     <TargetFramework>net9.0-windows</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWindowsForms>true</UseWindowsForms>
-    <Nullable>enable</Nullable>
+    <Nullable>disable</Nullable>
     <OutputType>Exe</OutputType>
     <RootNamespace>FSO.Server.Debug</RootNamespace>
     <AssemblyName>FSO.Server.Debug</AssemblyName>

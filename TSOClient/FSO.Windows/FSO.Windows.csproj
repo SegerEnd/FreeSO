@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net9.0-windows</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
+    <Nullable>disable</Nullable>
     <OutputType>WinExe</OutputType>
     <RootNamespace>FSO.Windows</RootNamespace>
     <AssemblyName>FreeSO</AssemblyName>
