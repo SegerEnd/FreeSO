@@ -9,25 +9,16 @@ using System.Threading;
 using FSO.Files;
 using FSO.Client.UI.Panels;
 //using Ninject;
-#if MONOMAC
-using MonoMac.AppKit;
-using MonoMac.Foundation;
-#elif __IOS__ || __TVOS__
 using Foundation;
 using FSO.Client;
 using FSO.Common;
 using UIKit;
-#endif
 #endregion
 
 namespace FSOiOS
 {
-#if __IOS__ || __TVOS__
     [Register("AppDelegate")]
     class Program : UIApplicationDelegate
-#else
-	static class Program
-#endif
 	{
 
         public static Action<string> MainOrg;
@@ -50,7 +41,7 @@ namespace FSOiOS
 			FSOEnvironment.UIZoomFactor = iPad?1:2;
             FSOEnvironment.DPIScaleFactor = iPad ? 2 : 1;
             FSOEnvironment.TexCompress = false;
-            FSOEnvironment.TexCompressSupport = false;
+            FSOEnvironment.TexCompressSupport = true;
 
             FSOEnvironment.GameThread = Thread.CurrentThread;
             FSOEnvironment.Enable3D = true;
