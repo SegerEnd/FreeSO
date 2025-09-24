@@ -1,11 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFrameworks>net8.0;net9.0-ios</TargetFrameworks>
     <RootNamespace>MSDFData</RootNamespace>
     <AssemblyName>MSDFData</AssemblyName>
     <FileAlignment>512</FileAlignment>
-    <PublishAot>true</PublishAot>
+    <PublishAot>false</PublishAot>
     <IsAotCompatible>True</IsAotCompatible>
     <PublishTrimmed>true</PublishTrimmed>
     <TrimMode>link</TrimMode>

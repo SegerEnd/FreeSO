@@ -1,95 +1,150 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-	<PropertyGroup>
-		<TargetFramework>net9.0-ios</TargetFramework>
-		<OutputType>Exe</OutputType>
-		<ImplicitUsings>enable</ImplicitUsings>
-		<Nullable>enable</Nullable>
-		<RootNamespace>FSOiOS</RootNamespace>
-		<AssemblyName>FSOiOS</AssemblyName>
-		<IPhoneResourcePrefix>Resources</IPhoneResourcePrefix>
-		<VBRuntime>Embed</VBRuntime>
-		<SupportedOSPlatformVersion>11.2</SupportedOSPlatformVersion>
-		<CodesignKey>iPhone Developer</CodesignKey>
-	</PropertyGroup>
-	<ItemGroup>
-		<PackageReference Include="MonoGame.Framework.iOS" Version="3.8.4" />
-		<PackageReference Include="Ninject" Version="3.3.6" />
-	</ItemGroup>
-	<ItemGroup>
-		<ProjectReference Include="..\..\Other\libs\TargaImagePCL\TargaImagePCL.csproj" />
-		<ProjectReference Include="..\tso.client\FSO.Client.csproj" />
-		<ProjectReference Include="..\tso.common\FSO.Common.csproj" />
-		<ProjectReference Include="..\tso.content\FSO.Content.csproj" />
-		<ProjectReference Include="..\tso.files\FSO.Files.csproj" />
-	</ItemGroup>
-	<ItemGroup>
-		<InterfaceDefinition Include="Installer.storyboard" />
-		<None Include="Entitlements.plist" />
-		<None Include="Info.plist" />
-	</ItemGroup>
-	<ItemGroup>
-		<BundleResource Include="GameThumbnail.png" />
-		<BundleResource Include="Default-568h%402x.png" />
-		<BundleResource Include="blueprint.dtd">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</BundleResource>
-	</ItemGroup>
-	<ItemGroup>
-		<BundleResource Include="FreeSO.png" />
-	</ItemGroup>
-	<ItemGroup>
-		<BundleResource Include="..\tso.client\Content\**\*.*">
-			<Link>Content\%(RecursiveDir)%(Filename)%(Extension)</Link>
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</BundleResource>
-	</ItemGroup>
-	<ItemGroup>
-		<BundleResource Include="..\tso.content\Content\**\*.*">
-			<Link>Content\%(RecursiveDir)%(Filename)%(Extension)</Link>
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</BundleResource>
-	</ItemGroup>
-	<ItemGroup>
-		<BundleResource Include="..\tso.client\bin\WindowsGL\Release\Content\Objects\**\*.*">
-			<Link>Content\Objects\%(RecursiveDir)%(Filename)%(Extension)</Link>
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</BundleResource>
-	</ItemGroup>
-	<ItemGroup>
-		<BundleResource Include="..\FSO.Windows\bin\Release\Content\MeshReplace\**\*.*">
-			<Link>Content\MeshReplace\%(RecursiveDir)%(Filename)%(Extension)</Link>
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</BundleResource>
-	</ItemGroup>
-	<ItemGroup>
-		<BundleResource Include="Resources\Default%402x.png" />
-	</ItemGroup>
-	<ItemGroup>
-		<BundleResource Include="Resources\Default-Portrait.png" />
-	</ItemGroup>
-	<ItemGroup>
-		<BundleResource Include="Resources\Default-Landscape.png" />
-	</ItemGroup>
-	<ItemGroup>
-		<BundleResource Include="Resources\Default.png" />
-	</ItemGroup>
-	<ItemGroup>
-		<None Include="iTunesMetadata.plist" />
-		<BundleResource Include="Resources\iTunesMetadata.plist">
-			<SubType>Designer</SubType>
-		</BundleResource>
-	</ItemGroup>
-	<ItemGroup>
-		<BundleResource Include="Default-Landscape-736h%403x.png" />
-	</ItemGroup>
-	<ItemGroup>
-		<BundleResource Include="Default-667h%402x.png" />
-	</ItemGroup>
-	<ItemGroup>
-		<Content Include="LICENSE.txt" />
-		<Content Include="MIConvexHull.xml" />
-	</ItemGroup>
-	<ItemGroup>
-		<Folder Include="extensions\" />
-	</ItemGroup>
+    <PropertyGroup>
+        <TargetFramework>net9.0-ios</TargetFramework>
+        <OutputType>Exe</OutputType>
+        <CodesignKey>iPhone Developer</CodesignKey>
+        <UseMaui>false</UseMaui>
+        <MtouchExtraArgs>--linkskip=System.Windows.Forms --linkskip=System.Drawing</MtouchExtraArgs>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="MonoGame.Framework.iOS" Version="3.8.4" />
+        <PackageReference Include="Ninject" Version="3.3.6" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\Other\libs\TargaImagePCL\TargaImagePCL.csproj" />
+        <ProjectReference Include="..\tso.client\FSO.Client.csproj" />
+        <ProjectReference Include="..\tso.common\FSO.Common.csproj" />
+        <ProjectReference Include="..\tso.content\FSO.Content.csproj" />
+        <ProjectReference Include="..\tso.files\FSO.Files.csproj" />
+    </ItemGroup>
+
+    <!-- Debug | iPhoneSimulator -->
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhoneSimulator' ">
+        <DebugSymbols>true</DebugSymbols>
+        <DebugType>full</DebugType>
+        <Optimize>false</Optimize>
+        <OutputPath>bin\iPhoneSimulator\Debug</OutputPath>
+        <DefineConstants>DEBUG;</DefineConstants>
+        <ErrorReport>prompt</ErrorReport>
+        <WarningLevel>4</WarningLevel>
+        <ConsolePause>false</ConsolePause>
+        <CodesignKey>iPhone Developer</CodesignKey>
+        <MtouchDebug>true</MtouchDebug>
+        <MtouchFastDev>true</MtouchFastDev>
+        <MtouchUseSGen>true</MtouchUseSGen>
+        <MtouchUseRefCounting>true</MtouchUseRefCounting>
+        <MtouchLink>Full</MtouchLink>
+        <MtouchTlsProvider>Default</MtouchTlsProvider>
+        <MtouchExtraArgs>--</MtouchExtraArgs>
+        <PlatformTarget>Arm64</PlatformTarget>
+        <RuntimeIdentifier>iossimulator-arm64</RuntimeIdentifier>
+    </PropertyGroup>
+
+    <!-- Release | iPhoneSimulator -->
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhoneSimulator' ">
+        <Optimize>true</Optimize>
+        <OutputPath>bin\iPhoneSimulator\Release</OutputPath>
+        <ErrorReport>prompt</ErrorReport>
+        <WarningLevel>4</WarningLevel>
+        <ConsolePause>false</ConsolePause>
+        <CodesignKey>iPhone Developer</CodesignKey>
+        <MtouchUseSGen>true</MtouchUseSGen>
+        <MtouchUseRefCounting>true</MtouchUseRefCounting>
+        <MtouchLink>None</MtouchLink>
+        <MtouchTlsProvider>Default</MtouchTlsProvider>
+        <PlatformTarget>Arm64</PlatformTarget>
+        <RuntimeIdentifier>iossimulator-arm64</RuntimeIdentifier>
+    </PropertyGroup>
+
+    <!-- Debug | iPhone (device) -->
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhone' ">
+        <DebugSymbols>true</DebugSymbols>
+        <DebugType>full</DebugType>
+        <Optimize>false</Optimize>
+        <OutputPath>bin\iPhone\Debug</OutputPath>
+        <DefineConstants>DEBUG;</DefineConstants>
+        <ErrorReport>prompt</ErrorReport>
+        <WarningLevel>4</WarningLevel>
+        <ConsolePause>false</ConsolePause>
+        <CodesignKey>iPhone Developer</CodesignKey>
+        <DeviceSpecificBuild>true</DeviceSpecificBuild>
+        <MtouchDebug>true</MtouchDebug>
+        <MtouchFastDev>true</MtouchFastDev>
+        <MtouchUseSGen>true</MtouchUseSGen>
+        <MtouchUseRefCounting>true</MtouchUseRefCounting>
+        <MtouchFloat32>false</MtouchFloat32>
+        <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
+        <MtouchLink>Full</MtouchLink>
+        <MtouchTlsProvider>Default</MtouchTlsProvider>
+        <MtouchExtraArgs>--linkskip=MonoGame.Framework --linkskip=FSO.Files --linkskip=FSO.SimAntics --linkskip=FSO.Content --linkskip=Ninject --linkskip=FreeSO --linkskip=FSO.Server.Protocol --linkskip=FSO.Common.Domain --linkskip=FSO.Common.DatabaseService --linkskip=FSO.Common.DataService --linkskip=FSO.UI --linkskip=System.Collections.Immutable --nolinkaway -v -v -v -v</MtouchExtraArgs>
+        <MtouchI18n>west</MtouchI18n>
+        <PlatformTarget>Arm64</PlatformTarget>
+        <RuntimeIdentifier>ios-arm64</RuntimeIdentifier>
+    </PropertyGroup>
+
+    <!-- Release | iPhone (device) -->
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhone' ">
+        <Optimize>true</Optimize>
+        <OutputPath>bin\iPhone\Release</OutputPath>
+        <ErrorReport>prompt</ErrorReport>
+        <WarningLevel>4</WarningLevel>
+        <ConsolePause>false</ConsolePause>
+        <CodesignKey>iPhone Developer</CodesignKey>
+        <MtouchUseSGen>True</MtouchUseSGen>
+        <MtouchUseRefCounting>True</MtouchUseRefCounting>
+        <MtouchFloat32>true</MtouchFloat32>
+        <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
+        <MtouchLink>Full</MtouchLink>
+        <MtouchDebug>True</MtouchDebug>
+        <MtouchUseLlvm>true</MtouchUseLlvm>
+        <BuildIpa>True</BuildIpa>
+        <IpaIncludeArtwork>False</IpaIncludeArtwork>
+        <IpaPackageName>FreeSO</IpaPackageName>
+        <MtouchProfiling>False</MtouchProfiling>
+        <MtouchFastDev>False</MtouchFastDev>
+        <MtouchUseThumb>False</MtouchUseThumb>
+        <MtouchEnableBitcode>False</MtouchEnableBitcode>
+        <OptimizePNGs>True</OptimizePNGs>
+        <DeviceSpecificBuild>true</DeviceSpecificBuild>
+        <MtouchI18n>west</MtouchI18n>
+        <IpaMetadata>iTunesMetadata.plist</IpaMetadata>
+        <MtouchExtraArgs>--linkskip=MonoGame.Framework --linkskip=FSO.Files --linkskip=FSO.SimAntics --linkskip=FSO.Content --linkskip=Ninject --linkskip=FSO.Client --linkskip=FSO.Server.Protocol --linkskip=FSO.Common.Domain --linkskip=FSO.Common.DatabaseService --linkskip=FSO.Common.DataService --linkskip=FSO.UI --linkskip=System.Collections.Immutable --linkskip=MSDFData --nolinkaway -v -v -v -v</MtouchExtraArgs>
+        <MtouchEnableSGenConc>true</MtouchEnableSGenConc>
+        <PlatformTarget>Arm64</PlatformTarget>
+        <RuntimeIdentifier>ios-arm64</RuntimeIdentifier>
+    </PropertyGroup>
+
+    <!-- Resources and plist -->
+    <ItemGroup>
+        <None Include="Entitlements.plist" />
+        <None Include="Info.plist" />
+    </ItemGroup>
+    <ItemGroup>
+        <BundleResource Include="GameThumbnail.png" />
+        <BundleResource Include="Default-568h%402x.png" />
+        <BundleResource Include="blueprint.dtd">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </BundleResource>
+    </ItemGroup>
+    <ItemGroup>
+        <BundleResource Include="FreeSO.png" />
+    </ItemGroup>
+    <ItemGroup>
+        <BundleResource Include="..\tso.client\Content\**\*.*">
+            <Link>Content\%(RecursiveDir)%(Filename)%(Extension)</Link>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </BundleResource>
+    </ItemGroup>
+    <ItemGroup>
+        <BundleResource Include="..\tso.content\Content\**\*.*">
+            <Link>Content\%(RecursiveDir)%(Filename)%(Extension)</Link>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </BundleResource>
+    </ItemGroup>
+    <ItemGroup>
+        <Content Include="LICENSE.txt" />
+        <Content Include="MIConvexHull.xml" />
+    </ItemGroup>
 </Project>

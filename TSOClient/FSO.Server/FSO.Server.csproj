@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFrameworks>net9.0;net9.0-ios</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <OutputType>Library</OutputType>
@@ -9,7 +9,7 @@
     <AssemblyName>server</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <ApplicationIcon>FreeSO.ico</ApplicationIcon>
-    <PublishAot>true</PublishAot>
+    <PublishAot>false</PublishAot>
     <PublishTrimmed>true</PublishTrimmed>
     <IsAotCompatible>true</IsAotCompatible>
     <TrimMode>full</TrimMode>
@@ -38,18 +38,21 @@
 
   <ItemGroup>
     <ProjectReference Include="..\FSO.Common.DatabaseService\FSO.Common.DatabaseService.csproj" />
-    <ProjectReference Include="..\FSO.Server.Api.Core\FSO.Server.Api.Core.csproj" />
     <ProjectReference Include="..\FSO.Server.Clients\FSO.Server.Clients.csproj" />
     <ProjectReference Include="..\FSO.Server.Common\FSO.Server.Common.csproj" />
     <ProjectReference Include="..\FSO.Server.Database\FSO.Server.Database.csproj" />
     <ProjectReference Include="..\FSO.Server.DataService\FSO.Common.DataService.csproj" />
     <ProjectReference Include="..\FSO.Server.Domain\FSO.Server.Domain.csproj" />
     <ProjectReference Include="..\FSO.Server.Protocol\FSO.Server.Protocol.csproj" />
-    <ProjectReference Include="..\FSO.Server.Updater\FSO.Server.Watchdog.csproj" />
     <ProjectReference Include="..\tso.simantics\FSO.SimAntics.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
+    <ItemGroup Condition="'$(OS)' == 'Windows_NT' Or '$(OS)' == 'Linux'">
+        <ProjectReference Include="..\FSO.Server.Api.Core\FSO.Server.Api.Core.csproj" />
+        <ProjectReference Include="..\FSO.Server.Updater\FSO.Server.Watchdog.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
     <Reference Include="Mario">
       <HintPath>..\tso.world\Mario.dll</HintPath>
     </Reference>

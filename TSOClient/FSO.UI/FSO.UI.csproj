@@ -2,14 +2,14 @@
 
   <PropertyGroup>
     <OutputType>Library</OutputType>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFrameworks>net9.0;net9.0-ios</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <RootNamespace>FSO.UI</RootNamespace>
     <AssemblyName>FSO.UI</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <IsAotCompatible>True</IsAotCompatible>
-    <PublishAot>true</PublishAot>
+    <PublishAot>false</PublishAot>
     <PublishTrimmed>true</PublishTrimmed>
     <IsAotCompatible>true</IsAotCompatible>
     <TrimMode>full</TrimMode>

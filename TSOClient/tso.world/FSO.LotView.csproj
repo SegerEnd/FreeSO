@@ -1,21 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFrameworks>net9.0;net9.0-ios</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <OutputType>Library</OutputType>
     <RootNamespace>FSO.LotView</RootNamespace>
     <AssemblyName>FSO.LotView</AssemblyName>
     <FileAlignment>512</FileAlignment>
-    <IsAotCompatible>True</IsAotCompatible>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <IsAotCompatible>True</IsAotCompatible>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <IsAotCompatible>True</IsAotCompatible>
   </PropertyGroup>
 
