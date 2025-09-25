@@ -137,10 +137,10 @@ namespace FSOFacadeWorker
         private static bool LoginSent;
         private static int Done;
 
-        public static async Task LoginAsync()
+        public static void Login()
         {
             api = new ApiClient(Config.Api_Url);
-            await api.AdminLoginAsync(Config.User, Config.Password, async (result) =>
+            _ = api.AdminLoginAsync(Config.User, Config.Password, (result) =>
             {
                 if (!result)
                 {
@@ -155,7 +155,7 @@ namespace FSOFacadeWorker
                     }
                     else
                     {
-                        await api.GetLotList(1, (lots) =>
+                        _ = api.GetLotList(1, (lots) =>
                         {
                             Console.WriteLine("Got a lot list for full thumbnail rebake.");
                             //LotQueue.AddRange(lots);
@@ -332,7 +332,7 @@ namespace FSOFacadeWorker
                 {
                     LoginSent = true;
                     Console.WriteLine("Attempting Login... (" + (loginAttempts++) + ")");
-                    LoginAsync();
+                    Login();
                 }
                 GameThread.OnWork.WaitOne(1000);
                 GameThread.DigestUpdate(null);
