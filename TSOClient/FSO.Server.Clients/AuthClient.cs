@@ -1,6 +1,7 @@
 ﻿using FSO.Server.Clients.Framework;
 using FSO.Server.Protocol.Authorization;
 using RestSharp;
+using System;
 
 namespace FSO.Server.Clients
 {
@@ -10,7 +11,7 @@ namespace FSO.Server.Clients
         {
         }
 
-        public async Task<AuthResult> Authenticate(AuthRequest input)
+        public AuthResult Authenticate(AuthRequest input)
         {
             var client = Client();
 
@@ -21,17 +22,18 @@ namespace FSO.Server.Clients
                             .AddQueryParameter("version", input.Version)
                             .AddQueryParameter("clientid", input.ClientID);
 
-            var response = await client.ExecuteAsync(request);
 
-            var result = new AuthResult { Valid = false };
+            var response = client.Execute(request);
+            var result = new AuthResult();
+            result.Valid = false;
 
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
             {
-                var lines = response.Content.Split('\n');
+                var lines = response.Content.Split(new char[] { '\n' });
                 foreach (var line in lines)
                 {
                     var components = line.Trim().Split(new char[] { '=' }, 2);
-                    if (components.Length != 2) continue;
+                    if (components.Length != 2) { continue; }
 
                     switch (components[0])
                     {

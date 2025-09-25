@@ -5,6 +5,8 @@ using FSO.Server.Clients;
 using FSO.Server.Clients.Framework;
 using FSO.Server.Protocol.Authorization;
 using FSO.Server.Protocol.CitySelector;
+using System;
+using System.Collections.Generic;
 
 namespace FSO.Client.Regulators
 {
@@ -15,6 +17,7 @@ namespace FSO.Client.Regulators
     {
         public AuthResult AuthResult { get; internal set; }
         public List<AvatarData> Avatars { get; internal set; } = new List<AvatarData>();
+        //public List<ShardStatusItem> Shards { get; internal set; } = new List<ShardStatusItem>();
         public IShardsDomain Shards;
 
         private AuthClient AuthClient;
@@ -40,35 +43,26 @@ namespace FSO.Client.Regulators
             AddState("UpdateRequired").OnlyTransitionFrom("InitialConnect");
         }
 
-        protected override async void OnAfterTransition(RegulatorState oldState, RegulatorState newState, object data)
+        protected override void OnAfterTransition(RegulatorState oldState, RegulatorState newState, object data)
         {
             switch (newState.Name)
             {
                 case "AuthLogin":
                     var loginData = (AuthRequest)data;
-                    AuthResult result = null;
-                    try
-                    {
-                        result = await AuthClient.Authenticate(loginData); // Await the async method
-                    }
-                    catch (Exception ex)
-                    {
-                        base.ThrowErrorAndReset(ex);
-                        return;
-                    }
+                    var result = AuthClient.Authenticate(loginData);
 
                     if (result == null || !result.Valid)
                     {
-                        if (!string.IsNullOrEmpty(result?.ReasonText))
+                        if (result.ReasonText != null)
                         {
                             base.ThrowErrorAndReset(ErrorMessage.FromLiteral(result.ReasonText));
                         }
-                        else if (!string.IsNullOrEmpty(result?.ReasonCode))
+                        else if (result.ReasonCode != null)
                         {
                             base.ThrowErrorAndReset(ErrorMessage.FromLiteral(
                                 (GameFacade.Strings.GetString("210", result.ReasonCode) ?? "Unknown Error")
                                 .Replace("EA.com", AuthClient.BaseUrl.Substring(7).TrimEnd('/'))
-                            ));
+                                ));
                         }
                         else
                         {
@@ -84,13 +78,12 @@ namespace FSO.Client.Regulators
                 case "InitialConnect":
                     try
                     {
-                        var connectResult = await Task.Run(() =>
-                            CityClient.InitialConnectServlet(
-                                new InitialConnectServletRequest
-                                {
-                                    Ticket = AuthResult.Ticket,
-                                    Version = "Version 1.1097.1.0"
-                                }));
+                        var connectResult = CityClient.InitialConnectServlet(
+                            new InitialConnectServletRequest
+                            {
+                                Ticket = AuthResult.Ticket,
+                                Version = "Version 1.1097.1.0"
+                            });
 
                         if (connectResult.Status == InitialConnectServletResultType.Authorized)
                         {
@@ -117,11 +110,12 @@ namespace FSO.Client.Regulators
                         base.ThrowErrorAndReset(ex);
                     }
                     break;
-
+                case "UpdateRequired":
+                    break;
                 case "AvatarData":
                     try
                     {
-                        Avatars = await Task.Run(() => CityClient.AvatarDataServlet());
+                        Avatars = CityClient.AvatarDataServlet();
                         AsyncTransition("ShardStatus");
                     }
                     catch (Exception ex)
@@ -133,7 +127,7 @@ namespace FSO.Client.Regulators
                 case "ShardStatus":
                     try
                     {
-                        ((ClientShards)Shards).All = await Task.Run(() => CityClient.ShardStatus());
+                        ((ClientShards)Shards).All = CityClient.ShardStatus();
                         AsyncTransition("LoggedIn");
                     }
                     catch (Exception ex)
@@ -155,6 +149,12 @@ namespace FSO.Client.Regulators
             var authstr = auth.FSOBranch + "-" + auth.FSOVersion;
 
             return str != authstr;
+
+            /*
+            var split = str.LastIndexOf('-');
+            int verNum = 0;
+            int.TryParse(split.)
+            */
         }
 
         protected override void OnBeforeTransition(RegulatorState oldState, RegulatorState newState, object data)
