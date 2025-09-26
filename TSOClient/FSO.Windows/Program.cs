@@ -32,6 +32,8 @@ namespace FSO.Windows
                 var startProxy = new GameStartProxy();
                 startProxy.Start(UseDX);
             }
+
+            Environment.Exit(0);
         }
 
 

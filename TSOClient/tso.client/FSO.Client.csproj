@@ -129,7 +129,6 @@
     <None Include="Content\ArchiveCities\FreeSO Archive\archive.ini">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="packages.config" />
     <None Include="Resources\Icon.bmp" />
     <None Include="Resources\ico256.fw.png" />
   </ItemGroup>
