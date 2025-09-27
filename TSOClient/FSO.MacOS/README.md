@@ -4,7 +4,7 @@
 2. Run the following command in Terminal in that folder to build a release publish:
 
 ```bash
-dotnet publish -c Release --self-contained true /p:PublishSingleFile=true`
+dotnet publish -c Release --self-contained true /p:PublishSingleFile=true
 ```
 
 This will generate a .app bundle in: bin/Release/net9.0/osx-arm64/publish folder.
