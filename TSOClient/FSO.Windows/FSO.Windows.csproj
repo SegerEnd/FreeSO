@@ -1,27 +1,29 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net9.0-windows;net9.0-macos</TargetFrameworks>
+    <TargetFramework>net9.0-windows</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>disable</Nullable>
-    <OutputType>Exe</OutputType>
+    <OutputType>WinExe</OutputType>
     <RootNamespace>FSO.Windows</RootNamespace>
     <AssemblyName>FreeSO</AssemblyName>
     <FileAlignment>512</FileAlignment>
+    <UseWindowsForms>true</UseWindowsForms>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <PublishAot>false</PublishAot>
+    <IsAotCompatible>false</IsAotCompatible>
+    <TrimMode>partial</TrimMode>
+    <ApplicationIcon>fso.ico</ApplicationIcon>
+    <PublishReadyToRun>true</PublishReadyToRun>
+    <TieredPGO>true</TieredPGO>
   </PropertyGroup>
 
   <ItemGroup>
     <Content Include="fso.ico" />
   </ItemGroup>
 
-    <PropertyGroup Condition="'$(TargetFramework)'=='net9.0-macos'">
-        <DefineConstants>MACOS</DefineConstants>
-        <ApplicationId>org.freeso.FreeSO</ApplicationId>
-    </PropertyGroup>
-
-    <PropertyGroup>
-      <ApplicationIcon>fso.ico</ApplicationIcon>
+  <PropertyGroup>
+    <ApplicationIcon>fso.ico</ApplicationIcon>
   </PropertyGroup>
   
   <ItemGroup>
