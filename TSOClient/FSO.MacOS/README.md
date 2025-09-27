@@ -14,7 +14,7 @@ You can then copy the app to your Applications folder.
 
 To open the app in 3D mode, run the open command with `--args -3d`:
 
-E.g when in the Applications folder, you can run:
+E.g when the application is placed in the Applications folder, you can run:
 
 ```bash
 open /Applications/FreeSO.app --args -3d
