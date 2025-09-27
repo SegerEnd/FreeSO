@@ -14,13 +14,8 @@
         <key>CFBundleExecutable</key>
         <string>FreeSO</string>
         <key>CFBundleIconFile</key>
-        <string>fso</string>
+        <string>Icon</string>
         <key>LSMinimumSystemVersion</key>
         <string>10.12</string>
-        <key>LSEnvironment</key>
-        <dict>
-            <key>DYLD_LIBRARY_PATH</key>
-            <string>@executable_path</string>
-        </dict>
     </dict>
 </plist>
