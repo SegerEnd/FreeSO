@@ -8,11 +8,7 @@ dotnet publish -c Release --self-contained true /p:PublishSingleFile=true`
 ```
 
 This will generate a .app bundle in: bin/Release/net9.0/osx-x64/publish folder.
-You can then copy the app to your Applications folder:
-
-```bash
-cp -R bin/Release/net9.0/osx-arm64/publish/FreeSO.app /Applications/
-```
+You can then copy the app to your Applications folder.
 
 ## Launch 3D
 
