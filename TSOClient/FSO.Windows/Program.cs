@@ -1,21 +1,33 @@
 ﻿using FSO.Client;
 using FSO.Client.UI.Panels;
 using FSO.Common.Rendering.Framework.IO;
+
+#if WINDOWS
 using System.Drawing.Imaging;
+#endif
 using System.Runtime.InteropServices;
+#if MACOS
+using AppKit;
+#endif
 
 namespace FSO.Windows
 {
     public static class Program
     {
-
         public static bool UseDX = true;
+
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
-
         public static void Main(string[] args)
         {
+#if MACOS
+            // Initialize AppKit for dialogs
+            NSApplication.Init();
+            NSApplication.SharedApplication.ActivateIgnoringOtherApps(true);
+#endif
+
+#if WINDOWS
             InitWindows();
 
             GameStartProxy.BindClosingHandler = (Func<bool> handler, IntPtr windowHandle) =>
@@ -26,6 +38,8 @@ namespace FSO.Windows
                     e.Cancel = !handler();
                 };
             };
+#endif
+            FSOProgram.ShowDialog = ShowDialog;
 
             if ((new FSOProgram()).InitWithArguments(args))
             {
@@ -36,8 +50,7 @@ namespace FSO.Windows
             Environment.Exit(0);
         }
 
-
-
+#if WINDOWS
         public static void InitWindows()
         {
             //initialize some platform specific stuff
@@ -51,12 +64,24 @@ namespace FSO.Windows
             if (!linux) ITTSContext.Provider = UITTSContext.PlatformProvider;
 
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
-            FSOProgram.ShowDialog = ShowDialog;
-
         }
+#endif
 
         public static void ShowDialog(string text)
         {
+#if MACOS
+            NSApplication.Init();
+            NSApplication.SharedApplication.ActivateIgnoringOtherApps(true);
+
+            var alert = new NSAlert
+            {
+                MessageText = "This is a message",
+                InformativeText = text,
+                AlertStyle = NSAlertStyle.Informational
+            };
+            alert.AddButton("OK");
+            alert.RunModal();
+#else
             OperatingSystem os = Environment.OSVersion;
             PlatformID pid = os.Platform;
             bool linux = pid == PlatformID.MacOSX || pid == PlatformID.Unix;
@@ -65,12 +90,16 @@ namespace FSO.Windows
                 Console.WriteLine(text);
                 Environment.Exit(0);
             }
+#endif
+#if WINDOWS
             else
             {
                 MessageBox.Show(text);
             }
+#endif
         }
 
+#if WINDOWS
         private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
             var exception = e.ExceptionObject;
@@ -100,24 +129,11 @@ namespace FSO.Windows
         public static void SavePNG(byte[] data, int width, int height, Stream str)
         {
             Bitmap image = new Bitmap(width, height, PixelFormat.Format32bppArgb);
-
-            // Fix up the Image to match the expected format
-            //image = (Bitmap)image.RGBToBGR();
-
             BitmapData bitmapData = image.LockBits(new System.Drawing.Rectangle(0, 0, image.Width, image.Height),
                 ImageLockMode.WriteOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 
             if (bitmapData.Stride != image.Width * 4)
                 throw new NotImplementedException();
-
-
-            for (int i = 0; i < data.Length; i += 4)
-            {
-                //if (data[i+3] == 0) { }
-                //var temp = data[i];
-                //data[i] = data[i + 2];
-                //data[i + 2] = temp;
-            }
 
             Marshal.Copy(data, 0, bitmapData.Scan0, data.Length);
             image.UnlockBits(bitmapData);
@@ -130,9 +146,6 @@ namespace FSO.Windows
             Bitmap image = (Bitmap)Bitmap.FromStream(str);
             try
             {
-                // Fix up the Image to match the expected format
-                //image = (Bitmap)image.RGBToBGR();
-
                 var data = new byte[image.Width * image.Height * 4];
 
                 BitmapData bitmapData = image.LockBits(new System.Drawing.Rectangle(0, 0, image.Width, image.Height),
@@ -153,29 +166,15 @@ namespace FSO.Windows
             }
         }
 
-        private static void RGBToBGROld(byte[] data)
-        {
-            for (int i = 0; i < data.Length; i += 4)
-            {
-                var temp = data[i];
-                data[i] = data[i + 2];
-                data[i + 2] = temp;
-            }
-        }
-
         private const ulong MaskR = 0x000000FF000000FF;
         private const ulong MaskB = 0x00FF000000FF0000;
         private const ulong MaskElse = 0xFF00FF00FF00FF00;
 
         private unsafe static void RGBToBGRSoft(byte[] data)
         {
-            // Do 8 bytes at a time with ulong.
-            // Could do this with an SSE shuffle, but .NET 4 doesn't have intrinsics.
-
             fixed (void* dataPtr = data)
             {
                 ulong* longPtr = (ulong*)dataPtr;
-
                 int longCount = data.Length / 8;
 
                 for (int i = 0; i < longCount; i++)
@@ -187,7 +186,6 @@ namespace FSO.Windows
 
             if (data.Length % 8 != 0)
             {
-                // Deal with the remainder.
                 int i = data.Length - 4;
                 var temp = data[i];
                 data[i] = data[i + 2];
@@ -197,14 +195,13 @@ namespace FSO.Windows
 
         // RGB to BGR convert Matrix
         private static float[][] rgbtobgr = new float[][]
-          {
-             new float[] {0, 0, 1, 0, 0},
-             new float[] {0, 1, 0, 0, 0},
-             new float[] {1, 0, 0, 0, 0},
-             new float[] {0, 0, 0, 1, 0},
-             new float[] {0, 0, 0, 0, 1}
-          };
-
+        {
+            new float[] {0, 0, 1, 0, 0},
+            new float[] {0, 1, 0, 0, 0},
+            new float[] {1, 0, 0, 0, 0},
+            new float[] {0, 0, 0, 1, 0},
+            new float[] {0, 0, 0, 0, 1}
+        };
 
         internal static Image RGBToBGR(this Image bmp)
         {
@@ -215,7 +212,6 @@ namespace FSO.Windows
             }
             else
             {
-                // Need to clone so the call to Clear() below doesn't clear the source before trying to draw it to the target.
                 newBmp = (Image)bmp.Clone();
             }
 
@@ -228,7 +224,8 @@ namespace FSO.Windows
                 using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(newBmp))
                 {
                     g.Clear(Color.Transparent);
-                    g.DrawImage(bmp, new System.Drawing.Rectangle(0, 0, bmp.Width, bmp.Height), 0, 0, bmp.Width, bmp.Height, System.Drawing.GraphicsUnit.Pixel, ia);
+                    g.DrawImage(bmp, new System.Drawing.Rectangle(0, 0, bmp.Width, bmp.Height),
+                        0, 0, bmp.Width, bmp.Height, System.Drawing.GraphicsUnit.Pixel, ia);
                 }
             }
             finally
@@ -241,5 +238,6 @@ namespace FSO.Windows
 
             return newBmp;
         }
+#endif
     }
 }

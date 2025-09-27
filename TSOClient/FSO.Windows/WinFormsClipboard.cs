@@ -1,4 +1,6 @@
-﻿using FSO.Common.Rendering.Framework.IO;
+﻿#if WINDOWS
+
+using FSO.Common.Rendering.Framework.IO;
 using System;
 using System.Threading;
 
@@ -35,3 +37,5 @@ namespace FSO.Windows
         }
     }
 }
+
+#endif
