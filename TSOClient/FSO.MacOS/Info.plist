@@ -19,5 +19,12 @@
         <string>public.app-category.simulation-games</string>
         <key>LSMinimumSystemVersion</key>
         <string>13.0</string>
+        <key>NSHumanReadableCopyright</key>
+        <string><![CDATA[
+By: riperiperi,
+MacOS: SegerEnd.
+Licensed under the Mozilla Public License, v. 2.0.
+FreeSO is not in any way affiliated with Electronic Arts or The Sims, it is an unofficial community run project.
+]]></string>
     </dict>
 </plist>
