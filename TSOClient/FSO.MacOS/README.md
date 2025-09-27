@@ -17,5 +17,5 @@ To open the app in 3D mode, run the open command with `--args -3d`:
 E.g when in the Applications folder, you can run:
 
 ```bash
-open /Applications/FreeSO.app --args -3d`
+open /Applications/FreeSO.app --args -3d
 ```
