@@ -15,7 +15,9 @@
         <string>FreeSO</string>
         <key>CFBundleIconFile</key>
         <string>Icon</string>
+        <key>LSApplicationCategoryType</key>
+        <string>public.app-category.simulation-games</string>
         <key>LSMinimumSystemVersion</key>
-        <string>10.12</string>
+        <string>13.0</string>
     </dict>
 </plist>
