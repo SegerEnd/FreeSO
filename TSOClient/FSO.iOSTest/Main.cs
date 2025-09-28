@@ -3,6 +3,7 @@ using FSO.Client;
 using FSO.Client.UI.Panels;
 using FSO.Common;
 using FSO.Files;
+using Microsoft.Xna.Framework.Input;
 using UIKit;
 
 namespace FSO.iOS
@@ -69,8 +70,8 @@ namespace FSO.iOS
             // set.CitySelectorUrl = "http://46.101.67.219:8081";
             // set.GameEntryUrl = "http://46.101.67.219:8081";
 
-            if (File.Exists(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "The Sims Online.zip")))
-                File.Delete(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "The Sims Online.zip"));
+            // if (File.Exists(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "The Sims Online.zip")))
+            //     File.Delete(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "The Sims Online.zip"));
 
 			var start = new GameStartProxy();
             start.SetPath(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "The Sims Online/TSOClient/"));//"/private/var/mobile/Documents/The Sims Online/TSOClient/");
@@ -86,23 +87,32 @@ namespace FSO.iOS
         /// </summary>
         static void Main(string[] args)
         {
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+            FSOProgram.ShowDialog = ShowDialog;
+            
             UIApplication.Main(args, null, "AppDelegate");
         }
+        
+        private UIWindow? window;
+        private FSOInstallViewController? installerVC;
 
         public override void FinishedLaunching(UIApplication app)
         {
-            if (File.Exists(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "The Sims Online/TSOClient/tuning.dat")))
+            var docs = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            var tsoClientPath = Path.Combine(docs, "The Sims Online/TSOClient/tuning.dat");
+
+            if (File.Exists(tsoClientPath))
             {
                 RunGame();
             }
             else
             {
-                UIStoryboard storyboard = UIStoryboard.FromName("Installer", null);
-                var window = new UIWindow(UIScreen.MainScreen.Bounds);
-                var viewController = storyboard.InstantiateViewController("Main") as FSOInstallViewController;
-                viewController.OnInstalled += FSOInstalled;
+                window = new UIWindow(UIScreen.MainScreen.Bounds);
+                installerVC = new FSOInstallViewController();
+                installerVC.OnInstalled += FSOInstalled;
+
+                window.RootViewController = installerVC;
                 window.MakeKeyAndVisible();
-                window.RootViewController = viewController;
             }
         }
 
@@ -111,48 +121,41 @@ namespace FSO.iOS
             RunGame();
         }
         
-        /*
         public static void ShowDialog(string text)
         {
-            var message = text;
+            // Escape double quotes in text
+            string escapedText = text.Replace("\"", "\\\"");
 
-            // Find the active foreground scene
-            foreach (var scene in UIApplication.SharedApplication.ConnectedScenes)
+            var alertController = UIAlertController.Create("FreeSO Message", escapedText, UIAlertControllerStyle.Alert);
+            alertController.AddAction(UIAlertAction.Create("OK", UIAlertActionStyle.Default, null));
+
+            // Get the topmost view controller
+            var window = UIApplication.SharedApplication.KeyWindow;
+            var viewController = window.RootViewController;
+            while (viewController.PresentedViewController != null)
             {
-                if (scene is UIWindowScene windowScene && windowScene.ActivationState == UISceneActivationState.ForegroundActive)
-                {
-                    var window = windowScene.Windows.FirstOrDefault(w => w.IsKeyWindow);
-                    var rootVC = window?.RootViewController;
-                    if (rootVC == null) continue;
-
-                    var topVC = GetTopViewController(rootVC);
-
-                    // Must present on the main thread
-                    UIApplication.SharedApplication.InvokeOnMainThread(() =>
-                    {
-                        var alert = UIAlertController.Create("FSO Message", message, UIAlertControllerStyle.Alert);
-                        alert.AddAction(UIAlertAction.Create("OK", UIAlertActionStyle.Default, null));
-                        topVC.PresentViewController(alert, true, null);
-                    });
-
-                    break; // only show on one active scene
-                }
+                viewController = viewController.PresentedViewController;
             }
+
+            viewController.PresentViewController(alertController, true, null);
+            
+            Environment.Exit(1);
         }
 
-        private static UIViewController GetTopViewController(UIViewController root)
+        private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
-            if (root.PresentedViewController == null)
-                return root;
-
-            if (root.PresentedViewController is UINavigationController nav)
-                return GetTopViewController(nav.VisibleViewController);
-
-            if (root.PresentedViewController is UITabBarController tab)
-                return GetTopViewController(tab.SelectedViewController);
-
-            return GetTopViewController(root.PresentedViewController);
+            var exception = e.ExceptionObject;
+            
+            if (exception is OutOfMemoryException)
+            {
+                ShowDialog(e.ExceptionObject.ToString() + "Out of Memory! FreeSO needs to close.");
+            }
+            else
+            {
+                ShowDialog(e.ExceptionObject.ToString() + "A fatal error occured! Screenshot this dialog and post it on Discord.");
+            }
+            
+            Environment.Exit(1);
         }
-        */
     }
 }
