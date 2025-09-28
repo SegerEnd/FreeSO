@@ -3,7 +3,7 @@
         <TargetFramework>net9.0-ios26.0</TargetFramework>
         <NoWarn>$(NoWarn);XCODE_26_0_PREVIEW</NoWarn>
         <OutputType>Exe</OutputType>
-        <Nullable>disable</Nullable>
+        <Nullable>enable</Nullable>
         <ImplicitUsings>true</ImplicitUsings>
         <SupportedOSPlatformVersion>13.0</SupportedOSPlatformVersion>
         <!--
@@ -19,86 +19,5 @@
     <ItemGroup>
         <ProjectReference Include="..\tso.client\FSO.Client.csproj" />
         <ProjectReference Include="..\tso.content\FSO.Content.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <PackageReference Include="MonoGame.Framework.iOS" Version="3.8.4" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <InterfaceDefinition Include="Installer.storyboard" />
-        <None Include="Entitlements.plist" />
-        <None Include="Info.plist" />
-    </ItemGroup>
-    <ItemGroup>
-        <BundleResource Include="GameThumbnail.png" />
-        <BundleResource Include="Default-568h%402x.png" />
-        <BundleResource Include="blueprint.dtd">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </BundleResource>
-    </ItemGroup>
-    <ItemGroup>
-        <ProjectReference Include="..\..\Other\libs\TargaImagePCL\TargaImagePCL.csproj">
-            <Project>{d8232422-9d79-4200-a981-eb70ed82ccf3}</Project>
-            <Name>TargaImagePCL</Name>
-        </ProjectReference>
-    </ItemGroup>
-    <ItemGroup>
-        <BundleResource Include="FreeSO.png" />
-    </ItemGroup>
-    <ItemGroup>
-        <BundleResource Include="..\tso.client\Content\**\*.*">
-            <Link>Content\%(RecursiveDir)%(Filename)%(Extension)</Link>
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </BundleResource>
-    </ItemGroup>
-    <ItemGroup>
-        <BundleResource Include="..\tso.content\Content\**\*.*">
-            <Link>Content\%(RecursiveDir)%(Filename)%(Extension)</Link>
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </BundleResource>
-    </ItemGroup>
-    <ItemGroup>
-        <BundleResource Include="..\tso.client\bin\WindowsGL\Release\Content\Objects\**\*.*">
-            <Link>Content\Objects\%(RecursiveDir)%(Filename)%(Extension)</Link>
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </BundleResource>
-    </ItemGroup>
-    <ItemGroup>
-        <BundleResource Include="..\FSO.Windows\bin\Release\Content\MeshReplace\**\*.*">
-            <Link>Content\MeshReplace\%(RecursiveDir)%(Filename)%(Extension)</Link>
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </BundleResource>
-    </ItemGroup>
-    <ItemGroup>
-        <BundleResource Include="Resources\Default%402x.png" />
-    </ItemGroup>
-    <ItemGroup>
-        <BundleResource Include="Resources\Default-Portrait.png" />
-    </ItemGroup>
-    <ItemGroup>
-        <BundleResource Include="Resources\Default-Landscape.png" />
-    </ItemGroup>
-    <ItemGroup>
-        <BundleResource Include="Resources\Default.png" />
-    </ItemGroup>
-    <ItemGroup>
-        <None Include="iTunesMetadata.plist" />
-        <BundleResource Include="Resources\iTunesMetadata.plist">
-            <SubType>Designer</SubType>
-        </BundleResource>
-    </ItemGroup>
-    <ItemGroup>
-        <BundleResource Include="Default-Landscape-736h%403x.png" />
-    </ItemGroup>
-    <ItemGroup>
-        <BundleResource Include="Default-667h%402x.png" />
-    </ItemGroup>
-    <ItemGroup>
-        <Content Include="LICENSE.txt" />
-        <Content Include="MIConvexHull.xml" />
-    </ItemGroup>
-    <ItemGroup>
-        <Folder Include="extensions\" />
     </ItemGroup>
 </Project>
