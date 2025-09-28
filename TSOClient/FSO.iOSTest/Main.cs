@@ -25,8 +25,8 @@ namespace FSO.iOS
 			FSOEnvironment.SoftwareKeyboard = true;
 			FSOEnvironment.SoftwareDepth = true;
             FSOEnvironment.EnableNPOTMip = true;
-            FSOEnvironment.GLVer = 2;
-            FSOEnvironment.UseMRT = false;
+            // FSOEnvironment.GLVer = 2;
+            // FSOEnvironment.UseMRT = false;
 			FSOEnvironment.UIZoomFactor = iPad?1:2;
             FSOEnvironment.DPIScaleFactor = iPad ? 2 : 1;
             FSOEnvironment.TexCompress = false;
@@ -54,7 +54,7 @@ namespace FSO.iOS
 
             var set = GlobalSettings.Default;
             set.TargetRefreshRate = 60;
-            set.CurrentLang = "english";
+            // set.CurrentLang = "english";
             set.Lighting = true;
             set.SmoothZoom = true;
             set.AntiAlias = 0;
@@ -66,8 +66,8 @@ namespace FSO.iOS
             set.GraphicsWidth = (int)UIScreen.MainScreen.Bounds.Width;
             set.DirectionalLight3D = false;
             set.GraphicsHeight = (int)UIScreen.MainScreen.Bounds.Height;
-            set.CitySelectorUrl = "http://46.101.67.219:8081";
-            set.GameEntryUrl = "http://46.101.67.219:8081";
+            // set.CitySelectorUrl = "http://46.101.67.219:8081";
+            // set.GameEntryUrl = "http://46.101.67.219:8081";
 
             if (File.Exists(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "The Sims Online.zip")))
                 File.Delete(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "The Sims Online.zip"));
