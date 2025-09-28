@@ -13,11 +13,45 @@
         <TrimMode Condition="'$(Configuration)' == 'Release'">full</TrimMode>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-      <CodesignKey>iPhone Developer</CodesignKey>
+        <CodesignKey>iPhone Developer</CodesignKey>
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\tso.client\FSO.Client.csproj" />
-        <ProjectReference Include="..\tso.content\FSO.Content.csproj" />
+        <InterfaceDefinition Include="Installer.storyboard"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <BundleResource Include="Default-Landscape-736h%403x.png"/>
+    </ItemGroup>
+    <ItemGroup>
+        <BundleResource Include="Default-667h%402x.png"/>
+    </ItemGroup>
+    <ItemGroup>
+        <Content Include="LICENSE.txt"/>
+        <Content Include="MIConvexHull.xml"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <BundleResource Include="GameThumbnail.png" />
+        <BundleResource Include="Default-568h%402x.png" />
+        <BundleResource Include="blueprint.dtd">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </BundleResource>
+        <BundleResource Include="FreeSO.png" />
+        <BundleResource Include="Resources\Default%402x.png" />
+        <BundleResource Include="Resources\Default-Portrait.png" />
+        <BundleResource Include="Resources\Default-Landscape.png" />
+        <BundleResource Include="Resources\Default.png" />
+        <BundleResource Include="Default-Landscape-736h%403x.png" />
+        <BundleResource Include="Default-667h%402x.png" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="MonoGame.Framework.iOS" Version="3.8.4"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\tso.client\FSO.Client.csproj"/>
+        <ProjectReference Include="..\tso.content\FSO.Content.csproj"/>
     </ItemGroup>
 </Project>
