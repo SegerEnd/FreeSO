@@ -1,4 +1,4 @@
-namespace FSO.iOSTest;
+namespace FSO.iOS;
 
 [Register("AppDelegate")]
 public class AppDelegate : UIApplicationDelegate

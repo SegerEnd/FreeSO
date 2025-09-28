@@ -1,4 +1,4 @@
-namespace FSO.iOSTest;
+namespace FSO.iOS;
 
 [Register("SceneDelegate")]
 public class SceneDelegate : UIResponder, IUIWindowSceneDelegate
