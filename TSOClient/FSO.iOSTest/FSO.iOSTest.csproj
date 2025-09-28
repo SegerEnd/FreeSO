@@ -15,4 +15,9 @@
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
       <CodesignKey>iPhone Developer</CodesignKey>
     </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\tso.client\FSO.Client.csproj" />
+        <ProjectReference Include="..\tso.content\FSO.Content.csproj" />
+    </ItemGroup>
 </Project>

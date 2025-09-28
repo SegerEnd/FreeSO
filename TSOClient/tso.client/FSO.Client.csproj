@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFrameworks>net9.0;net9.0-ios26.0</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>disable</Nullable>
     <ApplicationIcon>fso.ico</ApplicationIcon>
@@ -131,6 +131,11 @@
     </None>
     <None Include="Resources\Icon.bmp" />
     <None Include="Resources\ico256.fw.png" />
+    <Using Remove="UIKit" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)'=='net9.0-ios26.0'">
+      <PackageReference Include="MonoGame.Framework.iOS" Version="3.8.4" />
   </ItemGroup>
 
   <ItemGroup>

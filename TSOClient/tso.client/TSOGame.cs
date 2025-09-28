@@ -340,7 +340,9 @@ namespace FSO.Client
             catch (Exception e)
             {
                 FSOProgram.ShowDialog("Content could not be loaded. Make sure that the FreeSO content has been compiled! (ContentSrc/TSOClientContent.mgcb) \r\n\r\n" + e.ToString());
+                #if !IOS 
                 Exit();
+                #endif
                 Environment.Exit(0);
             }
 

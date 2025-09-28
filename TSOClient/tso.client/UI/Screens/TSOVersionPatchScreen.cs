@@ -48,10 +48,12 @@ namespace FSO.Client.UI.Screens
                     {
                         BeginUpdate();
                     }
+                    #if !IOS
                     else
                     {
                         GameFacade.Game.Exit();
                     }
+                    #endif
                 }
                 else if (state.CtrlDown && state.ShiftDown && state.NewKeys.Contains(Microsoft.Xna.Framework.Input.Keys.C))
                 {
