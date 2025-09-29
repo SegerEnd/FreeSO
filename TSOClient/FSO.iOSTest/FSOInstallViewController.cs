@@ -117,6 +117,58 @@ namespace FSO.iOS
                 IpConfirm.HeightAnchor.ConstraintEqualTo(30)
             });
         }
+        
+        private void ResetDownloader()
+        {
+            StatusText.Text = "Enter a location to download TSO files from.";
+            StatusProgress.Progress = 0f;
+            IpConfirm.Enabled = true;
+            IPEntry.Enabled = true;
+            try
+            {
+                File.Delete(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "The Sims Online.zip"));
+            }
+            catch (Exception e) { }
+            ReDownload = true;
+            if (DownloadClient != null) DownloadClient.Dispose();
+        }
+        
+        private void Client_DownloadFileCompleted()
+        {
+            InvokeOnMainThread(() =>
+            {
+                StatusText.Text = "Extracting TSO Files...";
+            });
+            (new Thread(() =>
+            {
+                //try zip extract
+                string zipPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "The Sims Online.zip");
+                Directory.CreateDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "The Sims Online/"));
+                string extractPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "The Sims Online/");
+
+                try
+                {
+                    ZipFile.ExtractToDirectory(zipPath, extractPath);
+                }
+                catch (Exception ex)
+                {
+                    InvokeOnMainThread(() =>
+                    {
+                        // UIAlertView _error = new UIAlertView("An error occurred", "Fatal error occurred during zip extraction. " + ex.ToString(), null, "Ok", null);
+                        ShowAlert("Extraction Error", "Fatal error occurred during zip extraction. " + ex.ToString());
+                        // _error.Show();
+                        ResetDownloader();
+                        return;
+                    });
+                }
+                Thread.Sleep(1500);
+                InvokeOnMainThread(() =>
+                {
+                    
+                    OnInstalled?.Invoke();
+                });
+            })).Start();
+        }
 
         private async void StartDownload()
         {
@@ -161,84 +213,14 @@ namespace FSO.iOS
                 // Extraction
                 new Thread(() =>
                 {
-                    string extractPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "The Sims Online");
-                    ExtractZipStreamedAsync(dest, extractPath).Wait();
+                    // string extractPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "The Sims Online");
+                    Client_DownloadFileCompleted();
                 }).Start();
             }
             catch (Exception ex)
             {
                 ShowAlert("Download Error", "Failed to download: " + ex.Message);
                 ResetDownloader();
-            }
-        }
-
-        private async Task ExtractZipStreamedAsync(string zipPath, string extractPath)
-        {
-            try
-            {
-                // Ensure the target directory exists
-                Directory.CreateDirectory(extractPath);
-
-                using (var zipFile = File.OpenRead(zipPath))
-                using (var archive = new ZipArchive(zipFile, ZipArchiveMode.Read))
-                {
-                    foreach (var entry in archive.Entries)
-                    {
-                        var destination = Path.Combine(extractPath, entry.FullName);
-
-                        if (string.IsNullOrEmpty(entry.Name)) // Folder
-                        {
-                            Directory.CreateDirectory(destination);
-                            continue;
-                        }
-
-                        Directory.CreateDirectory(Path.GetDirectoryName(destination)!);
-
-                        // Use async copy to avoid blocking
-                        using (var entryStream = entry.Open())
-                        using (var fileStream = File.Create(destination))
-                        {
-                            await entryStream.CopyToAsync(fileStream);
-                        }
-                    }
-                }
-
-                // Safely invoke OnInstalled on the main thread asynchronously
-                BeginInvokeOnMainThread(() =>
-                {
-                    OnInstalled?.Invoke();
-                });
-            }
-            catch (Exception ex)
-            {
-                BeginInvokeOnMainThread(() =>
-                {
-                    ShowAlert("Extraction Error", $"Failed during zip extraction: {ex.Message}");
-                    ResetDownloader();
-                });
-            }
-        }
-
-        private void ResetDownloader()
-        {
-            StatusText.Text = "Enter a location to download The Sims Online files from.";
-            StatusProgress.Progress = 0f;
-            IpConfirm.Enabled = true;
-            IPEntry.Enabled = true;
-
-            try
-            {
-                string zipPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "The Sims Online.zip");
-                if (File.Exists(zipPath)) File.Delete(zipPath);
-            }
-            catch { }
-
-            ReDownload = true;
-
-            if (DownloadClient != null)
-            {
-                DownloadClient.Dispose();
-                DownloadClient = null;
             }
         }
 
