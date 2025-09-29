@@ -125,21 +125,25 @@ namespace FSO.iOS
         {
             // Escape double quotes in text
             string escapedText = text.Replace("\"", "\\\"");
-
-            var alertController = UIAlertController.Create("FreeSO Message", escapedText, UIAlertControllerStyle.Alert);
-            alertController.AddAction(UIAlertAction.Create("OK", UIAlertActionStyle.Default, null));
-
-            // Get the topmost view controller
-            var window = UIApplication.SharedApplication.KeyWindow;
-            var viewController = window.RootViewController;
-            while (viewController.PresentedViewController != null)
-            {
-                viewController = viewController.PresentedViewController;
-            }
-
-            viewController.PresentViewController(alertController, true, null);
             
-            Environment.Exit(1);
+            UIAlertView _alert = new UIAlertView("FreeSO Message", text, null, "OK", null);
+            _alert.Show();
+            // _alert.Dismissed += (sender, e) => Environment.Exit(1);
+            
+            // var alertController = UIAlertController.Create("FreeSO Message", escapedText, UIAlertControllerStyle.Alert);
+            // alertController.AddAction(UIAlertAction.Create("OK", UIAlertActionStyle.Default, null));
+            //
+            // // Get the topmost view controller
+            // var window = UIApplication.SharedApplication.KeyWindow;
+            // var viewController = window.RootViewController;
+            // while (viewController.PresentedViewController != null)
+            // {
+            //     viewController = viewController.PresentedViewController;
+            // }
+            //
+            // viewController.PresentViewController(alertController, true, null);
+            
+            // Environment.Exit(1);
         }
 
         private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)

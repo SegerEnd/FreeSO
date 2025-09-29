@@ -244,10 +244,7 @@ namespace FSO.iOS
 
         private void ShowAlert(string title, string message)
         {
-            InvokeOnMainThread(() =>
-            {
-                FSOProgram.ShowDialog(title + " " + message);
-            });
+            FSOProgram.ShowDialog(title + " " + message);
         }
     }
 }
