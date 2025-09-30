@@ -3,6 +3,7 @@ using FSO.Client;
 using FSO.Client.UI.Panels;
 using FSO.Common;
 using FSO.Files;
+using FSO.LotView;
 using Microsoft.Xna.Framework.Input;
 using UIKit;
 
@@ -13,32 +14,11 @@ namespace FSO.iOS
     {
         public static Action<string>? MainOrg;
 
-		internal void RunGame()
+		private void RunGame()
 		{
             InvokeOnMainThread(() => { ShowDialog("Trying to start FreeSO MonoGame..."); });
 
-            ImageLoader.BaseFunction = iOSImageLoader.iOSFromStream;
-            var iPad = UIDevice.CurrentDevice.Model.Contains("iPad");
-            //TODO: disable iPad retina somehow
-            FSOEnvironment.ContentDir = "Content/";
-			FSOEnvironment.GFXContentDir = "Content/iOS/";
-			FSOEnvironment.UserDir = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-			FSOEnvironment.Linux = true;
-			FSOEnvironment.DirectX = false;
-			FSOEnvironment.SoftwareKeyboard = true;
-			FSOEnvironment.SoftwareDepth = true;
-            FSOEnvironment.EnableNPOTMip = true;
-            // FSOEnvironment.GLVer = 2;
-            // FSOEnvironment.UseMRT = false;
-			FSOEnvironment.UIZoomFactor = iPad?1:2;
-            FSOEnvironment.DPIScaleFactor = iPad ? 2 : 1;
-            FSOEnvironment.TexCompress = false;
-            FSOEnvironment.TexCompressSupport = false;
-
-            FSOEnvironment.Enable3D = true;
-            ITTSContext.Provider = AppleTTSContext.PlatformProvider;
-
-            FSO.Files.ImageLoader.UseSoftLoad = false;
+            // ImageLoader.BaseFunction = iOSImageLoader.iOSFromStream;
 
             /*
             var settings = new NinjectSettings();
@@ -50,15 +30,15 @@ namespace FSO.iOS
                 if (MainOrg != null)
                 {
                     ShowDialog("Falling into MainOrg...");
-                    var cont = new FSO.Client.GameController(null);
+                    // var cont = new FSO.Client.GameController(null);
                 }
 
                 MainOrg = FSO.Client.FSOProgram.ShowDialog;
             });
 
-            GlobalSettings.Default.CityShadows = false;
+            // GlobalSettings.Default.CityShadows = false;
 
-
+/*
             var set = GlobalSettings.Default;
             set.TargetRefreshRate = 60;
             // set.CurrentLang = "english";
@@ -75,7 +55,6 @@ namespace FSO.iOS
             set.GraphicsHeight = (int)UIScreen.MainScreen.Bounds.Height;
             // set.CitySelectorUrl = "http://46.101.67.219:8081";
             // set.GameEntryUrl = "http://46.101.67.219:8081";
-
             if (File.Exists(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "The Sims Online.zip")))
             {
                 InvokeOnMainThread(() => { 
@@ -83,17 +62,29 @@ namespace FSO.iOS
                 });
                 File.Delete(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "The Sims Online.zip"));
             }
-
-            var start = new GameStartProxy();
-            start.SetPath(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "The Sims Online/TSOClient/"));//"/private/var/mobile/Documents/The Sims Online/TSOClient/");
-
-            TSOGame game = new TSOGame();
-            GameFacade.DirectX = false;
-            FSO.LotView.World.DirectX = false;
+            */
+   
+            // TSOGame game = new TSOGame();
+            // GameFacade.DirectX = false;
+            // FSO.LotView.World.DirectX = false;
             InvokeOnMainThread(() => { 
-                FSOEnvironment.GameThread = Thread.CurrentThread;
-                ShowDialog("Going to run FreeSO MonoGame now...");
-                game.Run();
+                // FSOEnvironment.GameThread = Thread.CurrentThread;
+                // game.Run();
+                
+                if ((new FSOProgram()).InitWithArguments(new string[] { }))
+                {
+                    ShowDialog("Going to run FreeSO MonoGame now...");
+                    var startProxy = new GameStartProxy();
+                    startProxy.SetPath(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "The Sims Online/TSOClient/"));//"/private/var/mobile/Documents/The Sims Online/TSOClient/");
+                    TSOGame game = new TSOGame();
+                    GameFacade.DirectX = false;
+                    FSO.LotView.World.DirectX = false;
+                    game.Run();
+                }
+                else
+                {
+                    ShowDialog("FSOProgram InitWithArguments failed!");
+                }
             });
         }
 
@@ -102,8 +93,8 @@ namespace FSO.iOS
         /// </summary>
         static void Main(string[] args)
         {
-            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
-            FSOProgram.ShowDialog = ShowDialog;
+            // AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+            // FSOProgram.ShowDialog = ShowDialog;
             
             UIApplication.Main(args, null, "AppDelegate");
         }
@@ -115,10 +106,15 @@ namespace FSO.iOS
         {
             var docs = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             var tsoClientPath = Path.Combine(docs, "The Sims Online/TSOClient/tuning.dat");
+            
+            // print app files in documents for debugging in showDialog
+            var appFiles = Directory.GetFiles(docs, "*", SearchOption.AllDirectories);
+            var fileList = "App files:\n" + string.Join("\n", appFiles);
+            InvokeOnMainThread(() => { ShowDialog(fileList); });
 
             if (File.Exists(tsoClientPath))
             {
-                RunGame();
+                // RunGame();
             }
             else
             {
@@ -133,13 +129,11 @@ namespace FSO.iOS
 
         private void FSOInstalled()
         {
-            ShowDialog("FreeSO installed, starting game...");
-            window?.InvokeOnMainThread(() =>
+            InvokeOnMainThread(() =>
             {
-                window.RootViewController = null;
-                installerVC = null;
+                ShowDialog("FreeSO installed, starting game...");
+                RunGame();
             });
-            RunGame();
         }
         
         public static void ShowDialog(string text)

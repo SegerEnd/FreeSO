@@ -8,6 +8,8 @@
     <string>org.freeso.mobilefso</string>
     <key>CFBundleShortVersionString</key>
     <string>1.0</string>
+    <key>CFBundleName</key>
+    <string>FSO.iOS</string>
     <key>CFBundleVersion</key>
     <string>1.0</string>
     <key>LSRequiresIPhoneOS</key>
@@ -30,7 +32,6 @@
     </array>
     <key>UISupportedInterfaceOrientations~ipad</key>
     <array>
-        <string>UIInterfaceOrientationPortraitUpsideDown</string>
         <string>UIInterfaceOrientationLandscapeLeft</string>
         <string>UIInterfaceOrientationLandscapeRight</string>
     </array>
