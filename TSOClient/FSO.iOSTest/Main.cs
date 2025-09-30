@@ -11,10 +11,12 @@ namespace FSO.iOS
     [Register("AppDelegate")]
     internal class Program : UIApplicationDelegate
     {
-        public static Action<string> MainOrg;
+        public static Action<string>? MainOrg;
 
-		internal static void RunGame()
+		internal void RunGame()
 		{
+            InvokeOnMainThread(() => { ShowDialog("Trying to start FreeSO MonoGame..."); });
+
             ImageLoader.BaseFunction = iOSImageLoader.iOSFromStream;
             var iPad = UIDevice.CurrentDevice.Model.Contains("iPad");
             //TODO: disable iPad retina somehow
@@ -33,7 +35,6 @@ namespace FSO.iOS
             FSOEnvironment.TexCompress = false;
             FSOEnvironment.TexCompressSupport = false;
 
-            FSOEnvironment.GameThread = Thread.CurrentThread;
             FSOEnvironment.Enable3D = true;
             ITTSContext.Provider = AppleTTSContext.PlatformProvider;
 
@@ -44,11 +45,16 @@ namespace FSO.iOS
             settings.LoadExtensions = false;
             */
 
-            if (MainOrg != null)
+            InvokeOnMainThread(() =>
             {
-                var cont = new FSO.Client.GameController(null);
-            }
-            MainOrg = FSO.Client.FSOProgram.ShowDialog;
+                if (MainOrg != null)
+                {
+                    ShowDialog("Falling into MainOrg...");
+                    var cont = new FSO.Client.GameController(null);
+                }
+
+                MainOrg = FSO.Client.FSOProgram.ShowDialog;
+            });
 
             GlobalSettings.Default.CityShadows = false;
 
@@ -70,16 +76,25 @@ namespace FSO.iOS
             // set.CitySelectorUrl = "http://46.101.67.219:8081";
             // set.GameEntryUrl = "http://46.101.67.219:8081";
 
-            // if (File.Exists(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "The Sims Online.zip")))
-            //     File.Delete(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "The Sims Online.zip"));
+            if (File.Exists(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "The Sims Online.zip")))
+            {
+                InvokeOnMainThread(() => { 
+                    ShowDialog("Cleaning up temporary downloaded TSO file...");
+                });
+                File.Delete(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "The Sims Online.zip"));
+            }
 
-			var start = new GameStartProxy();
+            var start = new GameStartProxy();
             start.SetPath(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "The Sims Online/TSOClient/"));//"/private/var/mobile/Documents/The Sims Online/TSOClient/");
 
             TSOGame game = new TSOGame();
             GameFacade.DirectX = false;
             FSO.LotView.World.DirectX = false;
-            game.Run(Microsoft.Xna.Framework.GameRunBehavior.Asynchronous);
+            InvokeOnMainThread(() => { 
+                FSOEnvironment.GameThread = Thread.CurrentThread;
+                ShowDialog("Going to run FreeSO MonoGame now...");
+                game.Run();
+            });
         }
 
         /// <summary>
@@ -118,32 +133,20 @@ namespace FSO.iOS
 
         private void FSOInstalled()
         {
+            ShowDialog("FreeSO installed, starting game...");
+            window?.InvokeOnMainThread(() =>
+            {
+                window.RootViewController = null;
+                installerVC = null;
+            });
             RunGame();
         }
         
         public static void ShowDialog(string text)
         {
-            // Escape double quotes in text
-            string escapedText = text.Replace("\"", "\\\"");
-            
             UIAlertView _alert = new UIAlertView("FreeSO Message", text, null, "OK", null);
             _alert.Show();
-            // _alert.Dismissed += (sender, e) => Environment.Exit(1);
-            
-            // var alertController = UIAlertController.Create("FreeSO Message", escapedText, UIAlertControllerStyle.Alert);
-            // alertController.AddAction(UIAlertAction.Create("OK", UIAlertActionStyle.Default, null));
-            //
-            // // Get the topmost view controller
-            // var window = UIApplication.SharedApplication.KeyWindow;
-            // var viewController = window.RootViewController;
-            // while (viewController.PresentedViewController != null)
-            // {
-            //     viewController = viewController.PresentedViewController;
-            // }
-            //
-            // viewController.PresentViewController(alertController, true, null);
-            
-            // Environment.Exit(1);
+            Task.Delay(2000).Wait();
         }
 
         private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)

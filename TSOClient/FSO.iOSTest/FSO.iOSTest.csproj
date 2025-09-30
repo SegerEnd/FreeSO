@@ -40,6 +40,9 @@
         <BundleResource Include="Resources\Default.png" />
         <BundleResource Include="Default-Landscape-736h%403x.png" />
         <BundleResource Include="Default-667h%402x.png" />
+        <BundleResource Include="Content\**" />
+        <BundleResource Include="Content\**\*.*" />
+        <BundleResource Include="Content\**\**\*.*" />
     </ItemGroup>
 
     <ItemGroup>
@@ -49,5 +52,6 @@
     <ItemGroup>
         <ProjectReference Include="..\tso.client\FSO.Client.csproj"/>
         <ProjectReference Include="..\tso.content\FSO.Content.csproj"/>
+        <ProjectReference Include="..\tso.common\FSO.Common.csproj" />
     </ItemGroup>
 </Project>
