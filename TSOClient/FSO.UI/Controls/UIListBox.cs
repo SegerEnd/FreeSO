@@ -354,6 +354,13 @@ namespace FSO.Client.UI.Controls
         {
             Invalidate();
             m_SelectedRow = index;
+            
+            // Ensure selection is visible
+            if (index < ScrollOffset && index != -1)
+                ScrollOffset = index;
+            else if (index >= ScrollOffset + NumVisibleRows)
+                ScrollOffset = index - NumVisibleRows + 1;
+            
 
             if (OnChange != null)
             {
