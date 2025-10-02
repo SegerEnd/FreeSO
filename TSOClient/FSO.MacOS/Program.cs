@@ -28,8 +28,6 @@ namespace FSO.MacOS
                 var startProxy = new GameStartProxy();
                 startProxy.Start(false);
             }
-
-            Environment.Exit(0);
         }
 
         public static void InitMacOS()
