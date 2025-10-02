@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework.Graphics;
 using FSO.Common.Rendering.Framework.IO;
 using FSO.Common.Rendering.Framework.Model;
 using FSO.Common.Utils;
+using Microsoft.Xna.Framework.Input;
 
 namespace FSO.Client.UI.Controls
 {
@@ -273,6 +274,12 @@ namespace FSO.Client.UI.Controls
                     i++;
                 }
             }
+            
+            if (state.NewKeys.Contains(Keys.Up) && Items.Count > 0) InternalSelect(Math.Max(m_SelectedRow - 1, 0));
+            if (state.NewKeys.Contains(Keys.Down) && Items.Count > 0) InternalSelect(Math.Min(m_SelectedRow + 1, Items.Count - 1));
+            
+            if (SelectedItem != null && state.NewKeys.Contains(Keys.Enter))
+                OnDoubleClick?.Invoke(this);
 
             if (m_MouseOver)
             {
