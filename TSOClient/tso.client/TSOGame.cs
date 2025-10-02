@@ -34,11 +34,12 @@ namespace FSO.Client
         public UILayer uiLayer;
         public _3DLayer SceneMgr;
 
-        // public TSOGame() : base()
-        // {
+        public TSOGame() : base()
+        {
             /*
             var test = new Utils.TestFunctions.ProjectionTest();
             test.TestCombo();
+            */
 
             GameFacade.Game = this;
             //if (GameFacade.DirectX) TimedReferenceController.SetMode(CacheType.PERMANENT);
@@ -99,9 +100,7 @@ namespace FSO.Client
             GlobalSettings.Default.GraphicsWidth = (int)(width / FSOEnvironment.DPIScaleFactor);
             GlobalSettings.Default.GraphicsHeight = (int)(height / FSOEnvironment.DPIScaleFactor);
             uiLayer.CurrentUIScreen.GameResized();
-            
-                        */
-        // }
+        }
 
         /// <summary>
         /// Allows the game to perform any initialization it needs to before starting to run.
@@ -304,6 +303,8 @@ namespace FSO.Client
                 kernel.Get<CityConnectionRegulator>()?.Disconnect();
             }
             GameThread.SetKilled();
+
+            args.Cancel = !(FSOFacade.Controller?.CloseAttempt() ?? true);
         }
 
         /// <summary>
@@ -341,9 +342,7 @@ namespace FSO.Client
             catch (Exception e)
             {
                 FSOProgram.ShowDialog("Content could not be loaded. Make sure that the FreeSO content has been compiled! (ContentSrc/TSOClientContent.mgcb) \r\n\r\n" + e.ToString());
-                #if !IOS 
                 Exit();
-                #endif
                 Environment.Exit(0);
             }
 

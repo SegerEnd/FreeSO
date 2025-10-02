@@ -36,6 +36,8 @@ namespace FSO.SimAntics.NetPlay.Drivers
         //resyncing is a second class action - we will only provide state to resynced clients when there is a minimal amount of history.
         //this is to make sure they do not spend too long waiting for their game to catch up, and to avoid replaying sound effects.
         private HashSet<VMNetClient> ResyncClients;
+        // When sync is being sent to new clients, send every tick to reduce join latency.
+        private bool FastTick;
 
         //Sync and sync history
         private const int MAX_HISTORY = (30 * 30) / TICKS_PER_PACKET;
@@ -93,6 +95,7 @@ namespace FSO.SimAntics.NetPlay.Drivers
                 {
                     ClientsToSync.Add(client);
                     NewClients.Add(client); //note that the lock for clientstosync is valid for newclients too.
+                    FastTick = true;
                 }
             }
         }
@@ -113,6 +116,7 @@ namespace FSO.SimAntics.NetPlay.Drivers
                 {
                     ClientsToSync.Add(client);
                     NewClients.Add(client); //note that the lock for clientstosync is valid for newclients too.
+                    FastTick = true;
                 }
             }
         }
@@ -137,6 +141,45 @@ namespace FSO.SimAntics.NetPlay.Drivers
             }
         }
 
+        public void PrepareSync(VM vm)
+        {
+            SyncSerializing = true;
+            TicksSinceSync = new List<byte[]>(); //start saving a history.
+
+            var state = vm.Save(); //must be saved on lot thread. we can serialize elsewhere tho.
+            var statecmd = new VMStateSyncCmd { State = state };
+            if (vm.Trace != null)
+                statecmd.Traces = vm.Trace.History;
+            var cmd = new VMNetCommand(statecmd);
+
+            //currently just hack this on the tick system. might switch later
+            var ticks = new VMNetTickList
+            {
+                Ticks = new List<VMNetTick> {
+                        new VMNetTick {
+                            Commands = new List<VMNetCommand> { cmd },
+                            RandomSeed = 0, //will be restored by client from cmd
+                            TickID = TickID
+                        }
+                    }
+            };
+
+            Task.Run(() =>
+            {
+                byte[] data;
+                using (var stream = new MemoryStream())
+                {
+                    using (var writer = new BinaryWriter(stream))
+                    {
+                        ticks.SerializeInto(writer);
+                    }
+                    data = stream.ToArray();
+                }
+                LastSync = data;
+                SyncSerializing = false;
+            });
+        }
+
         private void SendState(VM vm)
         {
             if (ResyncClients.Count != 0 && LastSync == null && !SyncSerializing)
@@ -156,41 +199,7 @@ namespace FSO.SimAntics.NetPlay.Drivers
 
             if (LastSync == null && !SyncSerializing)
             {
-                SyncSerializing = true;
-                TicksSinceSync = new List<byte[]>(); //start saving a history.
-
-                var state = vm.Save(); //must be saved on lot thread. we can serialize elsewhere tho.
-                var statecmd = new VMStateSyncCmd { State = state };
-                if (vm.Trace != null)
-                    statecmd.Traces = vm.Trace.History;
-                var cmd = new VMNetCommand(statecmd);
-
-                //currently just hack this on the tick system. might switch later
-                var ticks = new VMNetTickList
-                {
-                    Ticks = new List<VMNetTick> {
-                        new VMNetTick {
-                            Commands = new List<VMNetCommand> { cmd },
-                            RandomSeed = 0, //will be restored by client from cmd
-                            TickID = TickID
-                        }
-                    }
-                };
-
-                Task.Run(() =>
-                {
-                    byte[] data;
-                    using (var stream = new MemoryStream())
-                    {
-                        using (var writer = new BinaryWriter(stream))
-                        {
-                            ticks.SerializeInto(writer);
-                        }
-                        data = stream.ToArray();
-                    }
-                    LastSync = data;
-                    SyncSerializing = false;
-                });
+                PrepareSync(vm);
             }
             else if (LastSync != null)
             {
@@ -323,12 +332,17 @@ namespace FSO.SimAntics.NetPlay.Drivers
 
             TickBuffer.Add(tick);
 
-            if (TickBuffer.Count >= TICKS_PER_PACKET)
+            if (FastTick || TickBuffer.Count >= TICKS_PER_PACKET)
             {
                 lock (ClientsToSync)
                 {
                     SendTickBuffer();
                     SendState(vm);
+
+                    if (ClientsToSync.Count == 0)
+                    {
+                        FastTick = false;
+                    }
                 }
             }
 
