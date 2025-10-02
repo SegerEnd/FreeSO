@@ -12,12 +12,11 @@ namespace FSO.iOS
     [Register("AppDelegate")]
     internal class Program : UIApplicationDelegate
     {
-        public static Action<string>? MainOrg;
+        // public static Action<string>? MainOrg;
 
-		private void RunGame()
+		internal static void RunGame()
 		{
-            InvokeOnMainThread(() => { ShowDialog("Trying to start FreeSO MonoGame..."); });
-
+            
             // ImageLoader.BaseFunction = iOSImageLoader.iOSFromStream;
 
             /*
@@ -25,67 +24,38 @@ namespace FSO.iOS
             settings.LoadExtensions = false;
             */
 
-            InvokeOnMainThread(() =>
-            {
-                if (MainOrg != null)
-                {
-                    ShowDialog("Falling into MainOrg...");
-                    // var cont = new FSO.Client.GameController(null);
-                }
-
-                MainOrg = FSO.Client.FSOProgram.ShowDialog;
-            });
-
-            // GlobalSettings.Default.CityShadows = false;
-
-/*
-            var set = GlobalSettings.Default;
-            set.TargetRefreshRate = 60;
-            // set.CurrentLang = "english";
-            set.Lighting = true;
-            set.SmoothZoom = true;
-            set.AntiAlias = 0;
-            set.LightingMode = 3;
-            set.AmbienceVolume = 10;
-            set.FXVolume = 10;
-            set.MusicVolume = 10;
-            set.VoxVolume = 10;
-            set.GraphicsWidth = (int)UIScreen.MainScreen.Bounds.Width;
-            set.DirectionalLight3D = false;
-            set.GraphicsHeight = (int)UIScreen.MainScreen.Bounds.Height;
-            // set.CitySelectorUrl = "http://46.101.67.219:8081";
-            // set.GameEntryUrl = "http://46.101.67.219:8081";
-            if (File.Exists(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "The Sims Online.zip")))
-            {
-                InvokeOnMainThread(() => { 
-                    ShowDialog("Cleaning up temporary downloaded TSO file...");
-                });
-                File.Delete(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "The Sims Online.zip"));
-            }
-            */
-   
-            // TSOGame game = new TSOGame();
-            // GameFacade.DirectX = false;
-            // FSO.LotView.World.DirectX = false;
-            InvokeOnMainThread(() => { 
-                // FSOEnvironment.GameThread = Thread.CurrentThread;
+            // InvokeOnMainThread(() =>
+            // {
+            //     if (MainOrg != null)
+            //     {
+            //         ShowDialog("Falling into MainOrg...");
+            //         // var cont = new FSO.Client.GameController(null);
+            //     }
+            //
+            // MainOrg = FSO.Client.FSOProgram.ShowDialog;
+            // });
+            
+                FSOEnvironment.GameThread = Thread.CurrentThread;
                 // game.Run();
+
                 
-                if ((new FSOProgram()).InitWithArguments(new string[] { }))
-                {
-                    ShowDialog("Going to run FreeSO MonoGame now...");
-                    var startProxy = new GameStartProxy();
-                    startProxy.SetPath(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "The Sims Online/TSOClient/"));//"/private/var/mobile/Documents/The Sims Online/TSOClient/");
-                    TSOGame game = new TSOGame();
-                    GameFacade.DirectX = false;
-                    FSO.LotView.World.DirectX = false;
-                    game.Run();
-                }
-                else
-                {
-                    ShowDialog("FSOProgram InitWithArguments failed!");
-                }
-            });
+                // ShowDialog("Trying to start FreeSO MonoGame...");
+
+                var startProxy = new GameStartProxy();
+                startProxy.SetPath(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "The Sims Online/TSOClient/")); //"/private/var/mobile/Documents/The Sims Online/TSOClient/");
+                // startProxy.Start(false);
+                // new FSOProgram().InitWithArguments(new string[] { });
+                ShowDialog("Going to run FreeSO MonoGame now...");
+                
+                var game = new TSOGame();
+                GameFacade.DirectX = false;
+                FSO.LotView.World.DirectX = false;
+                game.Run();
+            
+            /*else
+            {
+                ShowDialog("FSOProgram InitWithArguments failed!");
+            }*/
         }
 
         /// <summary>
@@ -129,11 +99,20 @@ namespace FSO.iOS
 
         private void FSOInstalled()
         {
-            InvokeOnMainThread(() =>
+            if (window != null)
             {
-                ShowDialog("FreeSO installed, starting game...");
-                RunGame();
-            });
+                window.RootViewController = null;
+                window.Dispose();
+                window = null;
+            }
+            if (installerVC != null)
+            {
+                installerVC.OnInstalled -= FSOInstalled;
+                installerVC.Dispose();
+                installerVC = null;
+            }
+            
+            RunGame();
         }
         
         public static void ShowDialog(string text)

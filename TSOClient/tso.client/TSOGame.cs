@@ -34,12 +34,11 @@ namespace FSO.Client
         public UILayer uiLayer;
         public _3DLayer SceneMgr;
 
-        public TSOGame() : base()
-        {
+        // public TSOGame() : base()
+        // {
             /*
             var test = new Utils.TestFunctions.ProjectionTest();
             test.TestCombo();
-            */
 
             GameFacade.Game = this;
             //if (GameFacade.DirectX) TimedReferenceController.SetMode(CacheType.PERMANENT);
@@ -100,7 +99,9 @@ namespace FSO.Client
             GlobalSettings.Default.GraphicsWidth = (int)(width / FSOEnvironment.DPIScaleFactor);
             GlobalSettings.Default.GraphicsHeight = (int)(height / FSOEnvironment.DPIScaleFactor);
             uiLayer.CurrentUIScreen.GameResized();
-        }
+            
+                        */
+        // }
 
         /// <summary>
         /// Allows the game to perform any initialization it needs to before starting to run.
