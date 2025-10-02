@@ -4,6 +4,7 @@ using FSO.Client.UI.Framework;
 using FSO.Client.UI.Framework.Parser;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using FSO.Common.Rendering.Framework.IO;
 using FSO.Common.Rendering.Framework.Model;
 using FSO.Common.Utils;
@@ -276,6 +277,12 @@ namespace FSO.Client.UI.Controls
 
             if (m_MouseOver)
             {
+                if (SelectedItem != null && state.NewKeys.Contains(Keys.Enter))
+                {
+                    OnDoubleClick?.Invoke(this);
+                    return;
+                }
+                
                 var overRow = GetRowUnderMouse(state);
                 m_HoverRow = overRow;
             }
