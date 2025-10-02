@@ -43,14 +43,17 @@ namespace FSO.MacOS
 
         public static void ShowDialog(string text)
         {
-            // Escape double quotes in text
-            string escapedText = text.Replace("\"", "\\\"");
+            ShowDialog(text, "FreeSO Message");
+        }
+        
+        private static void ShowDialog(string text, string title)
+        {
+            if (text.Length > 1500) text = text.Substring(0, 1500) + "...";
 
             var psi = new ProcessStartInfo
             {
                 FileName = "osascript",
-                Arguments = $"-e \"display alert \\\"FSO Message\\\" message \\\"{escapedText}\\\"\"",
-                RedirectStandardOutput = false,
+                Arguments = $"-e \"display alert \\\"{title.Replace("\"", "\\\"")}\\\" message \\\"{text.Replace("\"", "\\\"")}\\\" giving up after 15\"",
                 UseShellExecute = true
             };
             Process.Start(psi)?.WaitForExit();
@@ -62,11 +65,11 @@ namespace FSO.MacOS
             
             if (exception is OutOfMemoryException)
             {
-                ShowDialog(e.ExceptionObject.ToString() + "Out of Memory! FreeSO needs to close.");
+                ShowDialog(e.ExceptionObject.ToString(), "Out of Memory! FreeSO needs to close.");
             }
             else
             {
-                ShowDialog(e.ExceptionObject.ToString() + "A fatal error occured! Screenshot this dialog and post it on Discord.");
+                ShowDialog(e.ExceptionObject.ToString(), "A fatal error occured! Screenshot this dialog and post it on Discord.");
             }
             
             Environment.Exit(1);
