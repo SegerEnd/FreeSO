@@ -277,10 +277,13 @@ namespace FSO.Client.UI.Controls
 
             if (m_MouseOver)
             {
-                if (state.NewKeys.Contains(Keys.Up) && Items.Count > 0) InternalSelect(Math.Max(m_SelectedRow - 1, 0));
-                if (state.NewKeys.Contains(Keys.Down) && Items.Count > 0) InternalSelect(Math.Min(m_SelectedRow + 1, Items.Count - 1));
-            
-                if (SelectedItem != null && state.NewKeys.Contains(Keys.Enter))
+                if (state.NewKeys.Contains(Keys.Up) && Items.Count > 0) 
+                    InternalSelect((m_SelectedRow - 1 + Items.Count) % Items.Count);
+
+                if (state.NewKeys.Contains(Keys.Down) && Items.Count > 0) 
+                    InternalSelect((m_SelectedRow + 1) % Items.Count);
+
+                if (SelectedItem != null && state.NewKeys.Contains(Keys.Enter)) 
                     OnDoubleClick?.Invoke(this);
                 
                 var overRow = GetRowUnderMouse(state);
@@ -361,6 +364,8 @@ namespace FSO.Client.UI.Controls
             else if (index >= ScrollOffset + NumVisibleRows)
                 ScrollOffset = index - NumVisibleRows + 1;
             
+            if (m_Slider != null)
+                m_Slider.Value = ScrollOffset;
 
             if (OnChange != null)
             {
