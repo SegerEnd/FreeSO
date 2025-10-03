@@ -274,15 +274,15 @@ namespace FSO.Client.UI.Controls
                     i++;
                 }
             }
-            
-            if (state.NewKeys.Contains(Keys.Up) && Items.Count > 0) InternalSelect(Math.Max(m_SelectedRow - 1, 0));
-            if (state.NewKeys.Contains(Keys.Down) && Items.Count > 0) InternalSelect(Math.Min(m_SelectedRow + 1, Items.Count - 1));
-            
-            if (SelectedItem != null && state.NewKeys.Contains(Keys.Enter))
-                OnDoubleClick?.Invoke(this);
 
             if (m_MouseOver)
             {
+                if (state.NewKeys.Contains(Keys.Up) && Items.Count > 0) InternalSelect(Math.Max(m_SelectedRow - 1, 0));
+                if (state.NewKeys.Contains(Keys.Down) && Items.Count > 0) InternalSelect(Math.Min(m_SelectedRow + 1, Items.Count - 1));
+            
+                if (SelectedItem != null && state.NewKeys.Contains(Keys.Enter))
+                    OnDoubleClick?.Invoke(this);
+                
                 var overRow = GetRowUnderMouse(state);
                 m_HoverRow = overRow;
             }
