@@ -2,7 +2,7 @@
 """Create an archive template from a running FreeSO Docker server.
 
 Usage: ./fso-archive.py [archive-name]
-       curl segerend.nl/fso-archive.py | python3 - [archive-name]
+       curl https://raw.githubusercontent.com/SegerEnd/FreeSO/tools/docker/fso-archive.py | python3 - [archive-name]
 
 Prerequisites:
   - Docker compose stack running (mariadb + freeso-server)
