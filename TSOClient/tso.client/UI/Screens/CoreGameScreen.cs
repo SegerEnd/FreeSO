@@ -73,6 +73,7 @@ namespace FSO.Client.UI.Screens
         private UIMouseEventRef MouseHitAreaEventRef = null;
 
         // Simantics VMs can be kept around for a load transition.
+        private bool _pendingCacheClear;
         private VM TransitionVM;
         private World TransitionWorld;
         private CameraControllers TransitionCameras;
@@ -629,8 +630,7 @@ namespace FSO.Client.UI.Screens
 
             if (!localTransition)
             {
-                TimedReferenceController.Clear();
-                TimedReferenceController.Clear();
+                _pendingCacheClear = true;
 
                 if (ZoomLevel < 4) ZoomLevel = 5;
             }
@@ -768,6 +768,12 @@ namespace FSO.Client.UI.Screens
                     break;
 
                 case 6: //done world load
+                    if (_pendingCacheClear)
+                    {
+                        TimedReferenceController.Clear();
+                        _pendingCacheClear = false;
+                    }
+
                     GameFacade.Cursor.SetCursor(CursorType.Normal);
                     UIScreen.RemoveDialog(JoinLotProgress);
                     CursorManager.INSTANCE.SetCursorPriority(0);

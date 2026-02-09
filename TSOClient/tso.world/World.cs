@@ -1189,7 +1189,7 @@ namespace FSO.LotView
 
             bool shouldReturn()
             {
-                if (watch.ElapsedMilliseconds > 16)
+                if (watch.ElapsedMilliseconds > 25)
                 {
                     watch.Stop();
                     return true;
@@ -1200,13 +1200,12 @@ namespace FSO.LotView
 
             if (PreloadProgress == 0)
             {
-                var done = 0;
                 for (int i = PreloadObjProgress; i < Blueprint.Objects.Count; i++)
                 {
                     var obj = Blueprint.Objects[i];
                     obj.Preload(gd, State);
                     PreloadObjProgress++;
-                    if (done++ >= 6 && shouldReturn()) return false;
+                    if (shouldReturn()) return false;
                 }
 
                 for (int i=0; i<Blueprint.Avatars.Count; i++)
