@@ -53,12 +53,7 @@ namespace FSO.SimAntics.Marshals
                 var length = reader.ReadInt32();
                 var cStream = new MemoryStream(reader.ReadBytes(length));
                 var zipStream = new GZipStream(cStream, CompressionMode.Decompress);
-                var decompStream = new MemoryStream();
-                zipStream.CopyTo(decompStream);
-                decompStream.Seek(0, SeekOrigin.Begin);
-                reader = new BinaryReader(decompStream);
-                cStream.Close();
-                zipStream.Close();
+                reader = new BinaryReader(zipStream);
             }
 
             if (Version > 26) TS1 = reader.ReadBoolean();

@@ -93,6 +93,11 @@ namespace FSO.Files.FAR3
         /// <returns>The entry's data.</returns>
         public byte[] GetEntry(Far3Entry Entry)
         {
+            byte[] rawData;
+            uint compressedSize = 0;
+            uint decompressedSize = 0;
+            bool needsDecompress = false;
+
             lock (m_Reader)
             {
                 m_Reader.BaseStream.Seek((long)Entry.DataOffset, SeekOrigin.Begin);
@@ -110,43 +115,36 @@ namespace FSO.Files.FAR3
                         byte dummy0 = m_Reader.ReadByte();
                         byte dummy1 = m_Reader.ReadByte();
                         byte dummy2 = m_Reader.ReadByte();
-                        uint DecompressedSize = (uint)((dummy0 << 0x10) | (dummy1 << 0x08) | +dummy2);
+                        decompressedSize = (uint)((dummy0 << 0x10) | (dummy1 << 0x08) | +dummy2);
+                        compressedSize = Filesize;
 
-                        Decompresser Dec = new Decompresser();
-                        Dec.CompressedSize = Filesize;
-                        Dec.DecompressedSize = DecompressedSize;
-
-                        byte[] DecompressedData = Dec.Decompress(m_Reader.ReadBytes((int)Filesize));
-                        //m_Reader.Close();
-
-                        isReadingSomething = false;
-
-                        return DecompressedData;
+                        rawData = m_Reader.ReadBytes((int)Filesize);
+                        needsDecompress = true;
                     }
                     else
                     {
                         m_Reader.BaseStream.Seek((m_Reader.BaseStream.Position - 15), SeekOrigin.Begin);
-
-                        byte[] Data = m_Reader.ReadBytes((int)Entry.DecompressedFileSize);
-                        //m_Reader.Close();
-
-                        isReadingSomething = false;
-
-                        return Data;
+                        rawData = m_Reader.ReadBytes((int)Entry.DecompressedFileSize);
                     }
                 }
                 else
                 {
-                    byte[] Data = m_Reader.ReadBytes((int)Entry.DecompressedFileSize);
-                    //m_Reader.Close();
-
-                    isReadingSomething = false;
-
-                    return Data;
+                    rawData = m_Reader.ReadBytes((int)Entry.DecompressedFileSize);
                 }
+
+                isReadingSomething = false;
             }
 
-            throw new FAR3Exception("FAR3Entry didn't exist in archive - FAR3Archive.GetEntry()");
+            // Decompress outside the lock so other threads can read from this archive concurrently.
+            if (needsDecompress)
+            {
+                Decompresser Dec = new Decompresser();
+                Dec.CompressedSize = compressedSize;
+                Dec.DecompressedSize = decompressedSize;
+                return Dec.Decompress(rawData);
+            }
+
+            return rawData;
         }
 
         /// <summary>
