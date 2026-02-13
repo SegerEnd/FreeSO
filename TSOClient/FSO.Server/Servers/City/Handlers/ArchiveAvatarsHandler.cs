@@ -4,7 +4,8 @@ using FSO.Server.Database.DA.Avatars;
 using FSO.Server.Framework.Voltron;
 using FSO.Server.Protocol.CitySelector;
 using FSO.Server.Protocol.Electron.Packets;
-using Ninject;
+using FSO.Common.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using NLog;
 using System.Linq;
 

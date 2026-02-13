@@ -1,7 +1,8 @@
-﻿using FSO.Server.Clients;
+﻿using FSO.Common.DependencyInjection;
+using FSO.Server.Clients;
 using FSO.Server.Database.DA;
 using FSO.Server.Framework.Aries;
-using Ninject;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,9 +15,7 @@ using System.Threading;
 using NLog;
 using System.Security.Cryptography;
 using FSO.Server.Protocol.Gluon.Packets;
-using Ninject.Modules;
 using FSO.Server.Protocol.Utils;
-using Ninject.Parameters;
 using FSO.Server.Domain;
 
 namespace FSO.Server.Utils
@@ -105,10 +104,7 @@ namespace FSO.Server.Utils
                 if (Pool.ContainsKey(callSign)){
                     return Pool[callSign];
                 }else{
-                    var newHost = Kernel.Get<GluonHost>(
-                        new ConstructorArgument("pool", this), 
-                        new ConstructorArgument("callSign", callSign)
-                    );
+                    var newHost = ActivatorUtilities.CreateInstance<GluonHost>(Kernel, this, callSign);
                     Pool[callSign] = newHost;
                     return newHost;
                 }
@@ -433,11 +429,12 @@ namespace FSO.Server.Utils
         FAILED
     }
 
-    public class GluonHostPoolModule : NinjectModule
+    public static class GluonHostPoolModule
     {
-        public override void Load()
+        public static IServiceCollection AddGluonHostPool(this IServiceCollection services)
         {
-            Bind<IGluonHostPool>().To<GluonHostPool>().InSingletonScope();
+            services.AddSingleton<IGluonHostPool, GluonHostPool>();
+            return services;
         }
     }
 }

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using FSO.Common.DependencyInjection;
 using FSO.Server.Database.DA.Hosts;
 using FSO.Server.Framework.Aries;
-using Ninject;
 using FSO.Server.Servers.Tasks.Domain;
 using NLog;
 using FSO.Server.Servers.Shared.Handlers;

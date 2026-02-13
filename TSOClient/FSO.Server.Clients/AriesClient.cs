@@ -1,4 +1,5 @@
-﻿using FSO.Server.Common;
+using FSO.Common.DependencyInjection;
+using FSO.Server.Common;
 using FSO.Server.Protocol.Aries;
 using FSO.Server.Protocol.Voltron.Packets;
 using Mina.Core.Future;
@@ -6,7 +7,6 @@ using Mina.Core.Service;
 using Mina.Core.Session;
 using Mina.Filter.Codec;
 using Mina.Transport.Socket;
-using Ninject;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -18,7 +18,7 @@ namespace FSO.Server.Clients
     {
         void MessageReceived(AriesClient client, object message);
     }
-    
+
     public interface IAriesEventSubscriber
     {
         void SessionCreated(AriesClient client);
@@ -73,7 +73,7 @@ namespace FSO.Server.Clients
 
         private List<IAriesMessageSubscriber> MessageSubscribers = new List<IAriesMessageSubscriber>();
         private List<IAriesEventSubscriber> EventSubscribers = new List<IAriesEventSubscriber>();
-        
+
         public AriesClient(IKernel kernel)
         {
             this.Kernel = kernel;
@@ -137,7 +137,7 @@ namespace FSO.Server.Clients
             var connector = Connector;
             Connector.ConnectTimeoutInMillis = 10000;
             //Connector.FilterChain.AddLast("logging", new LoggingFilter());
-            
+
             Connector.Handler = this;
             //var ssl = new CustomSslFilter((X509Certificate)null);
             //ssl.SslProtocol = System.Security.Authentication.SslProtocols.Tls;
@@ -150,7 +150,7 @@ namespace FSO.Server.Clients
                 {
                    if (connector.Handler != null) SessionClosed(session);
                 }
-                
+
                 if (connector.Handler is NullIOHandler) session.Close(true);
                 else this.Session = session;
             });

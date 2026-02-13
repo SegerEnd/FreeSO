@@ -4,7 +4,7 @@ using FSO.Common.Utils;
 using FSO.Server.Clients;
 using FSO.Server.Protocol.Voltron.Model;
 using FSO.Server.Protocol.Voltron.Packets;
-using Ninject;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -23,7 +23,7 @@ namespace FSO.Common.DatabaseService
         private AriesClient CityClient;
         private Dictionary<uint, PendingRequest> PendingRequests = new Dictionary<uint, PendingRequest>();
 
-        public DatabaseService([Named("City")] AriesClient cityClient)
+        public DatabaseService([FromKeyedServices("City")] AriesClient cityClient)
         {
             CityClient = cityClient;
             CityClient.AddSubscriber(this);

@@ -1,5 +1,4 @@
 ﻿using FSO.Server.Database.DA;
-using Ninject;
 using NLog;
 using System;
 

@@ -1,15 +1,16 @@
-﻿using FSO.Common.DataService;
+using FSO.Common.DataService;
 using FSO.Server.DataService;
-using Ninject.Modules;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace FSO.Server.Servers.Lot
 {
-    public class LotServerModule : NinjectModule
+    public static class LotServerModule
     {
-        public override void Load()
+        public static IServiceCollection AddLotServerServices(this IServiceCollection services)
         {
-            Bind<IDataService>().To<NullDataService>().InSingletonScope();
-            Bind<IDataServiceSyncFactory>().To<DataServiceSyncFactory>().InSingletonScope();
+            services.AddSingleton<IDataService, NullDataService>();
+            services.AddSingleton<IDataServiceSyncFactory, DataServiceSyncFactory>();
+            return services;
         }
     }
 }

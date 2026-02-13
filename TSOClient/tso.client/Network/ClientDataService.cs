@@ -1,6 +1,7 @@
 ﻿using FSO.Common.Serialization;
 using FSO.Server.DataService.Providers.Client;
-using Ninject;
+using FSO.Common.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -40,7 +41,7 @@ namespace FSO.Common.DataService
             AddProvider(kernel.Get<ClientCityProvider>());
             AddProvider(kernel.Get<ClientNeighProvider>());
             AddProvider(kernel.Get<ClientMayorRatingProvider>());
-            CityClient = kernel.Get<AriesClient>("City");
+            CityClient = kernel.GetRequiredKeyedService<AriesClient>("City");
             CityClient.AddSubscriber(this);
 
             //When a new object is made, this data will be requested automatically

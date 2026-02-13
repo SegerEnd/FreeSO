@@ -4,7 +4,8 @@ using FSO.Common.DataService.Model;
 using FSO.Common.Enum;
 using FSO.Common.Utils;
 using FSO.Content.Model;
-using Ninject;
+using FSO.Common.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Generic;
 
 namespace FSO.Client.Model

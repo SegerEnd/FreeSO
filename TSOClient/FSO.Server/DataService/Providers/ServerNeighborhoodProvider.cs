@@ -14,7 +14,6 @@ using FSO.Server.Database.DA.Neighborhoods;
 using FSO.Server.Framework.Voltron;
 using Microsoft.Xna.Framework;
 using Newtonsoft.Json;
-using Ninject;
 using NLog;
 using System;
 using System.Collections.Generic;
@@ -36,7 +35,7 @@ namespace FSO.Server.DataService.Providers
 
         private static Logger LOG = LogManager.GetCurrentClassLogger();
 
-        public ServerNeighborhoodProvider([Named("ShardId")] int shardId, IRealestateDomain realestate, IDAFactory daFactory, IServerNFSProvider nfs)
+        public ServerNeighborhoodProvider(int shardId, IRealestateDomain realestate, IDAFactory daFactory, IServerNFSProvider nfs)
         {
             OnMissingLazyLoad = true;
             OnLazyLoadCacheValue = false;

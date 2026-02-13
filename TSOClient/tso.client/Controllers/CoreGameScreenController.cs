@@ -16,8 +16,8 @@ using FSO.Server.Protocol.Electron.Packets;
 using FSO.SimAntics.NetPlay;
 using FSO.SimAntics.NetPlay.Model;
 using Microsoft.Xna.Framework;
-using Ninject;
-using Ninject.Parameters;
+using FSO.Common.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.ComponentModel;
 using System.IO;
@@ -65,7 +65,7 @@ namespace FSO.Client.Controllers
             joinLotRegulator.OnTransition += JoinLotRegulator_OnTransition;
 
             var shard = Network.MyShard;
-            Terrain = kernel.Get<TerrainController>(new ConstructorArgument("parent", this));
+            Terrain = ActivatorUtilities.CreateInstance<TerrainController>(kernel, this);
             view.Initialize(shard.Name, int.Parse(shard.Map), Terrain);
 
             if (Mode == CityConnectionMode.ARCHIVE)

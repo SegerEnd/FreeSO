@@ -2,7 +2,7 @@
 using FSO.Server.Clients.Framework;
 using FSO.Server.Protocol.Electron.Packets;
 using FSO.Server.Protocol.Voltron.Packets;
-using Ninject;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace FSO.Client.Regulators
 {
@@ -10,7 +10,7 @@ namespace FSO.Client.Regulators
     {
         private AriesClient City;
 
-        public CreateASimRegulator([Named("City")] AriesClient cityClient)
+        public CreateASimRegulator([FromKeyedServices("City")] AriesClient cityClient)
         {
             this.City = cityClient;
             this.City.AddSubscriber(this);

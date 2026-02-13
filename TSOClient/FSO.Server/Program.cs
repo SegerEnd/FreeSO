@@ -1,9 +1,9 @@
-﻿using CommandLine;
+using CommandLine;
+using FSO.Common.DependencyInjection;
 using FSO.Server.Database;
 using FSO.Server.DataService;
 using FSO.Server.Utils;
-using Ninject;
-using Ninject.Parameters;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace FSO.Server
 {
@@ -81,25 +81,26 @@ namespace FSO.Server
                 Environment.Exit(1);
             }
 
-            var kernel = new StandardKernel(
-                new ServerConfigurationModule(),
-                new DatabaseModule(),
-                new GlobalDataServiceModule(),
-                new GluonHostPoolModule()
-            );
+            var container = ServiceContainer.Build(services =>
+            {
+                services.AddServerConfiguration();
+                services.AddDatabaseServices();
+                services.AddGlobalDataServices();
+                services.AddGluonHostPool();
+            });
 
             //If db init, allow @ variables in the query itself. We could always enable this but for added security
             //we are conditionally adding it only for db migrations
             if (toolInfo.Value.ToolType == typeof(ToolInitDatabase))
             {
-                var config = kernel.Get<ServerConfiguration>();
+                var config = container.Provider.Get<ServerConfiguration>();
                 if (!config.Database.ConnectionString.EndsWith(";")){
                     config.Database.ConnectionString += ";";
                 }
                 config.Database.ConnectionString += "Allow User Variables=True";
             }
 
-            var tool = (ITool)kernel.Get(toolInfo.Value.ToolType, new ConstructorArgument("options", toolInfo.Value.ToolOptions));
+            var tool = (ITool)ActivatorUtilities.CreateInstance(container.Provider, toolInfo.Value.ToolType, toolInfo.Value.ToolOptions);
             return tool.Run();
 
         }

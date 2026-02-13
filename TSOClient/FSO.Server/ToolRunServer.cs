@@ -1,4 +1,5 @@
-﻿using FSO.Common.DataService.Framework;
+using FSO.Common.DataService.Framework;
+using FSO.Common.DependencyInjection;
 using FSO.Common.Utils;
 using FSO.Server.Common;
 using FSO.Server.Database.DA;
@@ -13,9 +14,7 @@ using FSO.Server.Servers.Tasks;
 using FSO.Server.Servers.UserApi;
 using FSO.Server.Utils;
 using FSO.SimAntics;
-using Ninject;
-using Ninject.Extensions.ChildKernel;
-using Ninject.Parameters;
+using Microsoft.Extensions.DependencyInjection;
 using NLog;
 using System;
 using System.Collections.Generic;
@@ -136,7 +135,7 @@ namespace FSO.Server
             Kernel.Bind<MemoryCache>().ToConstant(new MemoryCache("fso_server"));
 
             LOG.Info("Loading domain logic");
-            Kernel.Load<ServerDomainModule>();
+            Kernel.Load(services => services.AddServerDomainServices());
 
             Servers = new List<AbstractServer>();
             CityServers = new List<CityServer>();
@@ -161,9 +160,7 @@ namespace FSO.Server
             {
                 if (Config.Archive == null || Config.Archive.AllowUserApi)
                 {
-                    var childKernel = new ChildKernel(
-                        Kernel
-                    );
+                    var childKernel = Kernel.CreateChildKernel(services => { });
                     var api = new UserApi(Config, childKernel);
                     ActiveUApiServer = api;
                     Servers.Add(api);
@@ -188,13 +185,13 @@ namespace FSO.Server
                 /**
                  * Need to create a kernel for each city server as there is some data they do not share
                  */
-                var childKernel = new ChildKernel(
-                    Kernel,
-                    new ShardDataServiceModule(Config.SimNFS),
-                    new CityServerModule()
-                );
+                var childKernel = Kernel.CreateChildKernel(services =>
+                {
+                    services.AddShardDataServices(Config.SimNFS);
+                    services.AddCityServerServices();
+                });
 
-                var city = childKernel.Get<CityServer>(new ConstructorArgument("config", cityServer));
+                var city = ActivatorUtilities.CreateInstance<CityServer>(childKernel, cityServer);
                 CityServers.Add(city);
                 Servers.Add(city);
 
@@ -208,13 +205,13 @@ namespace FSO.Server
                 if (!lotServer.AllOpenable) lotServer.AllOpenable = Config.AllOpenable;
 
                 if (lotServer.SimNFS == null) lotServer.SimNFS = Config.SimNFS;
-                var childKernel = new ChildKernel(
-                    Kernel,
-                    new LotServerModule()
-                );
+                var childKernel = Kernel.CreateChildKernel(services =>
+                {
+                    services.AddLotServerServices();
+                });
 
                 Servers.Add(
-                    childKernel.Get<LotServer>(new ConstructorArgument("config", lotServer))
+                    ActivatorUtilities.CreateInstance<LotServer>(childKernel, lotServer)
                 );
 
                 onProgress?.Invoke(30 + (20 * (++i)) / Config.Services.Lots.Count);
@@ -223,15 +220,14 @@ namespace FSO.Server
             if (Config.Services.Tasks != null
                 && Config.Services.Tasks.Enabled)
             {
-                var childKernel = new ChildKernel(
-                    Kernel,
-                    new TaskEngineModule()
-                );
+                var childKernel = Kernel.CreateChildKernel(services =>
+                {
+                    services.AddTaskEngine();
+                    services.AddSingleton(Config.Services.Tasks);
+                    services.AddSingleton(Config.Services.Tasks.Tuning);
+                });
 
-                childKernel.Bind<TaskServerConfiguration>().ToConstant(Config.Services.Tasks);
-                childKernel.Bind<TaskTuning>().ToConstant(Config.Services.Tasks.Tuning);
-
-                var tasks = childKernel.Get<TaskServer>(new ConstructorArgument("config", Config.Services.Tasks));
+                var tasks = ActivatorUtilities.CreateInstance<TaskServer>(childKernel, Config.Services.Tasks);
                 Servers.Add(tasks);
                 ActiveTaskServer = tasks;
                 Server.Servers.Tasks.Domain.ShutdownTask.ShutdownHook = RequestedShutdown;
@@ -301,19 +297,6 @@ namespace FSO.Server
             AppDomain.CurrentDomain.DomainUnload += CurrentDomain_DomainUnload;
             AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
 
-            /*
-            NetworkDebugger debugInterface = null;
-
-            if (Options.Debug)
-            {
-                debugInterface = new NetworkDebugger(Kernel);
-                foreach (AbstractServer server in Servers)
-                {
-                    server.AttachDebugger(debugInterface);
-                }
-            }
-            */
-
             LOG.Info("Starting services");
             foreach (AbstractServer server in Servers)
             {
@@ -326,12 +309,6 @@ namespace FSO.Server
             //Hacky reference to maek sure the assembly is included
             FSO.Common.DatabaseService.Model.LoadAvatarByIDRequest x;
 
-            /*if (debugInterface != null)
-            {
-                Application.EnableVisualStyles();
-                Application.Run(debugInterface);
-            }
-            else*/
             {
                 while (Running)
                 {
@@ -351,15 +328,6 @@ namespace FSO.Server
                                 return 4;
                             }
 
-                            /*var domain = AppDomain.CreateDomain("RebootApp");
-
-                            var assembly = "FSO.Server.Updater, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null";
-                            var type = "FSO.Server.Updater.Program";
-
-                            var updater = typeof(FSO.Server.Updater.Program);
-
-                            domain.CreateInstance(assembly, type);
-                            AppDomain.Unload(AppDomain.CurrentDomain);*/
                             return 2 + (int)ShutdownMode;
                         }
                     }

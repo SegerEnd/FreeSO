@@ -7,7 +7,8 @@ using FSO.Common.Rendering.Framework.Model;
 using FSO.Common.Utils;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Ninject;
+using FSO.Common.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 
 namespace FSO.Client.UI.Panels.Neighborhoods

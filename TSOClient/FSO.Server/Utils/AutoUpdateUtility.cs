@@ -1,7 +1,8 @@
 ﻿using FSO.Server.Common;
 using FSO.Server.Database.DA;
 using FSO.Server.Database.DA.Updates;
-using Ninject;
+using FSO.Common.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.IO;

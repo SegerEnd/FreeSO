@@ -7,7 +7,8 @@ using FSO.Client.Model;
 using FSO.Content.Model;
 using FSO.Client.Controllers;
 using FSO.Common.DataService;
-using Ninject;
+using FSO.Common.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace FSO.Client.UI.Controls
 {

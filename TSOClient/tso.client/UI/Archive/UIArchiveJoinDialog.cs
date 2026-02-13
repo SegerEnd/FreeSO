@@ -5,7 +5,8 @@ using FSO.Common;
 using FSO.Common.Rendering.Framework.Model;
 using FSO.Server.Clients;
 using Microsoft.Xna.Framework;
-using Ninject;
+using FSO.Common.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace FSO.Client.UI.Archive
 {

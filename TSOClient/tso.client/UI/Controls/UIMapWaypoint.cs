@@ -13,7 +13,8 @@ using FSO.HIT;
 using FSO.Server.DataService.Model;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Ninject;
+using FSO.Common.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 
 using static FSO.Client.GameContent.FileIDs;

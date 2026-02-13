@@ -1,6 +1,7 @@
 ﻿using System;
 using FSO.Server.Common;
-using Ninject;
+using FSO.Common.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using FSO.Server.Domain;
 
 using static FSO.Server.Common.ApiAbstract;

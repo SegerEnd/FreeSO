@@ -1,17 +1,18 @@
-﻿using FSO.Common.Domain.Realestate;
+using FSO.Common.Domain.Realestate;
 using FSO.Common.Domain.Shards;
 using FSO.Common.Domain.Top100;
-using Ninject.Modules;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace FSO.Common.Domain
 {
-    public class ClientDomainModule : NinjectModule
+    public static class ClientDomainModule
     {
-        public override void Load()
+        public static IServiceCollection AddClientDomainServices(this IServiceCollection services)
         {
-            Bind<IShardsDomain>().To<Shards.ClientShards>().InSingletonScope();
-            Bind<IRealestateDomain>().To<FSO.Common.Domain.Realestate.RealestateDomain>().InSingletonScope();
-            Bind<ITop100Domain>().To<Top100Domain>().InSingletonScope();
+            services.AddSingleton<IShardsDomain, ClientShards>();
+            services.AddSingleton<IRealestateDomain, FSO.Common.Domain.Realestate.RealestateDomain>();
+            services.AddSingleton<ITop100Domain, Top100Domain>();
+            return services;
         }
     }
 }

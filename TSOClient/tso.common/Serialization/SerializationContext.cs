@@ -1,4 +1,4 @@
-﻿using Ninject;
+using FSO.Common.DependencyInjection;
 
 namespace FSO.Common.Serialization
 {

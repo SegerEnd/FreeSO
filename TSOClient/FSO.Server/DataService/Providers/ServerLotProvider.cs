@@ -4,7 +4,6 @@ using FSO.Common.Domain.Realestate;
 using FSO.Common.Domain.RealestateDomain;
 using FSO.Server.Database.DA;
 using FSO.Server.Database.DA.Lots;
-using Ninject;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -42,7 +41,7 @@ namespace FSO.Server.DataService.Providers
         private IDAFactory DAFactory;
         private IServerNFSProvider NFS;
         
-        public ServerLotProvider([Named("ShardId")] int shardId, IRealestateDomain realestate, IDAFactory daFactory, IServerNFSProvider nfs)
+        public ServerLotProvider(int shardId, IRealestateDomain realestate, IDAFactory daFactory, IServerNFSProvider nfs)
         {
             OnMissingLazyLoad = true;
             OnLazyLoadCacheValue = false;

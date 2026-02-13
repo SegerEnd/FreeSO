@@ -1,21 +1,16 @@
-﻿using FSO.Common.DataService;
+using FSO.Common.DataService;
 using FSO.Common.DataService.Framework;
-using Ninject.Modules;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace FSO.Server.DataService
 {
-    public class ShardDataServiceModule : NinjectModule
+    public static class ShardDataServiceModule
     {
-        private ServerNFSProvider NFSProvider;
-        public ShardDataServiceModule(string simNFS)
+        public static IServiceCollection AddShardDataServices(this IServiceCollection services, string simNFS)
         {
-            NFSProvider = new ServerNFSProvider(simNFS);
-        }
-
-        public override void Load()
-        {
-            this.Bind<IServerNFSProvider>().ToConstant(NFSProvider);
-            this.Bind<IDataService>().To<ServerDataService>().InSingletonScope();
+            services.AddSingleton<IServerNFSProvider>(new ServerNFSProvider(simNFS));
+            services.AddSingleton<IDataService, ServerDataService>();
+            return services;
         }
     }
 }

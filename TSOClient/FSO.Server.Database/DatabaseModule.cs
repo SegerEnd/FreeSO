@@ -1,47 +1,24 @@
-﻿using FSO.Common.Serialization;
 using FSO.Server.Database.DA;
-using Ninject.Activation;
-using Ninject.Modules;
-using System;
+using FSO.Common.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace FSO.Server.Database
 {
-    public class DatabaseModule : NinjectModule
+    public static class DatabaseModule
     {
-        public override void Load()
+        public static IServiceCollection AddDatabaseServices(this IServiceCollection services)
         {
-            this.Bind<IDAFactory>().ToProvider<DAFactoryProvider>().InSingletonScope();
-        }
-
-        class DAFactoryProvider : IProvider<IDAFactory>
-        {
-            private DatabaseConfiguration Config;
-
-            public DAFactoryProvider(DatabaseConfiguration config)
+            services.AddSingleton<IDAFactory>(sp =>
             {
-                this.Config = config;
-            }
-
-            public Type Type
-            {
-                get
+                var config = sp.Get<DatabaseConfiguration>();
+                return config.Engine switch
                 {
-                    return typeof(IDAFactory);
-                }
-            }
-
-            public object Create(IContext context)
-            {
-                switch (Config.Engine)
-                {
-                    case "mysql":
-                        return new MySqlDAFactory(Config);
-                    case "sqlite":
-                        return new SqliteDAFactory(Config);
-                }
-
-                throw new NotSupportedException($"Unsupported database engine {Config.Engine}");
-            }
+                    "mysql" => new MySqlDAFactory(config),
+                    "sqlite" => new SqliteDAFactory(config),
+                    _ => throw new NotSupportedException($"Unsupported database engine {config.Engine}")
+                };
+            });
+            return services;
         }
     }
 }

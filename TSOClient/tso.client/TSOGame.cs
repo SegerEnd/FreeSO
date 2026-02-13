@@ -22,7 +22,8 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using MSDFData;
-using Ninject;
+using FSO.Common.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace FSO.Client
 {
@@ -110,12 +111,13 @@ namespace FSO.Client
         /// </summary>
         protected override void Initialize()
         {
-            var kernel = new StandardKernel(
-                new RegulatorsModule(),
-                new NetworkModule(),
-                new CacheModule()
-            );
-            FSOFacade.Kernel = kernel;
+            FSOFacade.Container = ServiceContainer.Build(services => {
+                services.AddSingleton(sp => FSO.Content.Content.Get());
+                services.AddRegulators();
+                services.AddNetworkServices();
+                services.AddCacheServices();
+                services.AddClientDomainServices();
+            });
 
             var settings = GlobalSettings.Default;
             if (FSOEnvironment.SoftwareDepth)
@@ -192,7 +194,7 @@ namespace FSO.Client
             SceneMgr = new _3DLayer();
             SceneMgr.Initialize(GraphicsDevice);
 
-            FSOFacade.Controller = kernel.Get<GameController>();
+            FSOFacade.Controller = FSOFacade.Kernel.Get<GameController>();
             FSOFacade.Hints = new UI.Hints.UIHintManager();
             GameFacade.Screens = uiLayer;
             GameFacade.Scenes = SceneMgr;
@@ -238,14 +240,10 @@ namespace FSO.Client
             base.Screen.Layers.Add(SceneMgr);
             base.Screen.Layers.Add(uiLayer);
             GameFacade.LastUpdateState = base.Screen.State;
-            //Bind ninject objects
-            kernel.Bind<FSO.Content.Content>().ToConstant(FSO.Content.Content.Get());
-            kernel.Load(new ClientDomainModule());
-
             //Have to be eager with this, it sets a singleton instance on itself to avoid packets having
-            //to be created using Ninject for performance reasons
-            kernel.Get<cTSOSerializer>();
-            var ds = kernel.Get<DataService>();
+            //to be created for performance reasons
+            FSOFacade.Kernel.Get<cTSOSerializer>();
+            var ds = FSOFacade.Kernel.Get<DataService>();
             ds.AddProvider(new ClientAvatarProvider());
 
             this.Window.Title = "FreeSO";

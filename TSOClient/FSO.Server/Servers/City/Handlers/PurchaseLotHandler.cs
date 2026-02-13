@@ -8,7 +8,8 @@ using FSO.Server.Database.DA;
 using FSO.Server.Database.DA.Lots;
 using FSO.Server.Framework.Voltron;
 using FSO.Server.Protocol.Electron.Packets;
-using Ninject;
+using FSO.Common.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 
 namespace FSO.Server.Servers.City.Handlers

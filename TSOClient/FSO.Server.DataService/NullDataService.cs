@@ -1,5 +1,5 @@
 ﻿using FSO.Common.Serialization;
-using Ninject;
+using FSO.Common.DependencyInjection;
 
 namespace FSO.Common.DataService
 {

@@ -1,4 +1,5 @@
-﻿using FSO.Common.Domain.Shards;
+﻿using FSO.Common.DependencyInjection;
+using FSO.Common.Domain.Shards;
 using FSO.Server.Common;
 using FSO.Server.Database.DA;
 using FSO.Server.Database.DA.ArchiveUsers;
@@ -16,7 +17,6 @@ using FSO.Server.Servers.City.Domain;
 using FSO.Server.Servers.City.Handlers;
 using FSO.Server.Servers.Shared.Handlers;
 using Mina.Core.Session;
-using Ninject;
 using NLog;
 using System.Net;
 using System.Security.Cryptography;
@@ -32,10 +32,10 @@ namespace FSO.Server.Servers.City
         private CityLivenessEngine Liveness;
         public bool ShuttingDown;
 
+        private uint SessionUID;
+
         private string ShardName;
         private string ShardMap;
-
-        private uint SessionUID;
 
         protected override RequestClientSessionArchive ArchiveHandshake(IoSession session)
         {
@@ -90,10 +90,11 @@ namespace FSO.Server.Servers.City
             context.Config = Config;
             context.Sessions = Sessions;
             context.BroadcastUserList = BroadcastUserList;
+
             Kernel.Bind<EventSystem>().ToSelf().InSingletonScope();
             Kernel.Bind<CityLivenessEngine>().ToSelf().InSingletonScope();
             Kernel.Bind<CityServerContext>().ToConstant(context);
-            Kernel.Bind<int>().ToConstant(shard.Id).Named("ShardId");
+            Kernel.Bind<int>().ToConstant(shard.Id);
             Kernel.Bind<CityServerConfiguration>().ToConstant(Config);
             Kernel.Bind<JobMatchmaker>().ToSelf().InSingletonScope();
             Kernel.Bind<LotServerPicker>().To<LotServerPicker>().InSingletonScope();

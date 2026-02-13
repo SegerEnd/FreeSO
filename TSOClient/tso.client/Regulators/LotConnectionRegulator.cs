@@ -10,7 +10,7 @@ using FSO.Server.Protocol.Aries.Packets;
 using FSO.Server.Protocol.Electron.Packets;
 using FSO.Server.Protocol.Utils;
 using FSO.Server.Protocol.Voltron.Packets;
-using Ninject;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 
 namespace FSO.Client.Regulators
@@ -44,7 +44,7 @@ namespace FSO.Client.Regulators
         private LotTransitionInfo ActiveTransition;
         private IClientDataService DataService;
 
-        public LotConnectionRegulator([Named("City")] AriesClient cityClient, [Named("Lot")] AriesClient lotClient, IClientDataService dataService)
+        public LotConnectionRegulator([FromKeyedServices("City")] AriesClient cityClient, [FromKeyedServices("Lot")] AriesClient lotClient, IClientDataService dataService)
         {
             this.City = cityClient;
             this.City.AddSubscriber(this);

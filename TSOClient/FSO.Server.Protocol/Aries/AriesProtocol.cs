@@ -1,5 +1,5 @@
-﻿using Mina.Filter.Codec;
-using Ninject;
+using FSO.Common.DependencyInjection;
+using Mina.Filter.Codec;
 using Mina.Core.Session;
 
 namespace FSO.Server.Protocol.Aries

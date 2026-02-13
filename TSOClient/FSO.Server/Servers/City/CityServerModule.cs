@@ -1,15 +1,17 @@
-﻿using FSO.Common.Domain.Top100;
+using FSO.Common.Domain.Top100;
 using FSO.Server.Domain;
-using Ninject.Modules;
+using FSO.Common.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace FSO.Server.Servers.City
 {
-    public class CityServerModule : NinjectModule
+    public static class CityServerModule
     {
-        public override void Load()
+        public static IServiceCollection AddCityServerServices(this IServiceCollection services)
         {
-            Bind<ServerTop100Domain>().ToSelf().InSingletonScope();
-            Bind<ITop100Domain>().To<ServerTop100Domain>();
+            services.AddSingleton<ServerTop100Domain>();
+            services.AddTransient<ITop100Domain>(sp => sp.Get<ServerTop100Domain>());
+            return services;
         }
     }
 }

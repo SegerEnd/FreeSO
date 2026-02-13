@@ -1,7 +1,6 @@
 ﻿using FSO.Common.Utils;
 using FSO.Server.Clients;
 using FSO.Server.Protocol.Electron.Packets;
-using Ninject.Activation;
 using System;
 using System.Collections.Concurrent;
 using System.Threading;

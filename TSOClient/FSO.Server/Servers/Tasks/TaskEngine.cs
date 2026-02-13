@@ -1,8 +1,8 @@
-﻿using FSO.Server.Database.DA;
+﻿using FSO.Common.DependencyInjection;
+using FSO.Server.Database.DA;
 using FSO.Server.Database.DA.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
-using Ninject;
-using Ninject.Modules;
 using NLog;
 using System;
 using System.Collections.Generic;
@@ -209,11 +209,12 @@ namespace FSO.Server.Servers.Tasks
         }
     }
 
-    public class TaskEngineModule : NinjectModule
+    public static class TaskEngineModule
     {
-        public override void Load()
+        public static IServiceCollection AddTaskEngine(this IServiceCollection services)
         {
-            Bind<TaskEngine>().ToSelf().InSingletonScope();
+            services.AddSingleton<TaskEngine>();
+            return services;
         }
     }
 

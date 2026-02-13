@@ -1,32 +1,17 @@
-﻿using FSO.Common.Utils.Cache;
-using Ninject.Activation;
-using Ninject.Modules;
-using System;
+using FSO.Common.Utils.Cache;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace FSO.Client.GameContent
 {
-    public class CacheModule : NinjectModule
+    public static class CacheModule
     {
-        public override void Load()
+        public static IServiceCollection AddCacheServices(this IServiceCollection services)
         {
-            Bind<ICache>().ToProvider(typeof(CacheProvider)).InSingletonScope();
-        }
-    }
-
-    public class CacheProvider : IProvider<ICache>
-    {
-        public Type Type
-        {
-            get
+            services.AddSingleton<ICache>(sp =>
             {
-                return typeof(ICache);
-            }
-        }
-
-        public object Create(IContext context)
-        {
-            var cache = new FileSystemCache("./fso_cache", 10 * 1024 * 1024);
-            return cache;
+                return new FileSystemCache("./fso_cache", 10 * 1024 * 1024);
+            });
+            return services;
         }
     }
 }

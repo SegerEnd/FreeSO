@@ -1,16 +1,17 @@
-﻿using Ninject.Modules;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace FSO.Client.Regulators
 {
-    public class RegulatorsModule : NinjectModule
+    public static class RegulatorsModule
     {
-        public override void Load()
+        public static IServiceCollection AddRegulators(this IServiceCollection services)
         {
-            Bind<LoginRegulator>().To<LoginRegulator>().InSingletonScope();
-            Bind<CityConnectionRegulator>().To<CityConnectionRegulator>().InSingletonScope();
-            Bind<CreateASimRegulator>().To<CreateASimRegulator>().InSingletonScope();
-            Bind<PurchaseLotRegulator>().To<PurchaseLotRegulator>().InSingletonScope();
-            Bind<LotConnectionRegulator>().To<LotConnectionRegulator>().InSingletonScope();
+            services.AddSingleton<LoginRegulator>();
+            services.AddSingleton<CityConnectionRegulator>();
+            services.AddSingleton<CreateASimRegulator>();
+            services.AddSingleton<PurchaseLotRegulator>();
+            services.AddSingleton<LotConnectionRegulator>();
+            return services;
         }
     }
 }

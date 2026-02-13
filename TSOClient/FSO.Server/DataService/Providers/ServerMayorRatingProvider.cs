@@ -1,7 +1,6 @@
 ﻿using FSO.Common.DataService.Framework;
 using FSO.Common.DataService.Model;
 using FSO.Server.Database.DA;
-using Ninject;
 using NLog;
 
 namespace FSO.Server.DataService.Providers
@@ -12,7 +11,7 @@ namespace FSO.Server.DataService.Providers
         private int ShardId;
         private IDAFactory DAFactory;
 
-        public ServerMayorRatingProvider([Named("ShardId")] int shardId, IDAFactory factory)
+        public ServerMayorRatingProvider(int shardId, IDAFactory factory)
         {
             this.ShardId = shardId;
             this.DAFactory = factory;

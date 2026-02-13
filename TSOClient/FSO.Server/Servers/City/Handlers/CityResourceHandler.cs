@@ -2,7 +2,8 @@
 using FSO.Server.Database.DA;
 using FSO.Server.Framework.Voltron;
 using FSO.Server.Protocol.Electron.Packets;
-using Ninject;
+using FSO.Common.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using NLog;
 using System;
 using System.Collections.Concurrent;

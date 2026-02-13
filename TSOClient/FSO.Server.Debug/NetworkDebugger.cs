@@ -6,7 +6,7 @@ using FSO.Server.Common;
 using FSO.Server.Protocol.Voltron;
 using tso.debug.network;
 using FSO.Common.Serialization;
-using Ninject;
+using FSO.Common.DependencyInjection;
 
 namespace FSO.Server.Debug
 {

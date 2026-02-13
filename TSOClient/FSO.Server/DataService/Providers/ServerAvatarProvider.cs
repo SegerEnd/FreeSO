@@ -8,7 +8,6 @@ using FSO.Server.Database.DA.Avatars;
 using FSO.Server.Database.DA.Bookmarks;
 using FSO.Server.Database.DA.Lots;
 using FSO.Server.Database.DA.Relationships;
-using Ninject;
 using NLog;
 using System;
 using System.Collections.Generic;
@@ -25,7 +24,7 @@ namespace FSO.Server.DataService.Providers
         private ServerConfiguration Config;
         private IDAFactory DAFactory;
 
-        public ServerAvatarProvider([Named("ShardId")] int shardId, IDAFactory factory, ServerConfiguration config)
+        public ServerAvatarProvider(int shardId, IDAFactory factory, ServerConfiguration config)
         {
             this.ShardId = shardId;
             this.DAFactory = factory;

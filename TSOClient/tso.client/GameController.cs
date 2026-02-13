@@ -4,7 +4,7 @@ using FSO.Client.UI.Screens;
 using FSO.Client.Network;
 using FSO.Client.UI.Framework;
 using FSO.Client.GameContent;
-using Ninject;
+using FSO.Common.DependencyInjection;
 using FSO.Server.Protocol.CitySelector;
 using FSO.Client.Controllers;
 using FSO.Common.Utils;
@@ -161,15 +161,8 @@ namespace FSO.Client
             var t2 = new Regulators.CityConnectionRegulator(null, null, null, null, Kernel, null);
             var neigh = new Regulators.GenericActionRegulator<NhoodRequest, NhoodResponse>(null);
             var bulletin = new Regulators.GenericActionRegulator<BulletinRequest, BulletinResponse>(null);
-            var regu = new Regulators.RegulatorsModule();
-
-            var prov = new CacheProvider();
-            var clip = new AuthClientProvider(null);
-            var citp = new CityClientProvider(null);
             var ar = new Server.Clients.AriesClient(null);
-            var tso = new cTSOSerializerProvider(null);
             var ser = new Server.Protocol.Voltron.DataService.cTSOSerializer(null);
-            var mods = new ModelSerializerProvider(null);
             var dbs = new Common.DatabaseService.DatabaseService(null);
             var cds = new Common.DataService.ClientDataService(null, null, null);
 
@@ -268,6 +261,7 @@ namespace FSO.Client
             {
                 controller.Connect(cityName, avatarId, () => {
                     var network = Kernel.Get<Network.Network>();
+
                     network.CityClient.Write(new AvatarRetireRequest());
                     GameThread.SetTimeout(() =>
                     {

@@ -1,6 +1,7 @@
 ﻿using FSO.Common.Serialization;
 using FSO.Server.DataService.Providers;
-using Ninject;
+using FSO.Common.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace FSO.Server.DataService
 {

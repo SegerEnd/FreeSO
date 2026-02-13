@@ -1,4 +1,5 @@
-﻿using FSO.Server.Database.DA;
+﻿using FSO.Common.DependencyInjection;
+using FSO.Server.Database.DA;
 using FSO.Server.Database.DA.Hosts;
 using FSO.Server.Database.DA.Lots;
 using FSO.Server.Domain;
@@ -12,7 +13,6 @@ using FSO.Server.Servers.Lot.Handlers;
 using FSO.Server.Servers.Lot.Lifecycle;
 using FSO.Server.Servers.Lot.Surround;
 using FSO.Server.Servers.Shared.Handlers;
-using Ninject;
 using NLog;
 using System;
 using System.Linq;
@@ -29,7 +29,7 @@ namespace FSO.Server.Servers.Lot
 
         private LotHost Lots;
 
-        public LotServer(LotServerConfiguration config, Ninject.IKernel kernel) : base(config, kernel)
+        public LotServer(LotServerConfiguration config, IKernel kernel) : base(config, kernel)
         {
             this.Config = config;
             this.UnexpectedDisconnectWaitSeconds = 30;
@@ -38,7 +38,7 @@ namespace FSO.Server.Servers.Lot
             Kernel.Bind<LotServerConfiguration>().ToConstant(Config);
             Kernel.Bind<LotHost>().To<LotHost>().InSingletonScope();
             Kernel.Bind<CityConnections>().To<CityConnections>().InSingletonScope();
-            Kernel.Bind<LiveSurroundHost>().To<LiveSurroundHost>().InSingletonScope();
+            Kernel.Bind<LiveSurroundHost>().ToSelf().InSingletonScope();
             Kernel.Bind<LotServer>().ToConstant(this);
 
             LotLivenessTimer.AutoReset = true;

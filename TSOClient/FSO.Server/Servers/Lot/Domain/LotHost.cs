@@ -1,4 +1,5 @@
-﻿using FSO.Common.Utils;
+﻿using FSO.Common.DependencyInjection;
+using FSO.Common.Utils;
 using FSO.Server.Common;
 using FSO.Server.Database.DA;
 using FSO.Server.Database.DA.LotVisitors;
@@ -11,8 +12,7 @@ using FSO.Server.Protocol.Gluon.Model;
 using FSO.Server.Protocol.Gluon.Packets;
 using FSO.Server.Servers.Lot.Lifecycle;
 using FSO.SimAntics;
-using Ninject;
-using Ninject.Extensions.ChildKernel;
+
 using NLog;
 using System;
 using System.Collections.Generic;
@@ -179,7 +179,6 @@ namespace FSO.Server.Servers.Lot.Domain
                 if (Lots.TryGetValue(id, out entry))
                 {
                     entry.Dispose();
-                    Kernel.Release(entry);
                 }
                 Lots.Remove(id);
                 CityConnections.LotCount = (short)Lots.Count;
@@ -267,7 +266,6 @@ namespace FSO.Server.Servers.Lot.Domain
                 }
 
                 var ctnr = Kernel.Get<LotHostEntry>();
-                var bind = Kernel.GetBindings(typeof(LotHostEntry));
                 ctnr.CityConnection = cityConnection;
                 Lots.Add(id, ctnr);
                 CityConnections.LotCount = (short)Lots.Count;
@@ -450,7 +448,6 @@ namespace FSO.Server.Servers.Lot.Domain
 
         public void Dispose()
         {
-            Kernel?.Dispose();
         }
 
         /// <summary>
@@ -472,9 +469,7 @@ namespace FSO.Server.Servers.Lot.Domain
             LOG.Info("Bootstrapping lot with dbid = " + context.DbId + "...");
 
             //Each lot gets its own set of bindings
-            Kernel = new ChildKernel(
-                ParentKernel
-            );
+            Kernel = ParentKernel.CreateChildKernel(services => { });
 
             Kernel.Bind<LotContext>().ToConstant(context);
             Kernel.Bind<ILotHost>().ToConstant(this);

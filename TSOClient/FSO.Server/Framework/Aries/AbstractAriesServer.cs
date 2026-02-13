@@ -1,4 +1,4 @@
-﻿using FSO.Server.Protocol.Aries;
+using FSO.Server.Protocol.Aries;
 using FSO.Server.Protocol.Voltron.Packets;
 using FSO.Server.Servers;
 using Mina.Core.Service;
@@ -6,7 +6,7 @@ using Mina.Core.Session;
 using Mina.Filter.Codec;
 using Mina.Filter.Ssl;
 using Mina.Transport.Socket;
-using Ninject;
+using FSO.Common.DependencyInjection;
 using NLog;
 using System;
 using System.Collections.Generic;

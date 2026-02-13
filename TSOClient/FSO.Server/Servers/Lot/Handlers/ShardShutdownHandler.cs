@@ -1,7 +1,8 @@
 ﻿using FSO.Server.Framework.Gluon;
 using FSO.Server.Protocol.Gluon.Packets;
 using FSO.Server.Servers.Lot.Domain;
-using Ninject;
+using FSO.Common.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace FSO.Server.Servers.Lot.Handlers
 {

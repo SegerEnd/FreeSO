@@ -1,9 +1,9 @@
 ﻿using FSO.Common;
+using FSO.Common.DependencyInjection;
 using FSO.Server.Database;
 using FSO.Server.DataService;
 using FSO.Server.Utils;
-using Ninject;
-using Ninject.Parameters;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -33,14 +33,15 @@ namespace FSO.Server.Embedded
             {
                 var config = ArchiveConfigBuilder.Build(Config);
 
-                var kernel = new StandardKernel(
-                    new ServerConfigurationModule(config),
-                    new DatabaseModule(),
-                    new GlobalDataServiceModule(),
-                    new GluonHostPoolModule()
-                );
+                var container = ServiceContainer.Build(services =>
+                {
+                    services.AddServerConfiguration(config);
+                    services.AddDatabaseServices();
+                    services.AddGlobalDataServices();
+                    services.AddGluonHostPool();
+                });
 
-                var tool = kernel.Get<ToolRunServer>(new ConstructorArgument("options", new RunServerOptions()));
+                var tool = ActivatorUtilities.CreateInstance<ToolRunServer>(container.Provider, new RunServerOptions());
 
                 tool.RunEmbedded(
                     (Action shutdown) =>

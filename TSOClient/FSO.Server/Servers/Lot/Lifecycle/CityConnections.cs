@@ -2,7 +2,8 @@
 using FSO.Server.Framework.Aries;
 using FSO.Server.Framework.Gluon;
 using FSO.Server.Protocol.Gluon.Packets;
-using Ninject;
+using FSO.Common.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using NLog;
 using System;
 using System.Collections.Generic;

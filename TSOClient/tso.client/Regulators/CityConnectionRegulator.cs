@@ -17,7 +17,8 @@ using FSO.Server.Protocol.Electron.Packets;
 using FSO.Server.Protocol.Utils;
 using FSO.Server.Protocol.Voltron.Packets;
 using FSO.UI.Model;
-using Ninject;
+using FSO.Common.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
@@ -65,7 +66,7 @@ namespace FSO.Client.Regulators
         }
         public bool CanReestablish;
 
-        public CityConnectionRegulator(CityClient cityApi, [Named("City")] AriesClient cityClient, IDatabaseService db, IClientDataService ds, IKernel kernel, IShardsDomain shards)
+        public CityConnectionRegulator(CityClient cityApi, [FromKeyedServices("City")] AriesClient cityClient, IDatabaseService db, IClientDataService ds, IKernel kernel, IShardsDomain shards)
         {
             this.CityApi = cityApi;
             this.Client = cityClient;

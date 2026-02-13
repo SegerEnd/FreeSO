@@ -1,72 +1,33 @@
-﻿using FSO.Common.DatabaseService.Framework;
+using FSO.Common.DatabaseService.Framework;
 using FSO.Common.DataService.Framework;
 using FSO.Common.Serialization;
 using FSO.Server.Protocol.Voltron.DataService;
-using Ninject.Activation;
-using Ninject.Modules;
-using System;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace FSO.Server.DataService
 {
-    /// <summary>
-    /// Data service classes that can be shared between multiple shards when multi-tenanting
-    /// </summary>
-    public class GlobalDataServiceModule : NinjectModule
+    public static class GlobalDataServiceModule
     {
-        public override void Load()
+        public static IServiceCollection AddGlobalDataServices(this IServiceCollection services)
         {
-            this.Bind<cTSOSerializer>().ToProvider<cTSOSerializerProvider>().InSingletonScope();
-            this.Bind<IModelSerializer>().ToProvider<ModelSerializerProvider>().InSingletonScope();
-            this.Bind<ISerializationContext>().To<SerializationContext>();
-        }
-    }
-
-    class ModelSerializerProvider : IProvider<IModelSerializer>
-    {
-        private Content.Content Content;
-
-        public ModelSerializerProvider(Content.Content content)
-        {
-            this.Content = content;
-        }
-
-        public Type Type
-        {
-            get
+            services.AddSingleton<cTSOSerializer>(sp =>
             {
-                return typeof(IModelSerializer);
-            }
-        }
+                var content = Content.Content.Get();
+                return new cTSOSerializer(content.DataDefinition);
+            });
 
-        public object Create(IContext context)
-        {
-            var serializer = new ModelSerializer();
-            serializer.AddTypeSerializer(new DatabaseTypeSerializer());
-            serializer.AddTypeSerializer(new DataServiceModelTypeSerializer(Content.DataDefinition));
-            serializer.AddTypeSerializer(new DataServiceModelVectorTypeSerializer(Content.DataDefinition));
-            return serializer;
-        }
-    }
-
-    class cTSOSerializerProvider : IProvider<cTSOSerializer>
-    {
-        private Content.Content Content;
-
-        public cTSOSerializerProvider(Content.Content content)
-        {
-            this.Content = content;
-        }
-
-        public Type Type
-        {
-            get
+            services.AddSingleton<IModelSerializer>(sp =>
             {
-                return typeof(cTSOSerializer);
-            }
-        }
+                var content = Content.Content.Get();
+                var serializer = new ModelSerializer();
+                serializer.AddTypeSerializer(new DatabaseTypeSerializer());
+                serializer.AddTypeSerializer(new DataServiceModelTypeSerializer(content.DataDefinition));
+                serializer.AddTypeSerializer(new DataServiceModelVectorTypeSerializer(content.DataDefinition));
+                return serializer;
+            });
 
-        public object Create(IContext context){
-            return new cTSOSerializer(this.Content.DataDefinition);
+            services.AddTransient<ISerializationContext, SerializationContext>();
+            return services;
         }
     }
 }

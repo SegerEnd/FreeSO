@@ -1,17 +1,16 @@
-﻿using FSO.Files.Formats.IFF.Chunks;
+﻿using FSO.Common.DependencyInjection;
+using FSO.Files.Formats.IFF.Chunks;
 using FSO.Server.Database.DA;
 using FSO.Server.Database.DA.Lots;
 using FSO.Server.Servers.Lot;
 using FSO.SimAntics;
 using FSO.SimAntics.Marshals;
-using Ninject;
 using NLog;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Runtime.Caching;
 
 namespace FSO.Server
 {
@@ -275,8 +274,6 @@ namespace FSO.Server
             LOG.Info("Scanning content");
             VMContext.InitVMConfig(false);
             Content.Content.Init(Config.GameLocation, Content.ContentMode.SERVER);
-            Kernel.Bind<Content.Content>().ToConstant(Content.Content.Get());
-            Kernel.Bind<MemoryCache>().ToConstant(new MemoryCache("fso_server"));
 
             using (var da = (SqlDA)DAFactory.Get())
             {
