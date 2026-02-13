@@ -1,9 +1,15 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 
 namespace FSO.Common
 {
     public static class FSOEnvironment
     {
+        /// <summary>
+        /// Called by UITextEdit to request showing/hiding the native software keyboard.
+        /// Set by platform code (iOS/Android). Parameter: true = show, false = hide.
+        /// </summary>
+        public static Action<bool> RequestSoftKeyboard;
         public static Thread GameThread;
 
         public static string ContentDir = "Content/";

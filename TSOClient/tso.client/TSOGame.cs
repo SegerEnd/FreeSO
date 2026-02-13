@@ -52,17 +52,20 @@ namespace FSO.Client
             }
 
             FSOEnvironment.DPIScaleFactor = GlobalSettings.Default.DPIScaleFactor;
+            Graphics.PreferredBackBufferWidth = (int)(GlobalSettings.Default.GraphicsWidth * FSOEnvironment.DPIScaleFactor);
+            Graphics.PreferredBackBufferHeight = (int)(GlobalSettings.Default.GraphicsHeight * FSOEnvironment.DPIScaleFactor);
+            Graphics.PreferredDepthStencilFormat = DepthFormat.Depth24Stencil8;
+            TargetElapsedTime = new TimeSpan(10000000 / GlobalSettings.Default.TargetRefreshRate);
+            FSOEnvironment.RefreshRate = GlobalSettings.Default.TargetRefreshRate;
             if (!FSOEnvironment.SoftwareDepth)
             {
-                Graphics.PreferredBackBufferWidth = (int)(GlobalSettings.Default.GraphicsWidth * FSOEnvironment.DPIScaleFactor);
-                Graphics.PreferredBackBufferHeight = (int)(GlobalSettings.Default.GraphicsHeight * FSOEnvironment.DPIScaleFactor);
-                //Graphics.PreferMultiSampling = true;
-                Graphics.PreferredDepthStencilFormat = DepthFormat.Depth24Stencil8;
-                TargetElapsedTime = new TimeSpan(10000000 / GlobalSettings.Default.TargetRefreshRate);
-                FSOEnvironment.RefreshRate = GlobalSettings.Default.TargetRefreshRate;
                 Graphics.HardwareModeSwitch = false;
-                Graphics.ApplyChanges();
             }
+            else
+            {
+                Graphics.IsFullScreen = true;
+            }
+            Graphics.ApplyChanges();
 
             this.Window.AllowUserResizing = true;
             this.Window.ClientSizeChanged += new EventHandler<EventArgs>(Window_ClientSizeChanged);
@@ -118,11 +121,16 @@ namespace FSO.Client
             FSOFacade.Kernel = kernel;
 
             var settings = GlobalSettings.Default;
+            Console.WriteLine($"[FSO-Init] Viewport: {GraphicsDevice.Viewport.Width}x{GraphicsDevice.Viewport.Height}");
+            Console.WriteLine($"[FSO-Init] BackBuffer: {GraphicsDevice.PresentationParameters.BackBufferWidth}x{GraphicsDevice.PresentationParameters.BackBufferHeight}");
+            Console.WriteLine($"[FSO-Init] PreferredBB: {Graphics.PreferredBackBufferWidth}x{Graphics.PreferredBackBufferHeight}");
+            Console.WriteLine($"[FSO-Init] DPIScale: {FSOEnvironment.DPIScaleFactor}, IsFullScreen: {Graphics.IsFullScreen}");
             if (FSOEnvironment.SoftwareDepth)
             {
                 settings.GraphicsWidth = (int)(GraphicsDevice.Viewport.Width / FSOEnvironment.DPIScaleFactor);
                 settings.GraphicsHeight = (int)(GraphicsDevice.Viewport.Height / FSOEnvironment.DPIScaleFactor);
             }
+            Console.WriteLine($"[FSO-Init] Final GraphicsWidth: {settings.GraphicsWidth}x{settings.GraphicsHeight}");
 
             //manage settings
             if (settings.LightingMode == -1)
@@ -234,7 +242,7 @@ namespace FSO.Client
 
             WorldContent.Init(this.Services, Content.RootDirectory);
             DGRP3DMesh.InitRCWorkers();
-            if (!(FSOEnvironment.SoftwareKeyboard && FSOEnvironment.SoftwareDepth)) AddTextInput();
+            AddTextInput();
             base.Screen.Layers.Add(SceneMgr);
             base.Screen.Layers.Add(uiLayer);
             GameFacade.LastUpdateState = base.Screen.State;

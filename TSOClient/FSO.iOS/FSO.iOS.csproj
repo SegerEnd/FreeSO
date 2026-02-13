@@ -1,0 +1,56 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-ios</TargetFramework>
+    <SupportedOSPlatformVersion>18.0</SupportedOSPlatformVersion>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>FSO.iOS</RootNamespace>
+    <AssemblyName>FreeSO</AssemblyName>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <PublishAot>false</PublishAot>
+    <MtouchLink>None</MtouchLink>
+    <!-- Enable interpreter for dynamic code (Ninject uses Reflection.Emit) -->
+    <UseInterpreter>true</UseInterpreter>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <!-- Xcode 26.1 is newer than what this SDK expects; skip version check -->
+    <ValidateXcodeVersion>false</ValidateXcodeVersion>
+    <RuntimeIdentifier>ios-arm64</RuntimeIdentifier>
+    <!-- Code signing: set CodesignKey, CodesignProvision, and DevelopmentTeam in Directory.Build.props or via command line -->
+    <CodesignKey Condition="'$(CodesignKey)' == ''">Apple Development</CodesignKey>
+    <CodesignProvision Condition="'$(CodesignProvision)' == ''">Automatic</CodesignProvision>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MonoGame.Framework.iOS" Version="3.8.2.1105" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.11" />
+    <!-- Suppress desktop MonoGame packages from library projects -->
+    <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.5-preview.2" ExcludeAssets="all" PrivateAssets="all" />
+    <PackageReference Include="MonoGame.Framework.WindowsDX" Version="3.8.5-preview.2" ExcludeAssets="all" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\tso.client\FSO.Client.csproj" />
+    <ProjectReference Include="..\tso.common\FSO.Common.csproj" />
+  </ItemGroup>
+
+  <!-- Bundle content from tso.client, tso.content, and FSO.Content.TSO -->
+  <ItemGroup>
+    <BundleResource Include="..\tso.client\Content\**\*.*">
+      <Link>Content\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </BundleResource>
+    <BundleResource Include="..\tso.content\Content\**\*.*">
+      <Link>Content\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </BundleResource>
+    <BundleResource Include="..\FSO.Content.TSO\Content\**\*.*">
+      <Link>Content\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </BundleResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <BundleResource Include="GameThumbnail.png" />
+    <BundleResource Include="FreeSO.png" />
+    <BundleResource Include="blueprint.dtd" />
+  </ItemGroup>
+
+</Project>

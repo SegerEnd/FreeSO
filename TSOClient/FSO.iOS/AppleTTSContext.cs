@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+using System;
 using System.Linq;
-using System.Text;
 using AVFoundation;
-using Foundation;
 using FSO.Client.UI.Panels;
-using UIKit;
 
-namespace FSOiOS
+namespace FSO.iOS
 {
     public class AppleTTSContext : ITTSContext
     {
@@ -18,19 +14,17 @@ namespace FSOiOS
 
         public override void Dispose()
         {
-            
         }
 
-        public override void Speak(string text, bool gender, int pitch)
+        public override void Speak(string text, bool gender, int pitch, uint persistID)
         {
             var speechSynthesizer = new AVSpeechSynthesizer();
             var voci = AVSpeechSynthesisVoice.GetSpeechVoices();
 
             var choices = voci.Where(x => x.Description.Contains(gender ? "female" : "male"));
-            //prefer us
             AVSpeechSynthesisVoice voice;
             voice = choices.FirstOrDefault(x => x.Language.ToLowerInvariant().Contains("en-gb"));
-            if (voice == null) voice = choices.FirstOrDefault(x => x.Language.ToLowerInvariant().Contains("en-gb"));
+            if (voice == null) voice = choices.FirstOrDefault(x => x.Language.ToLowerInvariant().Contains("en-us"));
             if (voice == null && voci.Length > 0) voice = voci[0];
             if (voice == null) return;
 

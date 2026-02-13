@@ -60,7 +60,8 @@ namespace FSO.Client
         {
             //TODO: Add any needed deconstruction here.
             Game.Exit();
-            Process.GetCurrentProcess().Kill();
+            try { Process.GetCurrentProcess().Kill(); }
+            catch (PlatformNotSupportedException) { } // iOS doesn't support Process.Kill
         }
         
         public static TimeSpan GameRunTime

@@ -34,9 +34,10 @@ namespace FSO.Common.Rendering.Framework
         }
 
         private static List<char> TextCharacters = new List<char>();
+        private static readonly object TextLock = new object();
         public static void TextInput(object sender, TextInputEventArgs e)
         {
-            TextCharacters.Add(e.Character);
+            lock (TextLock) { TextCharacters.Add(e.Character); }
         }
 
         /// <summary>
@@ -53,13 +54,17 @@ namespace FSO.Common.Rendering.Framework
         {
             State.Time = time;
             State.PreviousKeyboardState = State.KeyboardState;
-            State.FrameTextInput = TextCharacters;
+            lock (TextLock)
+            {
+                State.FrameTextInput = new List<char>(TextCharacters);
+                TextCharacters.Clear();
+            }
 
             var touchMode = FSOEnvironment.SoftwareKeyboard;
 
             if (touchMode)
             {
-                if (FSOEnvironment.SoftwareDepth) State.KeyboardState = new KeyboardState();
+                State.KeyboardState = Keyboard.GetState();
                 TouchCollection touches = TouchPanel.GetState();
 
                 var missing = new HashSet<MultiMouse>(State.MouseStates);
@@ -137,7 +142,6 @@ namespace FSO.Common.Rendering.Framework
                 layer.Update(State);
             }
 
-            TextCharacters.Clear();
         }
 
         private void TouchStub(UpdateState state)

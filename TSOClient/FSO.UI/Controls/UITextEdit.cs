@@ -364,24 +364,17 @@ namespace FSO.Client.UI.Controls
             {
                 m_cursorBlink = true;
                 m_cursorBlinkLastTime = GameFacade.LastUpdateState.Time.TotalGameTime.Ticks;
-                //if (FSOEnvironment.SoftwareKeyboard && FSOEnvironment.SoftwareDepth)
-                //{
-                //    try
-                //    {
-                //        Guide.BeginShowKeyboardInput(PlayerIndex.One, "", "", CurrentText, (ar) =>
-                //        {
-                //            var str = Guide.EndShowKeyboardInput(ar);
-                //            lock (this)
-                //            {
-                //                QueuedChange = str;
-                //            }
-                //        }, null);
-                //    }
-                //    catch (Exception e) { }
-                //}
+                if (FSOEnvironment.SoftwareKeyboard)
+                {
+                    FSOEnvironment.RequestSoftKeyboard?.Invoke(true);
+                }
             }
             else
             {
+                if (FSOEnvironment.SoftwareKeyboard)
+                {
+                    FSOEnvironment.RequestSoftKeyboard?.Invoke(false);
+                }
                 OnFocusOut?.Invoke(this);
                 m_cursorBlink = false;
                 SelectionEnd = -1;
@@ -414,7 +407,7 @@ namespace FSO.Client.UI.Controls
                     if (OnChange != null) OnChange(this);
                 }
             }
-            if (FSOEnvironment.SoftwareKeyboard && FSOEnvironment.SoftwareDepth && state.InputManager.GetFocus() == this) state.InputManager.SetFocus(null);
+            //force-blur removed - iOS keyboard helper handles focus lifecycle
             if (m_IsReadOnly) { return; }
 
             // Mouse wheel scrolling
