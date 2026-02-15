@@ -13,6 +13,7 @@ namespace FSO.iOS
     public static class iOSKeyboard
     {
         private static UITextField _hiddenField;
+        private static HiddenFieldDelegate _fieldDelegate;
         private static bool _initialized;
 
         public static void Initialize()
@@ -23,12 +24,56 @@ namespace FSO.iOS
             FSOEnvironment.RequestSoftKeyboard = OnKeyboardRequested;
         }
 
+        /// <summary>
+        /// UITextFieldDelegate subclass that intercepts keystrokes and forwards
+        /// them to GameScreen.TextInput. Using a delegate class is more reliable
+        /// than property-based delegates on iOS.
+        /// </summary>
+        private class HiddenFieldDelegate : UITextFieldDelegate
+        {
+            public override bool ShouldChangeCharacters(UITextField textField, NSRange range, string replacementString)
+            {
+                if (string.IsNullOrEmpty(replacementString))
+                {
+                    // Backspace
+                    GameScreen.TextInput(null,
+                        new Microsoft.Xna.Framework.TextInputEventArgs('\b', Microsoft.Xna.Framework.Input.Keys.Back));
+                }
+                else
+                {
+                    foreach (var c in replacementString)
+                    {
+                        GameScreen.TextInput(null,
+                            new Microsoft.Xna.Framework.TextInputEventArgs(c));
+                    }
+                }
+
+                // Defer text reset - modifying text inside this callback can break
+                // the delegate chain on newer iOS versions.
+                // Return false so iOS doesn't apply the change itself.
+                NSRunLoop.Main.BeginInvokeOnMainThread(() =>
+                {
+                    textField.Text = " ";
+                });
+                return false;
+            }
+
+            public override bool ShouldReturn(UITextField textField)
+            {
+                GameScreen.TextInput(null,
+                    new Microsoft.Xna.Framework.TextInputEventArgs('\r', Microsoft.Xna.Framework.Input.Keys.Enter));
+                return false;
+            }
+        }
+
         private static void EnsureField()
         {
             if (_hiddenField != null) return;
 
             NSRunLoop.Main.BeginInvokeOnMainThread(() =>
             {
+                if (_hiddenField != null) return; // Double-check after dispatch
+
                 var window = UIApplication.SharedApplication.KeyWindow
                     ?? UIApplication.SharedApplication.Windows[0];
 
@@ -45,34 +90,8 @@ namespace FSO.iOS
                     Text = " " // Need at least one char for backspace to work
                 };
 
-                _hiddenField.ShouldChangeCharacters = (textField, range, replacement) =>
-                {
-                    if (string.IsNullOrEmpty(replacement))
-                    {
-                        // Backspace
-                        GameScreen.TextInput(null,
-                            new Microsoft.Xna.Framework.TextInputEventArgs('\b', Microsoft.Xna.Framework.Input.Keys.Back));
-                    }
-                    else
-                    {
-                        foreach (var c in replacement)
-                        {
-                            GameScreen.TextInput(null,
-                                new Microsoft.Xna.Framework.TextInputEventArgs(c));
-                        }
-                    }
-
-                    // Reset text to a single space so backspace always works
-                    textField.Text = " ";
-                    return false;
-                };
-
-                _hiddenField.ShouldReturn = (textField) =>
-                {
-                    GameScreen.TextInput(null,
-                        new Microsoft.Xna.Framework.TextInputEventArgs('\r', Microsoft.Xna.Framework.Input.Keys.Enter));
-                    return false;
-                };
+                _fieldDelegate = new HiddenFieldDelegate();
+                _hiddenField.Delegate = _fieldDelegate;
 
                 window.AddSubview(_hiddenField);
             });
