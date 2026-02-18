@@ -38,6 +38,8 @@ namespace FSO.Server.Api.Core
 
         public string BranchName { get; set; } = "dev";
 
+        public bool AllOpenable { get; set; }
+
         public IUpdateUploader UpdateUploader { get; set; }
     }
 }
