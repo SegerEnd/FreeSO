@@ -176,20 +176,26 @@ namespace FSO.Client.UI.Screens
             WindowContainer = new UIContainer();
             Add(WindowContainer);
 
-            if (Content.Content.Get().TS1)
+            if (Content.Content.Target == FSO.Content.FSOEngineMode.TS1)
             {
-                TS1NeighPanel = new UINeighborhoodSelectionPanel(4);
-                TS1NeighPanel.OnHouseSelect += (house) =>
-                {
-                    ActiveFamily = Content.Content.Get().Neighborhood.GetFamilyForHouse((short)house);
-                    InitializeLot(Path.Combine(Content.Content.Get().TS1BasePath, "UserData/Houses/House" + house.ToString().PadLeft(2, '0') + ".iff"), false);// "UserData/Houses/House21.iff"
-                Remove(TS1NeighPanel);
-                };
-                Add(TS1NeighPanel);
+                ShowTS1NeighborhoodPanel();
             }
 
             var status = new UINetStatusTray();
             Add(status);
+        }
+
+        public void ShowTS1NeighborhoodPanel()
+        {
+            if (TS1NeighPanel != null) return;
+            TS1NeighPanel = new UINeighborhoodSelectionPanel(4);
+            TS1NeighPanel.OnHouseSelect += (house) =>
+            {
+                ActiveFamily = Content.Content.Get().Neighborhood.GetFamilyForHouse((short)house);
+                InitializeLot(Path.Combine(Content.Content.Get().TS1BasePath, "UserData/Houses/House" + house.ToString().PadLeft(2, '0') + ".iff"), false);
+                Remove(TS1NeighPanel);
+            };
+            Add(TS1NeighPanel);
         }
 
         public override void GameResized()

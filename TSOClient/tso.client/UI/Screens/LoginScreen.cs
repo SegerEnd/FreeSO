@@ -52,9 +52,9 @@ namespace FSO.Client.UI.Screens
             HITVM.Get().PlaySoundEvent(UIMusic.None);
             GlobalSettings.Default.Save();
 
-            if (Content.Content.Get().TS1)
+            if (Content.Content.Target == FSO.Content.FSOEngineMode.TS1)
             {
-                //load the sandbox screen in neighbourhood view mode
+                //load the sandbox screen in neighbourhood view mode (pure TS1 only)
                 GameThread.NextUpdate(x =>
                 {
                     FSOFacade.Controller.EnterSandboxMode("", false);
@@ -120,7 +120,23 @@ namespace FSO.Client.UI.Screens
             };
             this.Add(gameplayButton);
             gameplayButton.OnButtonClick += new ButtonClickDelegate(gameplayButton_OnButtonClick);
-            
+
+            if (Content.Content.Get().TS1)
+            {
+                var ts1Button = new UIButton()
+                {
+                    Caption = "TS1 Mode",
+                    Y = 10,
+                    Width = 100,
+                    X = 140
+                };
+                this.Add(ts1Button);
+                ts1Button.OnButtonClick += (btn) =>
+                {
+                    FSOFacade.Controller.EnterTS1Mode();
+                };
+            }
+
             Regulator.OnError += AuthRegulator_OnError;
             Regulator.OnTransition += AuthRegulator_OnTransition;
 

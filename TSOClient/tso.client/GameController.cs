@@ -477,6 +477,15 @@ namespace FSO.Client
             DiscordRpcEngine.SendFSOPresence("Playing Sandbox Mode");
         }
 
+        public void EnterTS1Mode()
+        {
+            var screen = new SandboxGameScreen();
+            GameFacade.Screens.RemoveCurrent();
+            GameFacade.Screens.AddScreen(screen);
+            screen.ShowTS1NeighborhoodPanel();
+            DiscordRpcEngine.SendFSOPresence("Playing TS1 Mode");
+        }
+
         public void ShowCredits()
         {
             var screen = Kernel.Get<Credits>();

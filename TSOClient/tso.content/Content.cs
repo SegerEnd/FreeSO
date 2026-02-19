@@ -107,10 +107,13 @@ namespace FSO.Content
             {
                 RCMeshes = new RCMeshProvider(device);
                 UIGraphics = new UIGraphicsProvider(this);
-                IffFile.TargetTS1 = TS1;
+                IffFile.TargetTS1 = (Target == FSOEngineMode.TS1);
                 if (TS1)
                 {
                     TS1Global = new TS1Provider(this);
+                }
+                if (Target == FSOEngineMode.TS1)
+                {
                     AvatarTextures = new TS1AvatarTextureProvider(TS1Global);
                     AvatarMeshes = new TS1BMFProvider(TS1Global);
                 }
@@ -126,7 +129,7 @@ namespace FSO.Content
             Changes = new ChangeManager();
             CustomUI = new CustomUIProvider(this);
 
-            if (TS1)
+            if (Target == FSOEngineMode.TS1)
             {
                 var provider = new TS1ObjectProvider(this, TS1Global);
                 WorldObjects = provider;
@@ -136,16 +139,18 @@ namespace FSO.Content
                 AvatarSkeletons = new TS1BCFSkeletonProvider(BCFGlobal);
                 AvatarAppearances = new TS1BCFAppearanceProvider(BCFGlobal);
                 Audio = new TS1Audio(this);
-            } else
+            }
+            else
             {
+                if (Target == FSOEngineMode.TS1Hybrid)
+                    BCFGlobal = new TS1BCFProvider(this, TS1Global);
+
                 AvatarBindings = new AvatarBindingProvider(this);
                 AvatarAppearances = new AvatarAppearanceProvider(this);
                 AvatarOutfits = new AvatarOutfitProvider(this);
-
                 AvatarPurchasables = new AvatarPurchasables(this);
                 AvatarCollections = new AvatarCollectionsProvider(this);
                 AvatarThumbnails = new AvatarThumbnailProvider(this);
-
                 AvatarAnimations = new AvatarAnimationProvider(this);
                 AvatarSkeletons = new AvatarSkeletonProvider(this);
                 WorldObjects = new WorldObjectProvider(this);
@@ -155,7 +160,6 @@ namespace FSO.Content
                 RackOutfits = new RackOutfitsProvider(this);
                 Ini = new IniProvider(this);
                 GlobalTuning = new Tuning(Path.Combine(basePath, "tuning.dat"));
-
                 Upgrades = new ObjectUpgradeProvider(this);
             }
             WorldFloors = new WorldFloorProvider(this);
@@ -173,7 +177,7 @@ namespace FSO.Content
         public void InitWorld()
         {
             LoadProgress = ContentLoadingProgress.InitObjects;
-            if (TS1)
+            if (Target == FSOEngineMode.TS1)
             {
                 WorldObjectGlobals.Init();
                 ((TS1ObjectProvider)WorldObjects).Init();
@@ -187,10 +191,29 @@ namespace FSO.Content
                 WorldObjectGlobals.Init();
                 ((WorldObjectProvider)WorldObjects).Init((Device != null));
                 ((WorldObjectCatalog)WorldCatalog).Init(this, WorldObjects.CatalogEnrich);
+
+                if (Target == FSOEngineMode.TS1Hybrid)
+                {
+                    // Init TS1 objects into a separate provider and merge with TSO
+                    var ts1Objects = new TS1ObjectProvider(this, TS1Global);
+                    ts1Objects.Init();
+                    TS1ObjectProvider = ts1Objects;
+                    WorldObjects = new HybridObjectProvider(this, (WorldObjectProvider)WorldObjects, ts1Objects);
+                    WorldCatalog = new HybridObjectCatalog((WorldObjectCatalog)WorldCatalog, ts1Objects);
+                }
+
                 LoadProgress = ContentLoadingProgress.InitArch;
 
-                WorldWalls.Init();
-                WorldFloors.Init();
+                if (Target == FSOEngineMode.TS1Hybrid)
+                {
+                    WorldWalls.InitHybrid();
+                    WorldFloors.InitHybrid();
+                }
+                else
+                {
+                    WorldWalls.Init();
+                    WorldFloors.Init();
+                }
                 Upgrades.Init();
                 if (Mode == ContentMode.SERVER) Upgrades.LoadJSONTuning();
             }
@@ -205,8 +228,13 @@ namespace FSO.Content
             _ScanFiles("Content/", contentFiles, "Content/");
             ContentFiles = contentFiles.ToArray();
             CustomUI.Init();
-            if (!TS1)
+            if (Target == FSOEngineMode.TS1)
             {
+                VersionString = "TS1";
+            }
+            else
+            {
+                // TSO and TS1Hybrid both need TSO file scanning and data definitions
                 var allFiles = new List<string>();
                 _ScanFiles(BasePath, allFiles, BasePath);
                 AllFiles = allFiles.ToArray();
@@ -232,9 +260,6 @@ namespace FSO.Content
                     VersionString = File.ReadAllText(GetPath("version"));
                 }
                 catch { }
-            } else
-            {
-                VersionString = "TS1";
             }
         }
 
@@ -244,7 +269,7 @@ namespace FSO.Content
         private void Init()
         {
             Inited = true;
-            if (!TS1) Audio.Init();
+            if (Target != FSOEngineMode.TS1) Audio.Init();
             /** Scan system for files **/
             if (AllFiles == null)
             {
@@ -257,8 +282,8 @@ namespace FSO.Content
                 }
             }
 
+            // Scan TS1 files for both pure TS1 and Hybrid modes
             var ts1AllFiles = new List<string>();
-            var oldBase = BasePath;
             if (TS1)
             {
                 _ScanFiles(TS1BasePath, ts1AllFiles, TS1BasePath);
@@ -270,8 +295,10 @@ namespace FSO.Content
             LoadProgress = ContentLoadingProgress.InitBCF;
             BCFGlobal?.Init();
 
-            if (!TS1) PIFFRegistry.Init(Path.Combine(FSOEnvironment.ContentDir, "Patch/"));
-            else PIFFRegistry.Init(Path.Combine(FSOEnvironment.ContentDir, "TS1Patch/"));
+            if (Target == FSOEngineMode.TS1)
+                PIFFRegistry.Init(Path.Combine(FSOEnvironment.ContentDir, "TS1Patch/"));
+            else
+                PIFFRegistry.Init(Path.Combine(FSOEnvironment.ContentDir, "Patch/"));
 
             LoadProgress = ContentLoadingProgress.InitAvatars;
             Archives = new Dictionary<string, FAR3Archive>();
@@ -280,13 +307,14 @@ namespace FSO.Content
                 UIGraphics.Init();
             }
 
-            if (TS1)
+            if (Target == FSOEngineMode.TS1)
             {
                 ((TS1AvatarTextureProvider)AvatarTextures)?.Init();
                 ((TS1BMFProvider)AvatarMeshes)?.Init();
                 Jobs = new TS1JobProvider(TS1Global);
                 Neighborhood = new TS1NeighborhoodProvider(this);
-            } else
+            }
+            else
             {
                 if (Mode == ContentMode.CLIENT) AvatarHandgroups.Init();
                 AvatarBindings.Init();
@@ -302,10 +330,12 @@ namespace FSO.Content
                 CityMaps.Init();
                 RackOutfits.Init();
                 Ini.Init();
+                if (Target == FSOEngineMode.TS1Hybrid)
+                    Neighborhood = new TS1NeighborhoodProvider(this);
             }
 
             LoadProgress = ContentLoadingProgress.InitAudio;
-            if (TS1) Audio.Init();
+            if (Target == FSOEngineMode.TS1) Audio.Init();
 
             InitWorld();
         }
@@ -385,6 +415,9 @@ namespace FSO.Content
         public WorldWallProvider WorldWalls;
         public IObjectCatalog WorldCatalog;
         public WorldRoofProvider WorldRoofs;
+
+        /** TS1 Hybrid - separate TS1 object provider for Remix mode **/
+        public TS1ObjectProvider TS1ObjectProvider;
 
         public ObjectUpgradeProvider Upgrades;
 

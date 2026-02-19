@@ -148,6 +148,60 @@ namespace FSO.Content
             NumFloors = floorID;
         }
 
+        /// <summary>
+        /// Hybrid mode: loads TSO floors first, then appends TS1 floors after the TSO range.
+        /// </summary>
+        public void InitHybrid()
+        {
+            // Load all TSO floors first
+            Init();
+
+            // Now append TS1 floors starting after the TSO range
+            ushort floorID = (ushort)NumFloors;
+
+            var files = new FileProvider<IffFile>(ContentManager, new IffCodec(), new Regex(".*/Floors.*\\.flr"));
+            files.UseTS1 = true;
+            var ts1 = new TS1SubProvider<IffFile>(ContentManager.TS1Global, ".flr");
+            files.Init();
+            ts1.Init();
+            var compo = new CompositeProvider<IffFile>(new List<IContentProvider<IffFile>>() {
+                ts1,
+                files
+            });
+
+            var all = compo.ListGeneric();
+            foreach (var entry in all)
+            {
+                var name = Path.GetFileNameWithoutExtension(entry.ToString().Replace('\\', '/')).ToLowerInvariant();
+                // Skip duplicates already loaded from TSO
+                if (DynamicFloorFromID.ContainsKey(name)) continue;
+
+                var iff = (IffFile)entry.GetThrowawayGeneric();
+                DynamicFloorFromID[name] = floorID;
+                var catStrings = iff.Get<STR>(0);
+
+                Entries.Add(floorID, new FloorReference(this)
+                {
+                    ID = floorID,
+                    FileName = Path.GetFileName(entry.ToString().Replace('\\', '/')).ToLowerInvariant(),
+                    Hardness = HardnessFromChunkName(iff.GetLabel<SPR2>(1)),
+
+                    Name = catStrings.GetString(0),
+                    Price = int.Parse(catStrings.GetString(1)),
+                    Description = catStrings.GetString(2)
+                });
+
+                floorID++;
+            }
+            NumFloors = floorID;
+
+            // Compose the Floors provider to include both TSO FAR1 and TS1 sources
+            Floors = new CompositeProvider<IffFile>(new List<IContentProvider<IffFile>>() {
+                Floors, // existing TSO FAR1 provider
+                compo   // TS1 providers
+            });
+        }
+
         private int HardnessFromChunkName(string name)
         {
             if (name == null || name.Length < 1)
