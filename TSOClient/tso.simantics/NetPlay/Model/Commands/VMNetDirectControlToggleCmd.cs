@@ -36,7 +36,6 @@ namespace FSO.SimAntics.NetPlay.Model.Commands
 
         public override bool Verify(VM vm, VMAvatar caller)
         {
-            if (IsSpectator(caller)) return false;
             if (!base.Verify(vm, caller))
             {
                 return false;

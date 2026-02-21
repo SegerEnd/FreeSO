@@ -57,9 +57,7 @@ namespace FSO.Client.UI.Archive
             NameInput.CurrentText = ClientArchiveConfiguration.Default.PlayerName;
 
             NameInput.OnChange += ValidateInputs;
-            NameInput.OnEnterPress += Submit;
             AddressInput.OnChange += ValidateInputs;
-            AddressInput.OnEnterPress += Submit;
             JoinButton.OnButtonClick += Submit;
             CloseButton.OnButtonClick += Close;
             ArchiveRadio.OnButtonClick += ModeChanged;
@@ -134,9 +132,6 @@ namespace FSO.Client.UI.Archive
 
         private void Submit(UIElement button)
         {
-            if (JoinButton.Disabled)
-                return;
-
             if (IsServerMode)
             {
                 var url = AddressInput.CurrentText;

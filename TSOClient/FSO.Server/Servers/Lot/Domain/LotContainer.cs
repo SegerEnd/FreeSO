@@ -102,26 +102,7 @@ namespace FSO.Server.Servers.Lot.Domain
         private LiveSurroundLotConnection SurroundConnection;
         private HashSet<uint> FreeRoamLeaving = [];
 
-        private bool AllowGuestOpening => Config.AllOpenable || IsArchiveServer;
-        private bool IsArchiveServer => Config.Archive?.Flags.HasFlag(FSO.Common.ArchiveConfigFlags.AllOpenable) ?? false;
-        private bool IsSpectatorMode;
-        private bool ShouldTransitionToSpectator
-        {
-            get
-            {
-                if (!AllowGuestOpening || IsArchiveServer || IsSpectatorMode) return false;
-
-                bool hasVisitor = false;
-                foreach (VMAvatar ava in Lot.Context.ObjectQueries.Avatars)
-                {
-                    if (ava.KillTimeout != -1) continue;
-                    if (ava.AvatarState.Permissions > VMTSOAvatarPermissions.Visitor)
-                        return false; // privileged avatar still present
-                    hasVisitor = true;
-                }
-                return hasVisitor;
-            }
-        }
+        private bool AllowGuestOpening => Config.AllOpenable || (Config.Archive?.Flags.HasFlag(FSO.Common.ArchiveConfigFlags.AllOpenable) ?? false);
 
         private static HashSet<uint> ValidOOWGUIDs = new HashSet<uint>()
         {
@@ -459,7 +440,7 @@ namespace FSO.Server.Servers.Lot.Domain
 
         public bool SaveRing()
         {
-            if (TransientLot || IsSpectatorMode) return true; //transient/spectator lots never get saved.
+            if (TransientLot) return true; //transient lots never get saved.
             var newBackup = (sbyte)((LotPersist.ring_backup_num + 1) % Config.RingBufferSize);
             var lotStr = LotPersist.lot_id.ToString("x8");
             Directory.CreateDirectory(Path.Combine(Config.SimNFS, "Lots/" + lotStr + "/"));
@@ -561,12 +542,9 @@ namespace FSO.Server.Servers.Lot.Domain
 
             var persists = Lot.Context.ObjectQueries.MultitileByPersist.Keys.ToList();
             Dictionary<uint, DbObject> ownerInfo;
-            var adminOwners = new HashSet<uint>();
             using (var da = DAFactory.Get())
             {
                 ownerInfo = da.Objects.GetObjectOwners(persists).ToDictionary(x => x.object_id);
-                foreach (var id in ownerInfo.Values.Select(x => x.owner_id ?? 0).Where(x => x != 0 && !Lot.TSOState.Roommates.Contains(x)).Distinct())
-                    if (da.Avatars.GetModerationLevel(id) > 0) adminOwners.Add(id);
             }
 
             var ents = new List<VMEntity>(Lot.Entities);
@@ -603,8 +581,7 @@ namespace FSO.Server.Servers.Lot.Domain
                         //or if the object is not donated and the owner is not a roomie
                         if (info.lot_id != Context.DbId)
                             deleteMode = 2;
-                        else if (removeAll || !(Lot.TSOState.Roommates.Contains(((VMTSOObjectState)ent.TSOState).OwnerID)
-                            || adminOwners.Contains(((VMTSOObjectState)ent.TSOState).OwnerID)
+                        else if (removeAll || !(Lot.TSOState.Roommates.Contains(((VMTSOObjectState)ent.TSOState).OwnerID) 
                             || ((VMTSOObjectState)ent.TSOState).ObjectFlags.HasFlag(VMTSOObjectFlags.FSODonated)))
                             deleteMode = 1;
                     }
@@ -760,7 +737,6 @@ namespace FSO.Server.Servers.Lot.Domain
         public void ResetVM()
         {
             LOG.Info("Resetting VM for lot with dbid = " + Context.DbId);
-            IsSpectatorMode = (Context.Action == ClaimAction.LOT_SPECTATOR);
             VMGlobalLink = Kernel.Get<LotServerGlobalLink>();
             if (AllowGuestOpening && !JobLot)
             {
@@ -1173,10 +1149,9 @@ namespace FSO.Server.Servers.Lot.Domain
                     lastTick++;
                     //sometimes avatars can be killed immediately after their kill timer starts (this frame will run the leave lot interaction)
                     //this works around that possibility. 
-                    var preTickAvatars = Lot.Context.ObjectQueries.AvatarsByPersist.Values.ToList();
-                    var noRoomies = !AllowGuestOpening && !IsSpectatorMode
-                        && LotPersist.admit_mode < 4 && LotPersist.category != LotCategory.community
-                        && !preTickAvatars.Any(x => x.AvatarState.Permissions > VMTSOAvatarPermissions.Visitor);
+                    var preTickAvatars = Lot.Context.ObjectQueries.AvatarsByPersist.Values.Select(x => x).ToList();
+                    var noRoomies = !(preTickAvatars.Any(x => ((VMTSOAvatarState)x.TSOState).Permissions > VMTSOAvatarPermissions.Visitor)) 
+                        && (LotPersist.admit_mode < 4 && LotPersist.category != LotCategory.community) && !AllowGuestOpening;
 
                     try
                     {
@@ -1242,7 +1217,7 @@ namespace FSO.Server.Servers.Lot.Domain
 
                     if (--LotSaveTicker <= 0)
                     {
-                        if (!IsSpectatorMode) SaveRing();
+                        SaveRing();
                         LotSaveTicker = LOT_SAVE_PERIOD;
 
                         Host.UpdateActiveVisitRecords();
@@ -1255,21 +1230,18 @@ namespace FSO.Server.Servers.Lot.Domain
                         TickFreeRoam();
                     }
 
-                    if (!IsSpectatorMode)
+                    var beingKilled = preTickAvatars.Where(x => x.KillTimeout == 1);
+                    if (beingKilled.Count() > 0)
                     {
-                        var beingKilled = preTickAvatars.Where(x => x.KillTimeout == 1);
-                        if (beingKilled.Any())
-                        {
-                            //avatars that are being killed could die before their user disconnects. It's important to save them immediately.
-                            SaveAvatars(beingKilled, true);
-                        }
+                        //avatars that are being killed could die before their user disconnects. It's important to save them immediately.
+                        SaveAvatars(beingKilled, true);
+                    }
 
-                        if (--AvatarSaveTicker <= 0)
-                        {
-                            //save all avatars
-                            SaveAvatars(Lot.Context.ObjectQueries.Avatars.Cast<VMAvatar>(), false);
-                            AvatarSaveTicker = AVATAR_SAVE_PERIOD;
-                        }
+                    if (--AvatarSaveTicker <= 0)
+                    {
+                        //save all avatars
+                        SaveAvatars(Lot.Context.ObjectQueries.Avatars.Cast<VMAvatar>(), false);
+                        AvatarSaveTicker = AVATAR_SAVE_PERIOD;
                     }
 
                     List<IVoltronSession> toRelease = null;
@@ -1302,11 +1274,6 @@ namespace FSO.Server.Servers.Lot.Domain
 
                     if (lotActions != null) {
                         while (lotActions.Count > 0) lotActions.Dequeue()();
-                    }
-
-                    if (ShouldTransitionToSpectator)
-                    {
-                        TransitionToSpectatorMode();
                     }
 
                     if (--KeepAliveTicker <= 0)
@@ -1363,41 +1330,6 @@ namespace FSO.Server.Servers.Lot.Domain
                 });
             }
             evt.WaitOne();
-        }
-
-        private void TransitionFromSpectatorMode()
-        {
-            LOG.Info("Transitioning lot " + Context.DbId + " from spectator mode to writable mode.");
-            IsSpectatorMode = false;
-
-            // Spectator flag clearing and chat event are handled by VMNetSimJoinCmd
-            // (which runs during the tick, before this method runs via LotThreadActions).
-            // Admission was already validated by the city server at join time.
-            // The arriving roommate/admin can eject anyone if needed.
-
-            // Reset save tickers to start normal save cycle
-            LotSaveTicker = LOT_SAVE_PERIOD;
-            AvatarSaveTicker = AVATAR_SAVE_PERIOD;
-        }
-
-        private void TransitionToSpectatorMode()
-        {
-            LOG.Info("Transitioning lot " + Context.DbId + " to spectator mode.");
-            IsSpectatorMode = true;
-
-            // Set spectator flag on all remaining visitor avatars
-            foreach (VMAvatar ava in Lot.Context.ObjectQueries.Avatars)
-            {
-                if (ava.AvatarState.Permissions > VMTSOAvatarPermissions.Visitor) continue;
-                ((VMTSOAvatarState)ava.TSOState).Flags |= VMTSOAvatarFlags.Spectator;
-            }
-
-            // Self-resync reloads the VM and SyncAllClients pushes the updated state to all clients
-            VMDriver.SelfResync = true;
-            VMDriver.SyncAllClients();
-
-            Lot.SignalChatEvent(new VMChatEvent(null, VMChatEventType.Generic,
-                "Lot transitioned to spectator mode."));
         }
 
         private bool TryBeginFreeRoam(uint persistID)
@@ -1694,13 +1626,11 @@ namespace FSO.Server.Servers.Lot.Domain
                 }
 
                 var visitorType = DbLotVisitorType.visitor;
-                bool isRoommate = false;
                 if (myRoomieLots.Count > 0)
                 {
                     var roomieStatus = myRoomieLots.FindAll(x => x.lot_id == Context.DbId).FirstOrDefault();
                     if (roomieStatus != null && roomieStatus.is_pending == 0)
                     {
-                        isRoommate = true;
                         switch (roomieStatus.permissions_level)
                         {
                             case 0:
@@ -1713,24 +1643,6 @@ namespace FSO.Server.Servers.Lot.Domain
                         }
                     }
                 }
-
-                bool isAdmin = session.HasModerationLevel(1);
-                if (IsSpectatorMode)
-                {
-                    if (isRoommate || isAdmin)
-                    {
-                        // Roommate or admin joining, transition to writable mode
-                        lock (LotThreadActions)
-                        {
-                            LotThreadActions.Enqueue(() => TransitionFromSpectatorMode());
-                        }
-                    }
-                    else
-                    {
-                        state.AvatarFlags |= VMTSOAvatarFlags.Spectator;
-                    }
-                }
-
                 Host.RecordStartVisit(session, visitorType);
 
                 var hollowLoadMask = (transitionInfo?.GetSurroundingLotMask() ?? HOLLOW_LOAD_ALL);
@@ -1809,11 +1721,6 @@ namespace FSO.Server.Servers.Lot.Domain
 
         public void SaveAvatar(VMAvatar avatar, Action postSave = null)
         {
-            if (IsSpectatorMode)
-            {
-                if (postSave != null) Host.InBackground(() => postSave());
-                return;
-            }
             var statevm = new VMNetAvatarPersistState();
             statevm.Save(avatar);
             foreach (var relsID in avatar.ChangedRels)

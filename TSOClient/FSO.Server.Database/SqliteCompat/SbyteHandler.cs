@@ -15,7 +15,8 @@ namespace FSO.Server.Database.SqliteCompat
                 return null;
             }
 
-            return (sbyte)Convert.ToInt64(value, CultureInfo.InvariantCulture);
+            // For some reason, the sqlite connection sees the value as unsigned.
+            return (sbyte)Convert.ToByte(value, CultureInfo.InvariantCulture);
         }
 
         /// <inheritdoc />

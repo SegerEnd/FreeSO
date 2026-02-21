@@ -17,7 +17,6 @@ namespace FSO.Client.Network
 
         public CityConnectionMode Mode => CityRegulator.Mode;
         public ArchiveConfigFlags ArchiveConfig => CityRegulator.ArchiveConfig;
-        public bool SpectatorMode => CityRegulator.SpectatorMode;
         public ConnectArchiveRequest ArchiveHost => CityRegulator.ArchiveSettings;
 
         public Network(LoginRegulator loginReg, CityConnectionRegulator cityReg, LotConnectionRegulator lotReg, IShardsDomain shards)

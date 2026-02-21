@@ -17,7 +17,7 @@ namespace FSO.SimAntics.Engine.Routing
 
         public LinkedList<VMWalkableRect> Route(Point from, Point to, int startCardinal)
         {
-            var openSet = new PriorityQueue<VMWalkableRect, int>();
+            var openSet = new List<VMWalkableRect>();
 
             var startRect = new VMWalkableRect(from.X, from.Y, from.X, from.Y);
             ConstructFirstFree(startRect);
@@ -32,12 +32,12 @@ namespace FSO.SimAntics.Engine.Routing
             startRect.ParentSourceHiP = new Point(from.X * 0x8000, from.Y * 0x8000);
             startRect.OriginalG = 0;
 
-            openSet.Enqueue(startRect, startRect.FScore);
+            openSet.Add(startRect);
 
             while (openSet.Count > 0)
             {
-                var current = openSet.Dequeue();
-                if (current.State == 2) continue; // skip stale entries (lazy deletion)
+                var current = openSet[0];
+                openSet.RemoveAt(0);
 
                 if (current.Contains(to))
                 {
@@ -83,7 +83,15 @@ namespace FSO.SimAntics.Engine.Routing
                         r.GScore = newGScore;
                         r.FScore = newGScore + PointDist(closest, to);
 
-                        openSet.Enqueue(r, r.FScore);
+                        if (newcomer)
+                        {
+                            OpenSetSortedInsert(openSet, r);
+                        }
+                        else
+                        {
+                            openSet.Remove(r);
+                            OpenSetSortedInsert(openSet, r);
+                        }
                     }
                 }
             }
@@ -221,6 +229,19 @@ namespace FSO.SimAntics.Engine.Routing
         {
             Point diff = pt1 - pt2;
             return (int)Math.Sqrt(diff.X * diff.X + diff.Y * diff.Y);
+        }
+
+        private void OpenSetSortedInsert(List<VMWalkableRect> set, VMWalkableRect item)
+        {
+            for (var i = 0; i < set.Count; i++)
+            {
+                if (set[i].FScore > item.FScore)
+                {
+                    set.Insert(i, item);
+                    return;
+                }
+            }
+            set.Add(item);
         }
 
 

@@ -5,7 +5,6 @@
         DEFAULT,
 
         LOT_HOST,
-        LOT_CLEANUP,
-        LOT_SPECTATOR
+        LOT_CLEANUP
     }
 }

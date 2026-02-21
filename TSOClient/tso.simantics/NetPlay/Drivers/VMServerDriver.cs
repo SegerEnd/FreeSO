@@ -184,20 +184,6 @@ namespace FSO.SimAntics.NetPlay.Drivers
             });
         }
 
-        public void SyncAllClients()
-        {
-            lock (ClientsToSync)
-            {
-                lock (Clients)
-                {
-                    foreach (var client in Clients.Values)
-                        ClientsToSync.Add(client);
-                }
-                LastSync = null;
-                FastTick = true;
-            }
-        }
-
         private void SendState(VM vm)
         {
             if (ResyncClients.Count != 0 && LastSync == null && !SyncSerializing)
