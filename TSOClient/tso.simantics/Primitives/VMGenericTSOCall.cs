@@ -93,7 +93,7 @@ namespace FSO.SimAntics.Primitives
                 case VMGenericTSOCallMode.MakeMeStackObjectsOwner: //21
                     if (context.StackObject is VMAvatar) return VMPrimitiveExitCode.GOTO_TRUE;
                     foreach (var owned in context.StackObject.MultitileGroup.Objects)
-                        ((VMTSOObjectState)owned.TSOState).OwnerID = context.Caller.PersistID;
+                        if (owned.TSOState is VMTSOObjectState tsoState1) tsoState1.OwnerID = context.Caller.PersistID;
 
                     if (context.VM.IsServer)
                         context.VM.GlobalLink.UpdateObjectPersist(context.VM, context.StackObject.MultitileGroup, (worked, objid) => { });
@@ -215,6 +215,7 @@ namespace FSO.SimAntics.Primitives
                     if (context.StackObject is VMGameObject)
                     {
                         var state = (context.StackObject.MultitileGroup.BaseObject.TSOState as VMTSOObjectState);
+                        if (state == null) return VMPrimitiveExitCode.GOTO_TRUE; // TS1 objects have no wear state
                         var wearRecovery = 0; //in quarter percents
 
                         if (context.Caller is VMAvatar) {
@@ -299,7 +300,7 @@ namespace FSO.SimAntics.Primitives
                     if (context.StackObject is VMAvatar || obj == null) return VMPrimitiveExitCode.GOTO_TRUE;
 
                     foreach (var owned in context.StackObject.MultitileGroup.Objects)
-                        ((VMTSOObjectState)owned.TSOState).OwnerID = obj.PersistID;
+                        if (owned.TSOState is VMTSOObjectState tsoState2) tsoState2.OwnerID = obj.PersistID;
 
                     if (context.VM.IsServer)
                         context.VM.GlobalLink.UpdateObjectPersist(context.VM, context.StackObject.MultitileGroup, (worked, objid) => { });
@@ -506,6 +507,7 @@ namespace FSO.SimAntics.Primitives
             else
             {
                 var objState = (obj.TSOState as VMTSOObjectState);
+                if (objState == null) return 0; // TS1 objects have no TSO owner
                 if (objState.ObjectFlags.HasFlag(VMTSOObjectFlags.FSODonated) && context.VM.TSOState.CommunityLot)
                     return context.VM.TSOState.OwnerID;
                 else

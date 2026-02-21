@@ -597,6 +597,10 @@ namespace FSO.Files.Formats.IFF
         public void SetFilename(string filename)
         {
             Filename = filename;
+            // Skip PIFF patches for TS1 IFFs in hybrid mode: the global mode is TSO (TargetTS1=false)
+            // but this specific file is TS1, so patches in the registry are TSO patches and don't apply.
+            // In pure Simitone mode (TargetTS1=true), TS1 IFFs are patched normally.
+            if (TS1 && !TargetTS1) return;
             var piffs = PIFFRegistry.GetPIFFs(filename);
             RuntimeInfo.Patches.Clear();
             if (piffs != null)

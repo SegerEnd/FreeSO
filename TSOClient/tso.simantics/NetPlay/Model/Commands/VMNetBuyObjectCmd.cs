@@ -100,8 +100,7 @@ namespace FSO.SimAntics.NetPlay.Model.Commands
             {
                 foreach (var obj in group.Objects)
                 {
-                    if (obj is VMGameObject) {
-                        var state = ((VMTSOObjectState)obj.TSOState);
+                    if (obj is VMGameObject && obj.TSOState is VMTSOObjectState state) {
                         state.OwnerID = caller.PersistID;
                         if (TargetUpgradeLevel > 0)
                         {
@@ -117,7 +116,7 @@ namespace FSO.SimAntics.NetPlay.Model.Commands
             if (Mode == PurchaseMode.Donate)
             {
                 //this object should be donated.
-                (CreatedGroup.BaseObject.TSOState as VMTSOObjectState).Donate(vm, CreatedGroup.BaseObject);
+                (CreatedGroup.BaseObject.TSOState as VMTSOObjectState)?.Donate(vm, CreatedGroup.BaseObject);
             }
 
             vm.SignalChatEvent(new VMChatEvent(caller, VMChatEventType.Arch,

@@ -94,7 +94,7 @@ namespace FSO.SimAntics.Engine.Primitives
                             if (score <= 0) continue; // lots of invalid functions with 0 score. just ignore them.
                             if (Thresholds.TryGetValue(funcVar, out threshold) && score < threshold) continue;
                         }
-                        else if (ent is VMAvatar || !((VMTSOObjectState)ent.MultitileGroup.BaseObject.TSOState).Broken) continue;
+                        else if (ent is VMAvatar || !(((VMTSOObjectState)ent.MultitileGroup.BaseObject.TSOState)?.Broken ?? false)) continue;
                     }
 
                     if (ent.EntryPoints[entry].ConditionFunction != 0) {

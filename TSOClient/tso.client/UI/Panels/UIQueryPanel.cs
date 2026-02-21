@@ -622,14 +622,17 @@ namespace FSO.Client.UI.Panels
             string owner = "Nobody";
             var ownerTable = "206";
             var ownerEntry = "24";
-            if (entity is VMGameObject && ((VMTSOObjectState)entity.TSOState).OwnerID > 0)
+            if (entity is VMGameObject && !entity.Object.IsTS1)
             {
-                var ownerID = ((VMTSOObjectState)entity.TSOState).OwnerID;
-                owner = (vm.TSOState.Names.GetNameForID(vm, VMGlobalEntityType.Avatar, ownerID));
-                if (((VMTSOObjectState)entity.TSOState).ObjectFlags.HasFlag(VMTSOObjectFlags.FSODonated))
+                var tsoObjState = (VMTSOObjectState)entity.TSOState;
+                if (tsoObjState.OwnerID > 0)
                 {
-                    ownerTable = "f114";
-                    ownerEntry = "1";
+                    owner = (vm.TSOState.Names.GetNameForID(vm, VMGlobalEntityType.Avatar, tsoObjState.OwnerID));
+                    if (tsoObjState.ObjectFlags.HasFlag(VMTSOObjectFlags.FSODonated))
+                    {
+                        ownerTable = "f114";
+                        ownerEntry = "1";
+                    }
                 }
             }
 
@@ -657,9 +660,12 @@ namespace FSO.Client.UI.Panels
             }
 
             if (entity is VMGameObject) {
-                WearProgressBar.Value = 100-((VMTSOObjectState)entity.TSOState).Wear/4;
-                WearProgressBar.Caption = ((VMTSOObjectState)entity.MultitileGroup.BaseObject.TSOState).Broken? GameFacade.Strings.GetString("206", "34") : null;
-                WearValueText.Caption = ((VMTSOObjectState)entity.TSOState).Wear / 4 + "%";
+                if (!entity.Object.IsTS1) {
+                    var tsoState = (VMTSOObjectState)entity.TSOState;
+                    WearProgressBar.Value = 100-tsoState.Wear/4;
+                    WearProgressBar.Caption = ((VMTSOObjectState)entity.MultitileGroup.BaseObject.TSOState).Broken ? GameFacade.Strings.GetString("206", "34") : null;
+                    WearValueText.Caption = tsoState.Wear / 4 + "%";
+                }
                 var objects = entity.MultitileGroup.Objects;
                 ObjectComponent[] objComps = new ObjectComponent[objects.Count];
                 for (int i=0; i<objects.Count; i++) {

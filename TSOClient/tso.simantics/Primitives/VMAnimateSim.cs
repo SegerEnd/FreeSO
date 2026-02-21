@@ -73,7 +73,7 @@ namespace FSO.SimAntics.Engine.Primitives
                     context.CodeOwner :
                     ((source == VMAnimationScope.StackObject) ? context.StackObject.Object : operand.AnimationSource);
 
-                bool child = ((VMAvatar)context.Caller).GetPersonData(VMPersonDataVariable.PersonsAge) < 18 && context.VM.TS1;
+                bool child = ((VMAvatar)context.Caller).GetPersonData(VMPersonDataVariable.PersonsAge) < 18 && context.CodeOwner.IsTS1;
 
                 if (child)
                 {

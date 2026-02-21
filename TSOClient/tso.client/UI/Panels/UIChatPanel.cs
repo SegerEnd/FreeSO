@@ -233,12 +233,13 @@ namespace FSO.Client.UI.Panels
             {
                 var label = Labels[i];
                 var avatar = (VMAvatar)avatars[i];
-                var tstate = ((VMTSOAvatarState)avatar.TSOState);
+                var tstate = (avatar.TSOState as VMTSOAvatarState);
 
                 if (label.Message != avatar.Message)
                     label.SetNameMessage(avatar);
-                if (label.Color != tstate.ChatColor)
-                    label.Color = tstate.ChatColor;
+                var chatColor = tstate?.ChatColor ?? Microsoft.Xna.Framework.Color.White;
+                if (label.Color != chatColor)
+                    label.Color = chatColor;
                 if (myIgnoring.Contains(avatar.PersistID))
                 {
                     label.Alpha = 0;

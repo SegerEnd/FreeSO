@@ -120,7 +120,7 @@ namespace FSO.SimAntics.JIT.Translation.CSharp.Primitives
                         found = "tempObj is VMGameObject";
                         break;
                     case VMSetToNextSearchType.FamilyMember:
-                        found = "(context.VM.TS1State.CurrentFamily?.FamilyGUIDs?.Contains(((VMAvatar)tempObj).Object.OBJ.GUID) ?? false)";
+                        found = "(context.VM.TS1State?.CurrentFamily?.FamilyGUIDs?.Contains(((VMAvatar)tempObj).Object.OBJ.GUID) ?? false)";
                         break;
                     default:
                         //set to next object, or cached search.

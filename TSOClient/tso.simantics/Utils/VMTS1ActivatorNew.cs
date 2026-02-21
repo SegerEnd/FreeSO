@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using FSO.SimAntics.Marshals;
 using FSO.SimAntics.Model.TS1Platform;
+using FSO.SimAntics.Model.TSOPlatform;
 using FSO.SimAntics.Marshals.Threads;
 using Microsoft.Xna.Framework;
 using FSO.SimAntics.Entities;
@@ -120,37 +121,41 @@ namespace FSO.SimAntics.Utils
 
             //altitude as 0
             var advFloors = iff.Get<ARRY>(11);
-            var flags = iff.Get<ARRY>(8).TransposeData;
+            var flags = iff.Get<ARRY>(8)?.TransposeData ?? new byte[Size * Size];
             if (advFloors != null)
             {
                 //advanced walls and floors from modern ts1. use 16 bit wall/floor data.
                 arch.Floors[0] = VMTS1Activator.RemapFloors(FlipRoad, VMTS1Activator.DecodeAdvFloors(advFloors.TransposeData), floorDict, flags);
-                arch.Floors[1] = VMTS1Activator.RemapFloors(FlipRoad, VMTS1Activator.DecodeAdvFloors(iff.Get<ARRY>(111).TransposeData), floorDict, flags);
+                arch.Floors[1] = VMTS1Activator.RemapFloors(FlipRoad, VMTS1Activator.DecodeAdvFloors(iff.Get<ARRY>(111)?.TransposeData ?? new byte[Size * Size * 2]), floorDict, flags);
                 //objects as 3
-                arch.Walls[0] = VMTS1Activator.RemapWalls(VMTS1Activator.DecodeAdvWalls(iff.Get<ARRY>(12).TransposeData), wallDict, floorDict, arch.Floors[0]);
-                arch.Walls[1] = VMTS1Activator.RemapWalls(VMTS1Activator.DecodeAdvWalls(iff.Get<ARRY>(112).TransposeData), wallDict, floorDict, arch.Floors[1]);
+                arch.Walls[0] = VMTS1Activator.RemapWalls(VMTS1Activator.DecodeAdvWalls(iff.Get<ARRY>(12)?.TransposeData ?? new byte[Size * Size * 2]), wallDict, floorDict, arch.Floors[0]);
+                arch.Walls[1] = VMTS1Activator.RemapWalls(VMTS1Activator.DecodeAdvWalls(iff.Get<ARRY>(112)?.TransposeData ?? new byte[Size * Size * 2]), wallDict, floorDict, arch.Floors[1]);
             }
             else
             {
-                arch.Floors[0] = VMTS1Activator.RemapFloors(FlipRoad, VMTS1Activator.DecodeFloors(iff.Get<ARRY>(1).TransposeData), floorDict, flags);
-                arch.Floors[1] = VMTS1Activator.RemapFloors(FlipRoad, VMTS1Activator.DecodeFloors(iff.Get<ARRY>(101).TransposeData), floorDict, flags);
+                arch.Floors[0] = VMTS1Activator.RemapFloors(FlipRoad, VMTS1Activator.DecodeFloors(iff.Get<ARRY>(1)?.TransposeData ?? new byte[Size * Size]), floorDict, flags);
+                arch.Floors[1] = VMTS1Activator.RemapFloors(FlipRoad, VMTS1Activator.DecodeFloors(iff.Get<ARRY>(101)?.TransposeData ?? new byte[Size * Size]), floorDict, flags);
                 //objects as 3
-                arch.Walls[0] = VMTS1Activator.RemapWalls(VMTS1Activator.DecodeWalls(iff.Get<ARRY>(2).TransposeData), wallDict, floorDict, arch.Floors[0]);
-                arch.Walls[1] = VMTS1Activator.RemapWalls(VMTS1Activator.DecodeWalls(iff.Get<ARRY>(102).TransposeData), wallDict, floorDict, arch.Floors[1]);
+                arch.Walls[0] = VMTS1Activator.RemapWalls(VMTS1Activator.DecodeWalls(iff.Get<ARRY>(2)?.TransposeData ?? new byte[Size * Size]), wallDict, floorDict, arch.Floors[0]);
+                arch.Walls[1] = VMTS1Activator.RemapWalls(VMTS1Activator.DecodeWalls(iff.Get<ARRY>(102)?.TransposeData ?? new byte[Size * Size]), wallDict, floorDict, arch.Floors[1]);
             }
             //objects as 103
-            arch.Terrain.GrassState = iff.Get<ARRY>(6).TransposeData.Select(x => (byte)(127 - x)).ToArray();
+            arch.Terrain.GrassState = (iff.Get<ARRY>(6)?.TransposeData ?? new byte[Size * Size]).Select(x => (byte)(127 - x)).ToArray();
 
             //targetgrass is 7
             //flags is 8/108
-            var pools = iff.Get<ARRY>(9).TransposeData;
-            var water = iff.Get<ARRY>(10).TransposeData;
+            // Pools (9) and water (10) are expansion-pack features; base game houses omit them.
+            var pools = iff.Get<ARRY>(9)?.TransposeData;
+            var water = iff.Get<ARRY>(10)?.TransposeData;
 
-            for (int i = 0; i < pools.Length; i++)
+            if (pools != null || water != null)
             {
-                //pools in freeso are slightly different
-                if (pools[i] != 0xff && pools[i] != 0x0) arch.Floors[0][i].Pattern = 65535;
-                if (water[i] != 0xff && water[i] != 0x0) arch.Floors[0][i].Pattern = 65534;
+                for (int i = 0; i < arch.Floors[0].Length; i++)
+                {
+                    //pools in freeso are slightly different
+                    if (pools != null && pools[i] != 0xff && pools[i] != 0x0) arch.Floors[0][i].Pattern = 65535;
+                    if (water != null && water[i] != 0xff && water[i] != 0x0) arch.Floors[0][i].Pattern = 65534;
+                }
             }
 
             arch.Floors[0] = VMTS1Activator.ResizeFloors(arch.Floors[0], size);
@@ -418,7 +423,7 @@ namespace FSO.SimAntics.Utils
             var simi = iff.Get<SIMI>(1);
             var hous = iff.Get<HOUS>(0);
 
-            var neighbors = content.Neighborhood.Neighbors;
+            var neighbors = content.Neighborhood?.Neighbors;
 
             var fsov = new VMMarshal();
 
@@ -470,9 +475,26 @@ namespace FSO.SimAntics.Utils
 
             var sims1 = new VMTS1LotState();
             sims1.SimulationInfo = simi;
-            // vm is initialized at the end...
 
-            fsov.PlatformState = sims1;
+            // Read the family from the neighborhood provider using the house number.
+            // FAMI chunks live in the neighborhood file, not in individual house IFFs.
+            var fami = content.Neighborhood?.GetFamilyForHouse(HouseNumber);
+            if (fami != null) fami.SelectWholeFamily();
+            sims1.CurrentFamily = fami ?? VM.TS1State?.CurrentFamily;
+
+            if (!VM.TS1)
+            {
+                // Hybrid mode: TSO infrastructure always expects a VMTSOLotState.
+                // Keep the TS1 state separately on the VM so TS1State remains accessible.
+                VM.HybridTS1State = sims1;
+                var tsoState = new VMTSOLotState { PropertyCategory = 255 };
+                tsoState.Size = (10) | (3 << 8);
+                fsov.PlatformState = tsoState;
+            }
+            else
+            {
+                fsov.PlatformState = sims1;
+            }
 
             // Load objects
 
@@ -509,7 +531,7 @@ namespace FSO.SimAntics.Utils
                         var person = inst.PersonData.Value;
                         var neighborId = person.PersonData[(int)VMPersonDataVariable.NeighborId];
 
-                        if (neighbors.NeighbourByID.TryGetValue(neighborId, out Neighbour neighbor) && inst.OBJT.Name == neighbor.Name)
+                        if (neighbors != null && neighbors.NeighbourByID.TryGetValue(neighborId, out Neighbour neighbor) && inst.OBJT.Name == neighbor.Name)
                         {
                             // Last chance recovery - doesn't tend to succeed.
                             // The unleashed premade families tend to have the wrong GUID doe to having their save copied from another hood.
@@ -667,6 +689,7 @@ namespace FSO.SimAntics.Utils
 
             VM.Load(fsov);
             VM.UpdateFreeObjectID();
+            VM.TS1State?.VerifyFamily(VM); // spawn missing family members, set globals 9/32
 
             // Attempt to recover queue names.
             foreach (var ava in VM.Context.ObjectQueries.Avatars)

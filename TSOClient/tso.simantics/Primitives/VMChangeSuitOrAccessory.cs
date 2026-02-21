@@ -18,7 +18,7 @@ namespace FSO.SimAntics.Primitives
 
             if (operand.SuitScope == VMSuitScope.Object && (operand.Flags & VMChangeSuitOrAccessoryFlags.Update) == VMChangeSuitOrAccessoryFlags.Update)
             { //update default outfit with outfit in stringset 304 with index in temp 0
-                avatar.DefaultSuits.Daywear = VMOutfitReference.Parse(context.Callee.Object.Resource.Get<STR>(304).GetString((context.Thread.TempRegisters[0])), context.VM.TS1);
+                avatar.DefaultSuits.Daywear = VMOutfitReference.Parse(context.Callee.Object.Resource.Get<STR>(304).GetString((context.Thread.TempRegisters[0])), context.Callee.Object.IsTS1);
                 avatar.BodyOutfit = avatar.DefaultSuits.Daywear;
             } 
             else 

@@ -121,22 +121,6 @@ namespace FSO.Client.UI.Screens
             this.Add(gameplayButton);
             gameplayButton.OnButtonClick += new ButtonClickDelegate(gameplayButton_OnButtonClick);
 
-            if (Content.Content.Get().TS1)
-            {
-                var ts1Button = new UIButton()
-                {
-                    Caption = "TS1 Mode",
-                    Y = 10,
-                    Width = 100,
-                    X = 140
-                };
-                this.Add(ts1Button);
-                ts1Button.OnButtonClick += (btn) =>
-                {
-                    FSOFacade.Controller.EnterTS1Mode();
-                };
-            }
-
             Regulator.OnError += AuthRegulator_OnError;
             Regulator.OnTransition += AuthRegulator_OnTransition;
 

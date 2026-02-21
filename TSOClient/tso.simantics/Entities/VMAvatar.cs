@@ -226,8 +226,10 @@ namespace FSO.SimAntics
         public VMAvatar(GameObject obj)
             : base(obj)
         {
-            var state = obj.IsTS1?(VMAbstractEntityState)new VMTS1AvatarState():new VMTSOAvatarState();
-            PlatformState = state; //todo: ts1 switch
+            // In hybrid mode (GlobTS1=false) the lot runs on TSO rules, so all avatars
+            // use VMTSOAvatarState regardless of whether their object is from TS1 content.
+            var state = (obj.IsTS1 && VM.GlobTS1) ? (VMAbstractEntityState)new VMTS1AvatarState() : new VMTSOAvatarState();
+            PlatformState = state;
             AvatarState = (VMIAvatarState)state;
             BodyStrings = Object.Resource.Get<STR>(Object.OBJ.BodyStringID);
 
@@ -295,7 +297,7 @@ namespace FSO.SimAntics
 
             try
             {
-                if (context.VM.TS1) {
+                if (Object.IsTS1) {
                     SkinTone = AppearanceType.Light;
                     DefaultSuits.Daywear = new VMOutfitReference(data, false);
                     HeadOutfit = new VMOutfitReference(data, true);
@@ -413,7 +415,7 @@ namespace FSO.SimAntics
             }
 
             SetMotiveData(VMMotive.SleepState, 0); //max all motives except sleep state
-            if (context.DisableAvatarCollision || (!context.VM.TS1 && Object.GUID != 0x7fd96b54 && context.VM.GetGlobalValue(11) > -1))
+            if (context.DisableAvatarCollision || (!Object.IsTS1 && Object.GUID != 0x7fd96b54 && context.VM.GetGlobalValue(11) > -1))
                 SetFlag(VMEntityFlags.AllowPersonIntersection, true);
             SetPersonData(VMPersonDataVariable.NeatPersonality, 1000); //for testing wash hands after toilet
         }
@@ -947,7 +949,7 @@ namespace FSO.SimAntics
                     }
                     break;
                 case VMPersonDataVariable.CurrentOutfit:
-                    if (Thread.Context.VM.TS1) BodyOutfit = VMSuitProvider.GetPersonSuitTS1(this, (ushort)value);
+                    if (Object.IsTS1) BodyOutfit = VMSuitProvider.GetPersonSuitTS1(this, (ushort)value);
                     else
                     {
                         var suit = VMSuitProvider.GetSuit(Thread.Stack.LastOrDefault(), Engine.Scopes.VMSuitScope.Person, (ushort)value);
@@ -1317,11 +1319,14 @@ namespace FSO.SimAntics
             SetPersonData(VMPersonDataVariable.RenderDisplayFlags, GetPersonData(VMPersonDataVariable.RenderDisplayFlags));
             SetPersonData(VMPersonDataVariable.IsGhost, GetPersonData(VMPersonDataVariable.IsGhost));
             SetPersonData(VMPersonDataVariable.JobPerformance, GetPersonData(VMPersonDataVariable.JobPerformance));
-            if (input.TS1)
+            if (input.TS1 || Object.IsTS1)
             {
-                SetPersonData(VMPersonDataVariable.CurrentOutfit, GetPersonData(VMPersonDataVariable.CurrentOutfit));
+                // For TS1 avatars (pure TS1 or hybrid), outfits are never persisted
+                // as IDs — always reconstruct from the object's body strings.
                 var bodyStr = Object.Resource.Get<STR>(Object.OBJ.BodyStringID);
+                DefaultSuits.Daywear = new VMOutfitReference(bodyStr, false);
                 HeadOutfit = new VMOutfitReference(bodyStr, true);
+                SetPersonData(VMPersonDataVariable.CurrentOutfit, GetPersonData(VMPersonDataVariable.CurrentOutfit));
             }
             else
             {

@@ -45,6 +45,19 @@ namespace FSO.Content
             }
         }
 
+        public override GameObject Get(ulong id)
+        {
+            // For TS1-only GUIDs, delegate to TS1Provider which:
+            // 1. Correctly sets IsTS1 = true on the returned GameObject
+            // 2. Has up-to-date Entries including person GUIDs added by LoadCharacters
+            if (!TSOProvider.Entries.ContainsKey(id))
+            {
+                var ts1Result = TS1Provider.Get(id);
+                if (ts1Result != null) return ts1Result;
+            }
+            return base.Get(id);
+        }
+
         protected override Func<string, GameObjectResource> GenerateResource(GameObjectReference reference)
         {
             if (TS1GUIDs.Contains(reference.ID) && !TSOProvider.Entries.ContainsKey(reference.ID))

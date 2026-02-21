@@ -42,6 +42,7 @@ namespace FSO.SimAntics.Primitives
                     return VMPrimitiveExitCode.GOTO_TRUE;
                 // 3. PullDownTaxiDialog
                 case VMGenericTS1CallMode.AddToFamily: //4
+                    if (!context.VM.TS1) return VMPrimitiveExitCode.GOTO_FALSE;
                     if (context.VM.TS1State.CurrentFamily == null || context.VM.TS1State.CurrentFamily.FamilyGUIDs.Length >= 8)
                         return VMPrimitiveExitCode.GOTO_FALSE;
                     var fneigh = Content.Content.Get().Neighborhood.GetNeighborByID(context.StackObjectID);
@@ -52,11 +53,13 @@ namespace FSO.SimAntics.Primitives
                     context.VM.TS1State.CurrentFamily.RuntimeSubset = runtime.ToArray();
                     return VMPrimitiveExitCode.GOTO_TRUE;
                 case VMGenericTS1CallMode.CombineAssetsOfFamilyInTemp0: //5
+                    if (!context.VM.TS1) return VMPrimitiveExitCode.GOTO_FALSE;
                     //adds the family in temp 0's assets to our budget. (for move in)
                     var family = Content.Content.Get().Neighborhood.GetFamily((ushort)context.Thread.TempRegisters[0]);
                     context.VM.TS1State.CurrentFamily.Budget += family.ValueInArch + family.Budget;
                     return VMPrimitiveExitCode.GOTO_TRUE;
                 case VMGenericTS1CallMode.RemoveFromFamily: //6
+                    if (!context.VM.TS1) return VMPrimitiveExitCode.GOTO_FALSE;
                     if (context.VM.TS1State.CurrentFamily == null)
                         return VMPrimitiveExitCode.GOTO_FALSE;
                     fneigh = Content.Content.Get().Neighborhood.GetNeighborByID(context.StackObjectID);
@@ -95,6 +98,7 @@ namespace FSO.SimAntics.Primitives
                     break;
                 // 16. Change Normal Outfit
                 case VMGenericTS1CallMode.ChangeToLotInTemp0: //17
+                    if (!context.VM.TS1) return VMPrimitiveExitCode.GOTO_FALSE;
                     //-1 is this family's home lot
                     var switchLotId = (uint)context.Thread.TempRegisters[0];
                     var vacation = switchLotId >= 40 && switchLotId < 50;
@@ -145,6 +149,7 @@ namespace FSO.SimAntics.Primitives
                     context.VM.SignalLotSwitch(switchLotId);
                     return VMPrimitiveExitCode.GOTO_TRUE_NEXT_TICK;
                 case VMGenericTS1CallMode.BuildTheDowntownSimAndPlaceObjIDInTemp0: //18
+                    if (!context.VM.TS1) return VMPrimitiveExitCode.GOTO_FALSE;
                     //spawn downtown sim out of world
 
                     var crossDataDT = Content.Content.Get().Neighborhood.GameState;

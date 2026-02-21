@@ -1,6 +1,7 @@
 ﻿using FSO.Client.UI.Framework;
 using FSO.Client.UI.Controls;
 using FSO.Client.UI.Panels;
+using FSO.Common;
 
 namespace FSO.Client.UI.Screens
 {
@@ -9,6 +10,7 @@ namespace FSO.Client.UI.Screens
         private UISetupBackground m_Background;
         private UILoginProgress m_LoginProgress;
         private UIButton SandboxModeButton;
+        private UIButton TS1ModeButton;
 
         /// <summary>
         /// Creates a new CityTransitionScreen.
@@ -80,6 +82,19 @@ namespace FSO.Client.UI.Screens
             };
             this.Add(SandboxModeButton);
             SandboxModeButton.OnButtonClick += new ButtonClickDelegate(gameplayButton_OnButtonClick);
+
+            if (FSO.Content.Content.TS1Hybrid)
+            {
+                TS1ModeButton = new UIButton()
+                {
+                    Caption = "TS1 Mode",
+                    Y = 10,
+                    Width = 100,
+                    X = 140
+                };
+                this.Add(TS1ModeButton);
+                TS1ModeButton.OnButtonClick += (btn) => FSOFacade.Controller.EnterTS1Mode();
+            }
         }
 
         void gameplayButton_OnButtonClick(UIElement button)
@@ -91,9 +106,9 @@ namespace FSO.Client.UI.Screens
         public void SetSandboxVisibility(bool visible)
         {
             if (SandboxModeButton != null)
-            {
                 SandboxModeButton.Visible = visible;
-            }
+            if (TS1ModeButton != null)
+                TS1ModeButton.Visible = visible;
         }
     }
 }

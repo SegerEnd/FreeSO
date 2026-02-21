@@ -216,6 +216,13 @@ namespace FSO.Client.UI.Screens
             GameFacade.CurrentCityName = propertyName;
             ZoomLevel = 1; //screen always starts at near zoom
 
+            if (Content.Content.TS1Hybrid)
+            {
+                var fname = Path.GetFileNameWithoutExtension(propertyName);
+                if (fname.StartsWith("House", StringComparison.OrdinalIgnoreCase) && short.TryParse(fname.Substring(5), out var houseNum))
+                    ActiveFamily = Content.Content.Get().Neighborhood?.GetFamilyForHouse(houseNum);
+            }
+
             JoinLotProgress = new UIJoinLotProgress();
             InitializeLot(propertyName, external);
         }
@@ -437,6 +444,7 @@ namespace FSO.Client.UI.Screens
         {
             if (lotName == "") return;
             var recording = lotName.ToLowerInvariant().EndsWith(".fsor");
+            var isIff = lotName.EndsWith(".iff", StringComparison.OrdinalIgnoreCase);
             CleanupLastWorld();
 
             Content.Content.Get().Upgrades.LoadJSONTuning();
@@ -554,7 +562,7 @@ namespace FSO.Client.UI.Screens
                 vm.TSOState.Size |= (10) | (3 << 8);
                 vm.Context.UpdateTSOBuildableArea();
 
-                if (vm.GetGlobalValue(11) > -1)
+                if (!vm.TS1 && !isIff && vm.GetGlobalValue(11) > -1)
                 {
                     for (int y = 0; y < 3; y++)
                     {
@@ -565,6 +573,10 @@ namespace FSO.Client.UI.Screens
                     }
                     VMLotTerrainRestoreTools.RestoreTerrain(vm);
                 }
+
+                // In TS1 content mode with an active family, the join command hands the
+                // client an existing family member avatar rather than spawning a TSO sim.
+                if (vm.TS1Content && vm.TS1State.CurrentFamily != null) myState.PersistID = 1;
 
                 var myClient = new VMNetClient
                 {
@@ -589,8 +601,9 @@ namespace FSO.Client.UI.Screens
             vm.Context.Clock.Hours = tsoTime.Item1;
             vm.Context.Clock.Minutes = tsoTime.Item2;
             
-            if (LotView.WorldConfig.Current.SurroundingLots > 0)
+            if (!vm.TS1 && LotView.WorldConfig.Current.SurroundingLots > 0)
             {
+                if (isIff) SimAntics.Utils.VMLotTerrainRestoreTools.AlignTS1TerrainForSurroundings(vm);
                 SimAntics.Utils.VMLotTerrainRestoreTools.RestoreSurroundings(vm, vm.HollowAdj);
             }
 

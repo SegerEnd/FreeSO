@@ -98,10 +98,10 @@ namespace FSO.SimAntics.Primitives
                 case VMTransferFundsType.MaxisToMe:
                     target = context.Caller.PersistID; break;
                 case VMTransferFundsType.MaxisToStackObjectsOwner:
-                    if (context.StackObject is VMGameObject) target = ((VMTSOObjectState)context.StackObject.TSOState).OwnerID;
+                    if (context.StackObject is VMGameObject) target = (context.StackObject.TSOState as VMTSOObjectState)?.OwnerID ?? 0;
                     break;
                 case VMTransferFundsType.StackObjectsOwnerToMaxis:
-                    if (context.StackObject is VMGameObject) source = ((VMTSOObjectState)context.StackObject.TSOState).OwnerID;
+                    if (context.StackObject is VMGameObject) source = (context.StackObject.TSOState as VMTSOObjectState)?.OwnerID ?? 0;
                     break;
                 case VMTransferFundsType.FromMeToStackObject:
                     source = context.Caller.PersistID; target = context.StackObject.PersistID; break;
@@ -114,7 +114,7 @@ namespace FSO.SimAntics.Primitives
                 case VMTransferFundsType.FromStackObjectToStackObjectOwner:
                 case VMTransferFundsType.FromStackObjectToLotRoommates:
                     source = context.StackObject.PersistID;
-                    if (context.StackObject is VMGameObject) target = ((VMTSOObjectState)context.StackObject.TSOState).OwnerID;
+                    if (context.StackObject is VMGameObject) target = (context.StackObject.TSOState as VMTSOObjectState)?.OwnerID ?? 0;
                     break;
                 case VMTransferFundsType.PutStackObjectCashIntoTempXL0:
                     source = context.StackObject.PersistID; amount = 0;
@@ -127,7 +127,7 @@ namespace FSO.SimAntics.Primitives
                     break;
                 case VMTransferFundsType.MeToLotRoommates:
                     //give to object owner for now (doors)
-                    if (context.StackObject is VMGameObject) target = ((VMTSOObjectState)context.StackObject.TSOState).OwnerID; 
+                    if (context.StackObject is VMGameObject) target = (context.StackObject.TSOState as VMTSOObjectState)?.OwnerID ?? 0;
                     break;
                 default:
                     return VMPrimitiveExitCode.GOTO_TRUE;
@@ -142,7 +142,7 @@ namespace FSO.SimAntics.Primitives
             {
                 if (operand.TransferType == VMTransferFundsType.PutStackObjectCashIntoTempXL0)
                 {
-                    context.Thread.TempXL[0] = (int)context.StackObject.TSOState.Budget.Value;
+                    context.Thread.TempXL[0] = (int)(context.StackObject.TSOState?.Budget.Value ?? 0);
                     return VMPrimitiveExitCode.GOTO_TRUE;
                 }
                 if (!operand.JustTest) return VMPrimitiveExitCode.GOTO_FALSE;

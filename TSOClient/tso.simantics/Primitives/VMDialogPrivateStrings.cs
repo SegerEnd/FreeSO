@@ -34,7 +34,7 @@ namespace FSO.SimAntics.Primitives
                 //in ts1, it's possible for a lot of blocking dialogs to come in one frame. due to the way our engine works,
                 //we cannot pause the rest of the tick as soon as we hit a blocking dialog, and we cannot show more than one blocking dialog.
                 //so additional blocking dialogs must wait.
-                if (context.VM.TS1 && context.VM.GlobalBlockingDialog != null) return VMPrimitiveExitCode.CONTINUE_NEXT_TICK;
+                if (context.CodeOwner.IsTS1 && context.VM.GlobalBlockingDialog != null) return VMPrimitiveExitCode.CONTINUE_NEXT_TICK;
                 VMDialogHandler.ShowDialog(context, operand, table);
 
                 if ((operand.Flags & VMDialogFlags.Continue) == 0)
@@ -44,7 +44,7 @@ namespace FSO.SimAntics.Primitives
                         Type = operand.Type,
                         HasDisplayed = true
                     };
-                    if (context.VM.TS1)
+                    if (context.CodeOwner.IsTS1)
                     {
                         context.VM.GlobalBlockingDialog = context.Caller;
                         context.VM.LastSpeedMultiplier = context.VM.SpeedMultiplier;

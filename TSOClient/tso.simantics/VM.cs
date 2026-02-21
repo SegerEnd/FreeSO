@@ -77,6 +77,9 @@ namespace FSO.SimAntics
         public HashSet<VMEntity> SoundEntities = new HashSet<VMEntity>();
         public short[] GlobalState;
         public VMAbstractLotState PlatformState;
+        // In hybrid mode (TS1Content && !TS1), the primary PlatformState is always VMTSOLotState
+        // so TSO infrastructure never sees a null TSOState. The TS1-specific state lives here.
+        public VMTS1LotState HybridTS1State;
 
         public VMScheduler Scheduler;
 
@@ -87,7 +90,7 @@ namespace FSO.SimAntics
 
         public VMTS1LotState TS1State
         {
-            get { return PlatformState as VMTS1LotState; }
+            get { return HybridTS1State ?? (PlatformState as VMTS1LotState); }
         }
 
         public string LotName
@@ -227,6 +230,7 @@ namespace FSO.SimAntics
         public void Init()
         {
             PlatformState = (Content.Content.Target == FSOEngineMode.TS1)?(VMAbstractLotState)new VMTS1LotState():new VMTSOLotState();
+            if (TS1Content && !TS1) HybridTS1State = new VMTS1LotState(); // hybrid: keep TS1State non-null
             GlobalState = new short[38];
             GlobalState[20] = 255; //Game Edition. Basically, what "expansion packs" are running. Let's just say all of them.
             GlobalState[25] = 4; //as seen in EA-Land edith's simulator globals, this needs to be set for people to do their idle interactions.
@@ -880,9 +884,9 @@ namespace FSO.SimAntics
             var lastPlatformState = PlatformState;
             PlatformState = input.PlatformState;
             PlatformState.ActivateValidator(this);
-            if (lastPlatformState != null && lastPlatformState is VMTSOLotState)
+            if (lastPlatformState is VMTSOLotState tsoLast && TSOState != null)
             {
-                TSOState.Names = ((VMTSOLotState)lastPlatformState).Names;
+                TSOState.Names = tsoLast.Names;
             }
             ObjectId = input.ObjectId;
 

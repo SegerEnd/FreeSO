@@ -48,7 +48,6 @@ namespace FSO.SimAntics.Model
 
         public static VMOutfitReference Parse(string data, bool ts1)
         {
-            ts1 = false;
             if (ts1)
             {
                 return new VMOutfitReference(data.Trim());

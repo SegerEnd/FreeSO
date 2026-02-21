@@ -4,6 +4,7 @@ using System.IO;
 using System.Text.RegularExpressions;
 using FSO.Common.Content;
 using FSO.Files.FAR1;
+using FSO.Files.Formats.IFF;
 using FSO.Files.Utils;
 using FSO.Common.Utils;
 using FSO.Content.Codecs;
@@ -135,6 +136,7 @@ namespace FSO.Content.Framework
                     T result = default(T);
                     if (Codec == null) result = (T)SmartCodec.Decode(stream, Path.GetExtension(entry.FarEntry.Filename));
                     else result = this.Codec.Decode(stream);
+                    if (TS1 && result is IffFile iffResult) iffResult.TS1 = true;
                     if (result is IFileInfoUtilizer) ((IFileInfoUtilizer)result).SetFilename(entry.FarEntry.Filename);
                     return result;
                 }

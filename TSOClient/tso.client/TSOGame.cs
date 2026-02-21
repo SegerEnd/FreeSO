@@ -179,7 +179,10 @@ namespace FSO.Client
             PlatformID pid = os.Platform;
             GameFacade.Linux = (pid == PlatformID.MacOSX || pid == PlatformID.Unix);
 
-            FSO.Content.Content.TS1Hybrid = GlobalSettings.Default.TS1HybridEnable;
+            var argSet = new HashSet<string>(FSOEnvironment.Args.Split(' '));
+            FSO.Content.Content.TS1Hybrid = argSet.Contains("-ts1") ? true
+                : argSet.Contains("-tso") ? false
+                : GlobalSettings.Default.TS1HybridEnable;
             FSO.Content.Content.TS1HybridBasePath = GlobalSettings.Default.TS1HybridPath;
             FSO.Content.Content.InitBasic(GlobalSettings.Default.StartupPath, GraphicsDevice);
             FSO.SimAntics.VMAvatar.MissingIconProvider = FSO.Client.UI.Model.UIIconCache.GetObject;

@@ -50,7 +50,7 @@ namespace FSO.SimAntics.NetPlay.Model.Commands
 
                 if (Success)
                 {
-                    if (((VMTSOObjectState)obj.TSOState).OwnerID == vm.MyUID)
+                    if ((obj.TSOState as VMTSOObjectState)?.OwnerID == vm.MyUID)
                     {
                         //if the owner is here, tell them this object is now in their inventory.
                         //if they're elsewhere, they'll see it the next time their inventory updates. 

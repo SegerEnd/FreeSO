@@ -1005,6 +1005,34 @@ namespace FSO.SimAntics.Utils
             }
         }
 
+        public static void AlignTS1TerrainForSurroundings(VM vm)
+        {
+            var heights = vm.Context.Architecture?.Terrain?.Heights;
+            if (heights == null) return;
+            var w = vm.Context.Architecture.Width;
+            var h = vm.Context.Architecture.Height;
+            var hw = w / 2; var hh = h / 2;
+            var t = vm.TSOState.Terrain;
+
+            int QuadAvg(int r0, int r1, int c0, int c1) {
+                long s = 0;
+                for (int r = r0; r < r1; r++) for (int c = c0; c < c1; c++) s += heights[r * w + c];
+                return (int)(s / ((r1 - r0) * (c1 - c0)) / 100);
+            }
+
+            int q11 = QuadAvg(hh, h, 0, hw), q21 = QuadAvg(0, hh, 0, hw);
+            int q12 = QuadAvg(hh, h, hw, w), q22 = QuadAvg(0, hh, hw, w);
+
+            for (int x = 0; x < 4; x++)
+                for (int y = 0; y < 4; y++) {
+                    int u = x - 1, v = y - 1;
+                    t.Height[x, y] = (byte)Math.Max(0, Math.Min(255,
+                        (1-u)*(1-v)*q11 + u*(1-v)*q21 + (1-u)*v*q12 + u*v*q22));
+                }
+
+            RestoreHeight(vm, t, 1, 1, false);
+        }
+
         public static void RestoreSurroundings(VM vm, VMHollowAdjEntry[] hollowAdj, bool modeSwitch = false)
         {
             var myArch = vm.Context.Architecture;

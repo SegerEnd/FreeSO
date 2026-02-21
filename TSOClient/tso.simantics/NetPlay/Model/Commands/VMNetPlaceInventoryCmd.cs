@@ -159,7 +159,7 @@ namespace FSO.SimAntics.NetPlay.Model.Commands
             vm.Context.ObjectQueries.RegisterMultitilePersist(CreatedGroup, ObjectPID);
 
             //is this my sim's object? try remove it from our local inventory representaton
-            if (((VMTSOObjectState)CreatedGroup.BaseObject.TSOState).OwnerID == vm.MyUID && Info.RestoreType != VMInventoryRestoreType.CopyOOW)
+            if ((CreatedGroup.BaseObject.TSOState as VMTSOObjectState)?.OwnerID == vm.MyUID && Info.RestoreType != VMInventoryRestoreType.CopyOOW)
             {
                 var index = vm.MyInventory.FindIndex(x => x.ObjectPID == ObjectPID);
                 if (index != -1) vm.MyInventory.RemoveAt(index);

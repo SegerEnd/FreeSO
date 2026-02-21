@@ -37,7 +37,7 @@ namespace FSO.SimAntics.Model.Platform
         public override bool CanManageAsyncSale(VMAvatar ava, VMGameObject obj)
         {
             if (ava == null || obj == null || obj is VMAvatar || obj.PersistID == 0) return false;
-            return ava.AvatarState.Permissions >= VMTSOAvatarPermissions.Roommate && ava.PersistID == (obj.TSOState as VMTSOObjectState).OwnerID;
+            return ava.AvatarState.Permissions >= VMTSOAvatarPermissions.Roommate && ava.PersistID == (obj.TSOState as VMTSOObjectState)?.OwnerID;
         }
 
         public override bool CanManageEnvironment(VMAvatar ava)
@@ -74,7 +74,7 @@ namespace FSO.SimAntics.Model.Platform
                     return (ava.AvatarState.Permissions < VMTSOAvatarPermissions.Admin) ? DeleteMode.Disallowed : DeleteMode.Delete;
                 if (ava.AvatarState.Permissions < VMTSOAvatarPermissions.Roommate)
                     desired = DeleteMode.Disallowed;
-                else if (obj.PersistID != 0 && ava.PersistID != (obj.TSOState as VMTSOObjectState).OwnerID && ava.AvatarState.Permissions != VMTSOAvatarPermissions.Admin)
+                else if (obj.PersistID != 0 && ava.PersistID != (obj.TSOState as VMTSOObjectState)?.OwnerID && ava.AvatarState.Permissions != VMTSOAvatarPermissions.Admin)
                     desired = DeleteMode.Sendback;
             }
             return desired;

@@ -104,13 +104,13 @@ namespace FSO.SimAntics.Primitives
             var pos1 = caller.Position;
 
             var visitor = (caller.GetPersonData(VMPersonDataVariable.PersonType) == 1);
-            var child = (caller.IsChild && context.VM.TS1);
+            var child = (caller.IsChild && caller.Object.IsTS1);
             var attenTable = visitor ? TTAB.VisitorAttenuationValues : TTAB.AttenuationValues;
             var global = Content.Content.Get().WorldObjectGlobals;
             var interactionCurve = child ? global.InteractionScoreChild : global.InteractionScore;
             var happyCurve = child ? global.HappyWeightChild : global.HappyWeight;
 
-            var isStray = caller.IsPet && context.VM.TS1 && caller.GetPersonData(VMPersonDataVariable.GreetStatus) == 0 && caller.GetPersonData(VMPersonDataVariable.PersonType) == 1;
+            var isStray = caller.IsPet && caller.Object.IsTS1 && caller.GetPersonData(VMPersonDataVariable.GreetStatus) == 0 && caller.GetPersonData(VMPersonDataVariable.PersonType) == 1;
 
             // === HAPPY CALCULATION ===
 

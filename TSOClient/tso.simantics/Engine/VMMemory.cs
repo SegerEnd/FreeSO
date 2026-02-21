@@ -74,13 +74,13 @@ namespace FSO.SimAntics.Engine.Utils
                     return context.StackObject.GetSlot(data)?.ObjectID ?? 0;
 
                 case VMVariableScope.StackObjectMotiveByTemp: //17
-                    return ((VMAvatar)context.StackObject).GetMotiveData((VMMotive)context.Thread.TempRegisters[data]);
+                    return (context.StackObject as VMAvatar)?.GetMotiveData((VMMotive)context.Thread.TempRegisters[data]) ?? 0;
 
                 case VMVariableScope.MyPersonData: //18
-                    return ((VMAvatar)context.Caller).GetPersonData((VMPersonDataVariable)data);
+                    return (context.Caller as VMAvatar)?.GetPersonData((VMPersonDataVariable)data) ?? 0;
 
                 case VMVariableScope.StackObjectPersonData: //19
-                    return ((VMAvatar)context.StackObject).GetPersonData((VMPersonDataVariable)data);
+                    return (context.StackObject as VMAvatar)?.GetPersonData((VMPersonDataVariable)data) ?? 0;
 
                 case VMVariableScope.MySlot: //20
                     return context.Caller.GetSlot(data)?.ObjectID ?? 0;
@@ -124,17 +124,17 @@ namespace FSO.SimAntics.Engine.Utils
                     return GetTreeAd(context, 0, (ushort)data);
 
                 case VMVariableScope.MyPersonDataByTemp: //30
-                    return ((VMAvatar)context.Caller).GetPersonData((VMPersonDataVariable)(context.Thread.TempRegisters[data]));
+                    return (context.Caller as VMAvatar)?.GetPersonData((VMPersonDataVariable)(context.Thread.TempRegisters[data])) ?? 0;
 
                 case VMVariableScope.StackObjectPersonDataByTemp: //31
-                    return ((VMAvatar)context.StackObject).GetPersonData((VMPersonDataVariable)(context.Thread.TempRegisters[data]));
+                    return (context.StackObject as VMAvatar)?.GetPersonData((VMPersonDataVariable)(context.Thread.TempRegisters[data])) ?? 0;
 
                 case VMVariableScope.NeighborPersonData: //32
-                    if (!context.VM.TS1Content) throw new VMSimanticsException("Only valid in TS1.", context);
+                    if (!context.CodeOwner.IsTS1) throw new VMSimanticsException("Only valid in TS1.", context);
                     return Content.Content.Get().Neighborhood.GetNeighborByID(context.StackObjectID)?.PersonData?.ElementAt(data) ?? 0;
 
                 case VMVariableScope.JobData: //33 jobdata(temp0, temp1), used a few times to test if a person is at work but that isn't relevant for tso...
-                    if (!context.VM.TS1Content) throw new VMSimanticsException("Only valid in TS1.", context);
+                    if (!context.CodeOwner.IsTS1) throw new VMSimanticsException("Only valid in TS1.", context);
                     return Content.Content.Get().Jobs?.GetJobData((ushort)context.Thread.TempRegisters[0], context.Thread.TempRegisters[1], data) ?? 0;
 
                 case VMVariableScope.NeighborhoodData: //34
@@ -145,15 +145,15 @@ namespace FSO.SimAntics.Engine.Utils
                     return (short)context.StackObject.EntryPoints[data].ActionFunction;
 
                 case VMVariableScope.MyTypeAttr: //36
-                    if (context.VM.TS1Content) return Content.Content.Get().Neighborhood.GetTATT((context.Caller.MasterDefinition ?? context.Caller.Object.OBJ).TypeAttrGUID, data);
+                    if (context.CodeOwner.IsTS1) return Content.Content.Get().Neighborhood.GetTATT((context.Caller.MasterDefinition ?? context.Caller.Object.OBJ).TypeAttrGUID, data);
                     return 0;
 
                 case VMVariableScope.StackObjectTypeAttr: //37
-                    if (context.VM.TS1Content) return Content.Content.Get().Neighborhood.GetTATT((context.StackObject.MasterDefinition ?? context.StackObject.Object.OBJ).TypeAttrGUID, data);
+                    if (context.CodeOwner.IsTS1) return Content.Content.Get().Neighborhood.GetTATT((context.StackObject.MasterDefinition ?? context.StackObject.Object.OBJ).TypeAttrGUID, data);
                     return 0;
 
                 case VMVariableScope.NeighborsObjectDefinition: //38
-                    if (!context.VM.TS1Content) throw new VMSimanticsException("Only valid in TS1.", context);
+                    if (!context.CodeOwner.IsTS1) throw new VMSimanticsException("Only valid in TS1.", context);
                     var neighbor2 = Content.Content.Get().Neighborhood.GetNeighborByID(context.StackObjectID);
                     if (neighbor2 == null) return 0;
                     var objd = Content.Content.Get().WorldObjects.Get(neighbor2.GUID)?.OBJ;
@@ -303,7 +303,7 @@ namespace FSO.SimAntics.Engine.Utils
 
         private static short GetNeighborInStackObject(VMStackFrame context, short data)
         {
-            if (!context.VM.TS1Content) throw new VMSimanticsException("Only valid in TS1.", context);
+            if (!context.CodeOwner.IsTS1) throw new VMSimanticsException("Only valid in TS1.", context);
             var neighbor = Content.Content.Get().Neighborhood.GetNeighborByID(context.StackObjectID);
             var fam = neighbor?.PersonData?.ElementAt((int)VMPersonDataVariable.TS1FamilyNumber);
 
@@ -526,13 +526,13 @@ namespace FSO.SimAntics.Engine.Utils
                     throw new VMSimanticsException("Not implemented...", context);
 
                 case VMVariableScope.StackObjectMotiveByTemp: //17
-                    return ((VMAvatar)context.StackObject).SetMotiveData((VMMotive)context.Thread.TempRegisters[data], value);
+                    return (context.StackObject as VMAvatar)?.SetMotiveData((VMMotive)context.Thread.TempRegisters[data], value) ?? false;
 
                 case VMVariableScope.MyPersonData: //18
-                    return ((VMAvatar)context.Caller).SetPersonData((VMPersonDataVariable)data, value);
+                    return (context.Caller as VMAvatar)?.SetPersonData((VMPersonDataVariable)data, value) ?? false;
 
                 case VMVariableScope.StackObjectPersonData: //19
-                    return ((VMAvatar)context.StackObject).SetPersonData((VMPersonDataVariable)data, value);
+                    return (context.StackObject as VMAvatar)?.SetPersonData((VMPersonDataVariable)data, value) ?? false;
 
                 case VMVariableScope.MySlot: //20
                     throw new VMSimanticsException("Not implemented...", context);
@@ -568,10 +568,10 @@ namespace FSO.SimAntics.Engine.Utils
                     return SetTreeAd(context, 0, (ushort)data, value);
 
                 case VMVariableScope.MyPersonDataByTemp: //30
-                    return ((VMAvatar)context.Caller).SetPersonData((VMPersonDataVariable)context.Thread.TempRegisters[data], value);
+                    return (context.Caller as VMAvatar)?.SetPersonData((VMPersonDataVariable)context.Thread.TempRegisters[data], value) ?? false;
 
                 case VMVariableScope.StackObjectPersonDataByTemp: //31
-                    return ((VMAvatar)context.StackObject).SetPersonData((VMPersonDataVariable)context.Thread.TempRegisters[data], value);
+                    return (context.StackObject as VMAvatar)?.SetPersonData((VMPersonDataVariable)context.Thread.TempRegisters[data], value) ?? false;
 
                 case VMVariableScope.NeighborPersonData: //32
                     throw new VMSimanticsException("Not implemented...", context);
@@ -586,11 +586,11 @@ namespace FSO.SimAntics.Engine.Utils
                     return false; //you can't set this!
 
                 case VMVariableScope.MyTypeAttr: //36
-                    if (context.VM.TS1Content) Content.Content.Get().Neighborhood.SetTATT((context.Caller.MasterDefinition ?? context.Caller.Object.OBJ).TypeAttrGUID, data, value);
+                    if (context.CodeOwner.IsTS1) Content.Content.Get().Neighborhood.SetTATT((context.Caller.MasterDefinition ?? context.Caller.Object.OBJ).TypeAttrGUID, data, value);
                     return true;
 
                 case VMVariableScope.StackObjectTypeAttr: //37
-                    if (context.VM.TS1Content) Content.Content.Get().Neighborhood.SetTATT((context.StackObject.MasterDefinition ?? context.StackObject.Object.OBJ).TypeAttrGUID, data, value);
+                    if (context.CodeOwner.IsTS1) Content.Content.Get().Neighborhood.SetTATT((context.StackObject.MasterDefinition ?? context.StackObject.Object.OBJ).TypeAttrGUID, data, value);
                     return true;
 
                 case VMVariableScope.NeighborsObjectDefinition: //38
@@ -674,7 +674,7 @@ namespace FSO.SimAntics.Engine.Utils
         public static Animation GetAnimation(VMStackFrame context, VMAnimationScope scope, ushort id){
 
             STR animTable = null;
-            bool child = ((VMAvatar)context.Caller).GetPersonData(VMPersonDataVariable.PersonsAge) < 18 && context.VM.TS1Content;
+            bool child = ((VMAvatar)context.Caller).GetPersonData(VMPersonDataVariable.PersonsAge) < 18 && context.CodeOwner.IsTS1;
             //a2o, c2o, a2c, c2a
 
             switch (scope){

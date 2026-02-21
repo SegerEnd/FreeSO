@@ -23,7 +23,7 @@ namespace FSO.SimAntics.NetPlay.Model.Commands
                 if (Success)
                 {
                     //was this my sim's object? try add it to our local inventory representaton
-                    if (((VMTSOObjectState)obj.TSOState).OwnerID == vm.MyUID)
+                    if ((obj.TSOState as VMTSOObjectState)?.OwnerID == vm.MyUID)
                     {
                         vm.MyInventory.Add(new VMInventoryItem()
                         {

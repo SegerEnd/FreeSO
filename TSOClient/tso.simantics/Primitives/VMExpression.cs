@@ -190,7 +190,7 @@ namespace FSO.SimAntics.Engine.Primitives
                     return result.AsGotoExitCode();
 
                 case VMExpressionOperator.Push:
-                    if (context.VM.TS1)
+                    if (context.CodeOwner.IsTS1)
                     {
                         //OrEquals
                         lhsValue = VMMemory.GetBigVariable(context, operand.LhsOwner, operand.LhsData);
@@ -218,7 +218,7 @@ namespace FSO.SimAntics.Engine.Primitives
                     return VMPrimitiveExitCode.GOTO_TRUE;
 
                 case VMExpressionOperator.Pop:
-                    if (context.VM.TS1)
+                    if (context.CodeOwner.IsTS1)
                     {
                         //XorEquals
                         lhsValue = VMMemory.GetBigVariable(context, operand.LhsOwner, operand.LhsData);

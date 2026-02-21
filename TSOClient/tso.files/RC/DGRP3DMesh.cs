@@ -263,7 +263,8 @@ namespace FSO.Files.RC
         private void CleanupFailedLoad(DGRP dgrp, GraphicsDevice gd, string filePath)
         {
             // TODO: force reconstruction to run
-            UnloadedGeoms.Clear();
+            if (UnloadedGeoms == null) UnloadedGeoms = new List<List<DGRP3DGeometry>>();
+            else UnloadedGeoms.Clear();
             CompleteFSOMLoad(gd);
         }
 

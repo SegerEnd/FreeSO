@@ -79,10 +79,8 @@ namespace FSO.Client
                                 useDX = false;
                                 break;
                             case "ts1":
-                                GlobalSettings.Default.TS1HybridEnable = true;
-                                break;
                             case "tso":
-                                GlobalSettings.Default.TS1HybridEnable = false;
+                                // session-only override, handled via FSOEnvironment.Args in TSOGame
                                 break;
                             case "3d":
                                 FSOEnvironment.Enable3D = true;
@@ -132,13 +130,14 @@ namespace FSO.Client
                 GlobalSettings.Default.StartupPath = path;
                 GlobalSettings.Default.ClientVersion = GetClientVersion();
 
-                // Auto-detect TS1 path if it's still the default Windows placeholder
-                if (GlobalSettings.Default.TS1HybridPath == "D:/Games/The Sims/")
+                // Auto-detect TS1 path when -ts1 is passed and path is still the default placeholder
+                if (GlobalSettings.Default.TS1HybridPath == "D:/Games/The Sims/" && args.Any(a => a == "-ts1"))
                 {
                     var ts1Path = gameLocator.FindTheSims1();
                     if (ts1Path != null)
                     {
                         GlobalSettings.Default.TS1HybridPath = ts1Path;
+                        GlobalSettings.Default.TS1IsSteamInstall = ts1Path.Contains("steamapps");
                         GlobalSettings.Default.Save();
                     }
                 }

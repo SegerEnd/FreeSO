@@ -7,10 +7,10 @@ namespace FSO.Content
 {
     public class WorldRoofProvider : FileProvider<ITextureRef>
     {
-        public WorldRoofProvider(Content contentManager) : base(contentManager, new TextureCodec(new uint[] { }, true), 
-            new Regex(contentManager.TS1? "GameData/Roofs/.*\\.bmp" : "housedata/roofs/.*\\.jpg"))
+        public WorldRoofProvider(Content contentManager) : base(contentManager, new TextureCodec(new uint[] { }, true),
+            new Regex(Content.TS1Hybrid ? "GameData/Roofs/.*\\.bmp" : "housedata/roofs/.*\\.jpg"))
         {
-            UseTS1 = contentManager.TS1;
+            UseTS1 = Content.TS1Hybrid;
         }
 
         public int Count

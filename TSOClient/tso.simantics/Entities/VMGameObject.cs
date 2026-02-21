@@ -110,7 +110,7 @@ namespace FSO.SimAntics
 
         public void DisableIfTSOCategoryWrong(VMContext context)
         {
-            if (context.VM.TS1) return;
+            if (Object.IsTS1) return;
             OBJD obj = Object.OBJ;
             if (MasterDefinition != null) obj = MasterDefinition;
             var category = context.VM.TSOState.PropertyCategory;

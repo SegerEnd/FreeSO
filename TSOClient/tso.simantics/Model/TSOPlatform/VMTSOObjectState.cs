@@ -114,7 +114,7 @@ namespace FSO.SimAntics.Model.TSOPlatform
             owner.MultitileGroup.InitialPrice = 0;
             foreach (var obj in owner.MultitileGroup.Objects)
             {
-                (obj.TSOState as VMTSOObjectState).ObjectFlags |= VMTSOObjectFlags.FSODonated;
+                if (obj.TSOState is VMTSOObjectState s) s.ObjectFlags |= VMTSOObjectFlags.FSODonated;
             }
             VMBuildableAreaInfo.UpdateOverbudgetObjects(vm);
         }

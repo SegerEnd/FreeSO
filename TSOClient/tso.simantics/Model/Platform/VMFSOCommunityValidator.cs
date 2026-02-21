@@ -15,8 +15,8 @@ namespace FSO.SimAntics.Model.Platform
 
         public override bool CanSendbackObject(VMAvatar ava, VMGameObject obj)
         {
-            return (obj.TSOState as VMTSOObjectState).OwnerID == ava.PersistID &&
-                !(obj.TSOState as VMTSOObjectState).ObjectFlags.HasFlag(VMTSOObjectFlags.FSODonated);
+            var objState = obj.TSOState as VMTSOObjectState;
+            return objState != null && objState.OwnerID == ava.PersistID && !objState.ObjectFlags.HasFlag(VMTSOObjectFlags.FSODonated);
         }
 
         public override DeleteMode GetDeleteMode(DeleteMode desired, VMAvatar ava, VMEntity obj)
@@ -36,7 +36,7 @@ namespace FSO.SimAntics.Model.Platform
 
             //build buy donator can delete build mode objects that are donated
 
-            if (!(obj.TSOState as VMTSOObjectState).ObjectFlags.HasFlag(VMTSOObjectFlags.FSODonated)) return DeleteMode.Disallowed;
+            if ((obj.TSOState as VMTSOObjectState)?.ObjectFlags.HasFlag(VMTSOObjectFlags.FSODonated) != true) return DeleteMode.Disallowed;
             var catalog = Content.Content.Get().WorldCatalog;
             var item = catalog.GetItemByGUID(obj.Object.OBJ.GUID);
 

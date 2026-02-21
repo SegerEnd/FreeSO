@@ -194,7 +194,7 @@ namespace FSO.SimAntics.Engine
                     break;
                 case VMSuitScope.Person:
                     //get outfit from person
-                    if (context.VM.TS1) return GetPersonSuitTS1((VMAvatar)context.Caller, id);
+                    if (context.Caller.Object.IsTS1) return GetPersonSuitTS1((VMAvatar)context.Caller, id);
 
                     var type = (VMPersonSuits)id;
                     bool male = (avatar.GetPersonData(VMPersonDataVariable.Gender) == 0);
@@ -209,7 +209,7 @@ namespace FSO.SimAntics.Engine
                         case VMPersonSuits.DefaultSwimwear:
                             return avatar.DefaultSuits.Swimwear.ID;
                         case VMPersonSuits.JobOutfit:
-                            if (context.VM.TS1) return null;
+                            if (context.Caller.Object.IsTS1) return null;
                             var job = avatar.GetPersonData(VMPersonDataVariable.OnlineJobID);
                             if (job < 1 || job > 5) return null;
                             var level = Math.Max(0, Math.Min(2, ((int)avatar.GetPersonData(VMPersonDataVariable.OnlineJobGrade) + 1) / 4));

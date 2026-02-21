@@ -38,7 +38,7 @@ namespace FSO.Content.Interfaces
 
         protected abstract Func<string, GameObjectResource> GenerateResource(GameObjectReference reference);
 
-        public GameObject Get(ulong id)
+        public virtual GameObject Get(ulong id)
         {
             return Cache.GetOrAdd(id, (_) =>
             {

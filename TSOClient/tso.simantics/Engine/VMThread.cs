@@ -1065,7 +1065,7 @@ namespace FSO.SimAntics.Engine
         public void EnsureDirectControlAction()
         {
             if (!(Entity is VMAvatar ava) ||
-                VM.GlobTS1 ||
+                Entity.Object.IsTS1 ||
                 ava.GetPersonData(VMPersonDataVariable.UnusedAndDoNotUse2) != 32767 ||
                 ava.GetPersonData(VMPersonDataVariable.Posture) != 0 ||
                 Queue.Any(entry => entry.Flags.HasFlag(TTABFlags.FSODirectControl)))
