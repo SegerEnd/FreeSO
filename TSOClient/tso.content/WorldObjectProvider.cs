@@ -228,6 +228,7 @@ namespace FSO.Content
         public ulong GUID;
         public OBJD OBJ;
         public GameObjectResource Resource;
+        public bool IsTS1; // true for objects loaded from TS1 content
     }
 
     public abstract class GameIffResource

@@ -334,7 +334,7 @@ namespace FSO.Files.Formats.IFF.Chunks
         {
             using (var io = IoWriter.FromStream(stream, ByteOrder.LITTLE_ENDIAN))
             {
-                if (IffFile.TargetTS1)
+                if (iff.TS1)
                 {
                     // TS1 format - null terminated string
                     io.WriteInt16(-3);

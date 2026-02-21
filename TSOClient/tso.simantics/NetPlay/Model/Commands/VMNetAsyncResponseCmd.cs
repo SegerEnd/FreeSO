@@ -53,7 +53,7 @@ namespace FSO.SimAntics.NetPlay.Model.Commands
                     {
                         foreach (var obj in obj1.MultitileGroup.Objects)
                         {
-                            if (!vm.TS1) obj.TSOState.Budget.Value = state.Budget1;
+                            if (!vm.TS1 && obj.TSOState != null) obj.TSOState.Budget.Value = state.Budget1;
                         }
                     }
                     var obj2 = vm.GetObjectByPersist(state.UID2);
@@ -61,7 +61,7 @@ namespace FSO.SimAntics.NetPlay.Model.Commands
                     {
                         foreach (var obj in obj2.MultitileGroup.Objects)
                         {
-                            if (!vm.TS1) obj.TSOState.Budget.Value = state.Budget2;
+                            if (!vm.TS1 && obj.TSOState != null) obj.TSOState.Budget.Value = state.Budget2;
                         }
                     }
                 }

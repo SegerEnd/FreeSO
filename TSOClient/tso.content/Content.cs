@@ -80,7 +80,7 @@ namespace FSO.Content
         public string[] ContentFiles;
         private GraphicsDevice Device;
         public ContentMode Mode;
-        public bool TS1 = TS1Hybrid;
+        public bool TS1 = (Target == FSOEngineMode.TS1);
         public TS1Provider TS1Global;
         public TS1BCFProvider BCFGlobal;
         public string TS1BasePath = TS1HybridBasePath;
@@ -108,7 +108,7 @@ namespace FSO.Content
                 RCMeshes = new RCMeshProvider(device);
                 UIGraphics = new UIGraphicsProvider(this);
                 IffFile.TargetTS1 = (Target == FSOEngineMode.TS1);
-                if (TS1)
+                if (TS1Hybrid)
                 {
                     TS1Global = new TS1Provider(this);
                 }
@@ -132,6 +132,7 @@ namespace FSO.Content
             if (Target == FSOEngineMode.TS1)
             {
                 var provider = new TS1ObjectProvider(this, TS1Global);
+                TS1ObjectProvider = provider;
                 WorldObjects = provider;
                 WorldCatalog = provider;
                 BCFGlobal = new TS1BCFProvider(this, TS1Global);
@@ -284,7 +285,7 @@ namespace FSO.Content
 
             // Scan TS1 files for both pure TS1 and Hybrid modes
             var ts1AllFiles = new List<string>();
-            if (TS1)
+            if (TS1Hybrid)
             {
                 _ScanFiles(TS1BasePath, ts1AllFiles, TS1BasePath);
                 TS1AllFiles = ts1AllFiles.ToArray();
@@ -298,7 +299,9 @@ namespace FSO.Content
             if (Target == FSOEngineMode.TS1)
                 PIFFRegistry.Init(Path.Combine(FSOEnvironment.ContentDir, "TS1Patch/"));
             else
+            {
                 PIFFRegistry.Init(Path.Combine(FSOEnvironment.ContentDir, "Patch/"));
+            }
 
             LoadProgress = ContentLoadingProgress.InitAvatars;
             Archives = new Dictionary<string, FAR3Archive>();
@@ -330,14 +333,17 @@ namespace FSO.Content
                 CityMaps.Init();
                 RackOutfits.Init();
                 Ini.Init();
-                if (Target == FSOEngineMode.TS1Hybrid)
-                    Neighborhood = new TS1NeighborhoodProvider(this);
             }
 
             LoadProgress = ContentLoadingProgress.InitAudio;
             if (Target == FSOEngineMode.TS1) Audio.Init();
 
             InitWorld();
+
+            // Neighborhood is created after InitWorld() so that TS1ObjectProvider entries
+            // are fully populated before LoadCharacters runs in the constructor.
+            if (Content.TS1Hybrid)
+                Neighborhood = new TS1NeighborhoodProvider(this);
         }
 
         /// <summary>

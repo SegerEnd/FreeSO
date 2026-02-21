@@ -136,30 +136,37 @@ namespace FSO.Files.Formats.IFF.Chunks
 
         public PIFFPatch[] Patches;
 
+        /// <summary>
+        /// Applies this patch to <paramref name="src"/>, returning the patched byte array.
+        /// Returns null if the patch is not compatible with the source data (e.g. wrong chunk version).
+        /// </summary>
         public byte[] Apply(byte[] src)
         {
             var result = new byte[NewDataSize];
             uint srcPtr = 0;
             uint destPtr = 0;
-            int i = 0;
             foreach (var p in Patches)
             {
                 var copyCount = p.Offset - destPtr;
+                if (srcPtr + copyCount > (uint)src.Length) return null;
                 Array.Copy(src, srcPtr, result, destPtr, copyCount);
                 srcPtr += copyCount; destPtr += copyCount;
                 if (p.Mode == PIFFPatchMode.Add)
                 {
                     Array.Copy(p.Data, 0, result, destPtr, p.Size);
                     destPtr += p.Size;
-                } else
+                }
+                else
                 {
                     srcPtr += p.Size;
                 }
-                i++;
             }
             var remainder = NewDataSize - destPtr;
-            if (remainder != 0) Array.Copy(src, srcPtr, result, destPtr, remainder);
-
+            if (remainder != 0)
+            {
+                if (srcPtr + remainder > (uint)src.Length) return null;
+                Array.Copy(src, srcPtr, result, destPtr, remainder);
+            }
             return result;
         }
     }

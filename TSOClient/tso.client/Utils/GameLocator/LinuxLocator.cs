@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using FSO.Common;
 
 namespace FSO.Client.Utils.GameLocator
 {
@@ -15,6 +16,19 @@ namespace FSO.Client.Utils.GameLocator
             if (File.Exists(Path.Combine(homeDir, "tuning.dat"))) return homeDir;
 
             return "game/TSOClient/";
+        }
+
+        public string FindTheSims1()
+        {
+            // Check relative directory first (portable install)
+            string localDir = @"../The Sims/";
+            if (File.Exists(Path.Combine(localDir, "GameData", "Behavior.iff"))) return localDir;
+
+            // Check Steam (Legacy Collection via Proton)
+            var steamPath = SteamGameLocator.GetGamePath(SteamGameLocator.TS1LegacyAppId);
+            if (steamPath != null) return steamPath;
+
+            return null;
         }
     }
 }

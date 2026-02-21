@@ -131,7 +131,9 @@ namespace FSO.HIT.Events
             string[] files;
             if (!isRegex) {
                 statBase = (content.TS1) ? Path.Combine(content.TS1BasePath, path) : content.GetPath(path);
-                files = Directory.GetFiles(statBase, "*.xa", SearchOption.AllDirectories);
+                files = Directory.Exists(statBase)
+                    ? Directory.GetFiles(statBase, "*.xa", SearchOption.AllDirectories)
+                    : new string[0];
             } else
             {
                 statBase = (content.TS1) ? content.TS1BasePath : content.BasePath;
@@ -162,7 +164,9 @@ namespace FSO.HIT.Events
                     var regex = new Regex(path);
                     files = content.AllFiles.Where(x => regex.IsMatch(x.Replace('\\', '/'))).Select(x => content.GetPath(x)).ToArray();
                 } else {
-                    files = Directory.GetFiles(statBase, "*.mp3", SearchOption.AllDirectories);
+                    files = Directory.Exists(statBase)
+                        ? Directory.GetFiles(statBase, "*.mp3", SearchOption.AllDirectories)
+                        : new string[0];
                 }
                 IsMusic = true;
             }

@@ -38,10 +38,49 @@ namespace FSO.Unix
 
         public static void InitUnix()
         {
+            // Must be set before anything accesses GlobalSettings.Default (which reads config.ini from UserDir).
+            FSOEnvironment.UserDir = GetUserDir();
+            Directory.CreateDirectory(FSOEnvironment.UserDir);
+            MigrateConfig();
+
             FSO.Files.ImageLoaderHelpers.BitmapFunction = BitmapReader;
             FSO.Files.ImageLoaderHelpers.SavePNGFunc = SavePNG;
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
             FSOProgram.ShowDialog = ShowDialog;
+        }
+
+        /// <summary>
+        /// Returns the platform-correct user data directory:
+        ///   Linux : $XDG_DATA_HOME/FreeSO/  (usually ~/.local/share/FreeSO/)
+        ///   macOS : ~/Library/Application Support/FreeSO/
+        /// </summary>
+        private static string GetUserDir()
+        {
+            var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+
+            if (OperatingSystem.IsMacOS())
+                return Path.Combine(home, "Library", "Application Support", "FreeSO") + "/";
+
+            // Linux — respect XDG Base Directory spec
+            var xdgDataHome = Environment.GetEnvironmentVariable("XDG_DATA_HOME")
+                ?? Path.Combine(home, ".local", "share");
+            return Path.Combine(xdgDataHome, "FreeSO") + "/";
+        }
+
+        /// <summary>
+        /// Copies config.ini from the old in-app Content/ location to the new UserDir
+        /// on first run after the move, so existing settings are preserved.
+        /// </summary>
+        private static void MigrateConfig()
+        {
+            var newConfig = Path.Combine(FSOEnvironment.UserDir, "config.ini");
+            if (File.Exists(newConfig)) return;
+
+            var oldConfig = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Content", "config.ini");
+            if (!File.Exists(oldConfig)) return;
+
+            try { File.Copy(oldConfig, newConfig); }
+            catch { /* non-fatal: defaults will be used */ }
         }
 
         public static void ShowDialog(string text)
@@ -67,19 +106,20 @@ namespace FSO.Unix
             }
             else
             {
+                Console.Error.WriteLine($"[{title}] {text}");
                 try
                 {
                     var psi = new ProcessStartInfo
                     {
                         FileName = "zenity",
-                        Arguments = $"--error --title=\"{Escape(title)}\" --text=\"{Escape(text)}\"",
+                        Arguments = $"--error --no-markup --title=\"{Escape(title)}\" --text=\"{Escape(text)}\"",
                         UseShellExecute = false
                     };
                     Process.Start(psi)?.WaitForExit();
                 }
                 catch
                 {
-                    Console.Error.WriteLine($"[{title}] {text}");
+                    // zenity not available, already printed to stderr above
                 }
             }
         }

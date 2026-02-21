@@ -126,13 +126,13 @@ namespace FSO.Vitaboy
             var realBindings = appearance.Bindings.Select(bindingReference =>
                 bindingReference.RealBinding ?? FSO.Content.Content.Get().AvatarBindings?.Get(bindingReference.TypeID, bindingReference.FileID)).ToList();
 
-            if (Content.Content.Get().TS1)
+            if (Content.Content.Get().TS1 && texOverride != null)
             {
                 foreach (var binding in realBindings)
                 {
-                    if (binding == null) { i++; continue; }
+                    if (binding == null || binding.MeshName == null) { i++; continue; }
                     var mesh = Content.Content.Get().AvatarMeshes.Get(binding.MeshName);
-                    if (texOverride != null &&
+                    if (mesh != null &&
                             (UniformName(mesh.TextureName.ToLowerInvariant()).EndsWith(UniformName(texOverride.ToLowerInvariant()))
                             || mesh.TextureName.ToLowerInvariant() == "x"))
                     {
@@ -141,11 +141,8 @@ namespace FSO.Vitaboy
                     i++;
                 }
 
-                if (texOverride != null)
-                {
-                    realBindings[replaced] = realBindings[replaced].TS1Copy();
-                    realBindings[replaced].TextureName = texOverride;
-                }
+                realBindings[replaced] = realBindings[replaced].TS1Copy();
+                realBindings[replaced].TextureName = texOverride;
             }
 
             foreach (var binding in realBindings)

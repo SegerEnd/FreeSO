@@ -17,6 +17,8 @@ namespace FSO.Content.TS1
         private static Dictionary<uint, ObjectCatalogItem> ItemsByGUID;
         public HashSet<uint> PersonGUIDs = new HashSet<uint>();
 
+        protected override bool IsTS1Provider => true;
+
         public TS1ObjectProvider(Content contentManager, TS1Provider provider) : base(contentManager)
         {
             GameObjects = new TS1SubProvider<IffFile>(provider, ".iff");
@@ -103,8 +105,6 @@ namespace FSO.Content.TS1
             var globalSims = Entries.Values.Where(x => x.GlobalSimObject);
             ControllerObjects.Clear();
             ControllerObjects.AddRange(globalSims);
-
-            ContentManager.Neighborhood.LoadCharacters(false);
         }
 
         protected override Func<string, GameObjectResource> GenerateResource(GameObjectReference reference)

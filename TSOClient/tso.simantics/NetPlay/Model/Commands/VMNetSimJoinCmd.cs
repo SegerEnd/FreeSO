@@ -161,14 +161,15 @@ namespace FSO.SimAntics.NetPlay.Model.Commands
 
             // If this avatar is not a spectator but existing avatars are,
             // the lot is transitioning from spectator mode (a roommate/admin joined).
-            if (!((VMTSOAvatarState)avatar.TSOState).IsSpectator)
+            var avatarTSOState = avatar.TSOState as VMTSOAvatarState;
+            if (avatarTSOState != null && !avatarTSOState.IsSpectator)
             {
                 bool hadSpectators = false;
                 foreach (VMAvatar ava in vm.Context.ObjectQueries.Avatars)
                 {
                     if (ava == avatar) continue;
-                    var ts = (VMTSOAvatarState)ava.TSOState;
-                    if (ts.IsSpectator)
+                    var ts = ava.TSOState as VMTSOAvatarState;
+                    if (ts != null && ts.IsSpectator)
                     {
                         ts.Flags &= ~VMTSOAvatarFlags.Spectator;
                         hadSpectators = true;

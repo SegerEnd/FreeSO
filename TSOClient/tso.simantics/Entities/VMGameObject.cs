@@ -27,7 +27,7 @@ namespace FSO.SimAntics
         public VMGameObject(GameObject def, ObjectComponent worldUI) : base(def)
         {
             this.WorldUI = worldUI;
-            var state = VM.GlobTS1?(VMAbstractEntityState)new VMTS1ObjectState():new VMTSOObjectState();
+            var state = def.IsTS1?(VMAbstractEntityState)new VMTS1ObjectState():new VMTSOObjectState();
             PlatformState = state;
             ObjectState = (VMIObjectState)state;
         }

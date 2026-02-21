@@ -36,7 +36,7 @@ namespace FSO.Content
         public void Init()
         {
             Cache = new Dictionary<string, GameGlobal>();
-            if (ContentManager.TS1)
+            if (Content.TS1Hybrid)
             {
                 TS1Provider = new FAR1Archive(Path.Combine(ContentManager.TS1BasePath, "GameData/Global/Global.far"), false);
             }
@@ -174,44 +174,79 @@ namespace FSO.Content
 
                 GameGlobalResource resource = null;
 
-                if (TS1Provider != null)
+                // In pure TS1 mode: prefer TS1 globals, fall back to TSO.
+                // In hybrid mode: prefer TSO globals (TSO lot, TSO objects must work correctly),
+                //   fall back to TS1 for files that only exist in TS1's archive.
+                if (TS1Provider != null && Content.Target == FSOEngineMode.TS1)
                 {
-                    var data = TS1Provider.GetEntry(
-                        TS1Provider.GetAllEntries().FirstOrDefault(x => x.Key.ToLowerInvariant() == (filename + ".iff").ToLowerInvariant()));
+                    var entry = TS1Provider.GetAllEntries().FirstOrDefault(
+                        x => x.Key.ToLowerInvariant() == (filename + ".iff").ToLowerInvariant());
 
-                    if (data != null)
+                    if (entry.Key != null)
                     {
-                        using (var stream = new MemoryStream(data))
+                        using (var stream = new MemoryStream(entry.Value))
                         {
                             var iff = new IffFile();
+                            iff.TS1 = true;
                             iff.Read(stream);
                             iff.InitHash();
-                            iff.SetFilename(filename + ".iff");
+                            iff.Filename = filename + ".iff";
+                            var piffs = PIFFRegistry.GetPIFFs(filename + ".iff");
+                            if (piffs != null)
+                                foreach (var piff in piffs)
+                                    iff.Patch(piff);
                             resource = new GameGlobalResource(iff, null);
                         }
                     }
-                    
                 }
-                else
-                { 
-          var iff = new IffFile(Path.Combine(ContentManager.BasePath, "objectdata/globals/" + filename + ".iff"));
-                    iff.InitHash();
-                    OTFFile otf = null;
-                    try
-                    {
-                        var rewrite = PIFFRegistry.GetOTFRewrite(filename + ".otf");
-                        var path = rewrite ?? Path.Combine(ContentManager.BasePath, ("objectdata/globals/" + filename + ".otf"));
 
-                        if (File.Exists(path))
+                if (resource == null)
+                {
+                    // Load from TSO objectdata/globals/.
+                    var tsoPath = Path.Combine(ContentManager.BasePath, "objectdata/globals/" + filename + ".iff");
+                    if (File.Exists(tsoPath))
+                    {
+                        var iff = new IffFile(tsoPath);
+                        iff.InitHash();
+                        OTFFile otf = null;
+                        try
                         {
-                            otf = new OTFFile(path);
+                            var rewrite = PIFFRegistry.GetOTFRewrite(filename + ".otf");
+                            var path = rewrite ?? Path.Combine(ContentManager.BasePath, "objectdata/globals/" + filename + ".otf");
+                            if (File.Exists(path)) otf = new OTFFile(path);
+                        }
+                        catch (IOException) { }
+                        resource = new GameGlobalResource(iff, otf);
+                    }
+                }
+
+                // In hybrid mode, fall back to TS1 archive for globals not present in TSO.
+                if (resource == null && TS1Provider != null && Content.Target == FSOEngineMode.TS1Hybrid)
+                {
+                    var entry = TS1Provider.GetAllEntries().FirstOrDefault(
+                        x => x.Key.ToLowerInvariant() == (filename + ".iff").ToLowerInvariant());
+
+                    if (entry.Key != null)
+                    {
+                        using (var stream = new MemoryStream(entry.Value))
+                        {
+                            var iff = new IffFile();
+                            iff.TS1 = true;
+                            iff.Read(stream);
+                            iff.InitHash();
+                            // In hybrid mode PIFFRegistry has TSO patches — skip TS1 global patching.
+                            iff.Filename = filename + ".iff";
+                            resource = new GameGlobalResource(iff, null);
                         }
                     }
-                    catch (IOException)
-                    {
-                        //if we can't load an otf, it probably doesn't exist.
-                    }
-                    resource = new GameGlobalResource(iff, otf);
+                }
+
+                if (resource == null)
+                {
+                    // Last resort: load from TSO even if file doesn't exist (will throw if truly missing).
+                    var iff = new IffFile(Path.Combine(ContentManager.BasePath, "objectdata/globals/" + filename + ".iff"));
+                    iff.InitHash();
+                    resource = new GameGlobalResource(iff, null);
                 }
 
                 var item = new GameGlobal

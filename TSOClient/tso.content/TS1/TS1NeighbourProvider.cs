@@ -64,11 +64,26 @@ namespace FSO.Content.TS1
                 // Check if user selected Steam install via Content.TS1SteamInstall flag
                 if (Content.TS1SteamInstall)
                 {
-                    // Use Steam's "Saved Games" location (used by The Sims Legacy Collection)
-                    source = Path.Combine(
-                        Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
-                        "Saved Games", "Electronic Arts", "The Sims 25", udName + "/"
-                    );
+                    if (FSOEnvironment.Linux)
+                    {
+                        // On Linux, The Sims Legacy Collection runs through Proton.
+                        // Saves are stored in the Proton (Wine) prefix, not the host filesystem.
+                        source = SteamGameLocator.GetProtonSavePath(
+                            SteamGameLocator.TS1LegacyAppId,
+                            Path.Combine("Saved Games", "Electronic Arts", "The Sims 25", udName));
+                    }
+                    else
+                    {
+                        // Windows: saves are in the user's "Saved Games" folder
+                        source = Path.Combine(
+                            Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+                            "Saved Games", "Electronic Arts", "The Sims 25", udName + "/"
+                        );
+                    }
+
+                    // Fall back to install directory if the Steam path wasn't found
+                    if (source == null)
+                        source = Path.Combine(ContentManager.TS1BasePath, udName + "/");
                 }
                 else
                 {
@@ -139,9 +154,11 @@ namespace FSO.Content.TS1
             //todo: manage avatar iffs here
         }
 
+        private TS1ObjectProvider GetTS1Objects() => ContentManager.TS1ObjectProvider;
+
         public void AddMissingNeighbors()
         {
-            var objs = (TS1ObjectProvider)ContentManager.WorldObjects;
+            var objs = GetTS1Objects();
             var missing = objs.PersonGUIDs.Where(x => !Neighbors.Entries.Any(y => y.GUID == x)).Select(x => objs.Get(x));
             foreach (var obj in missing)
             {
@@ -160,7 +177,7 @@ namespace FSO.Content.TS1
 
         public void LoadCharacters(bool clearLast)
         {
-            var objs = (TS1ObjectProvider)ContentManager.WorldObjects;
+            var objs = GetTS1Objects();
             if (objs.Entries == null) return;
             if (clearLast)
             {
@@ -411,6 +428,7 @@ namespace FSO.Content.TS1
             if (index >= dat.Length) return;
             else dat[index] = value;
         }
+
     }
 
     public class TS1GameState

@@ -23,6 +23,8 @@ namespace FSO.Content.Interfaces
             this.ContentManager = contentManager;
         }
 
+        protected virtual bool IsTS1Provider => false;
+
         private bool WithSprites;
 
         protected TimedReferenceCache<string, GameObjectResource> ProcessedFiles = new TimedReferenceCache<string, GameObjectResource>();
@@ -71,7 +73,8 @@ namespace FSO.Content.Interfaces
                         {
                             GUID = objd.GUID,
                             OBJ = objd,
-                            Resource = resource
+                            Resource = resource,
+                            IsTS1 = IsTS1Provider
                         };
                         return item; //found it!
                     }

@@ -3,6 +3,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
+using FSO.Common;
 
 namespace FSO.Client.Utils.GameLocator
 {
@@ -36,6 +37,33 @@ namespace FSO.Client.Utils.GameLocator
 
             // Fall back to the default install location if the other two checks fail
             return @"C:\Program Files\Maxis\The Sims Online\TSOClient\".Replace('\\', '/');
+        }
+
+        public string FindTheSims1()
+        {
+            // Check relative directory first (portable install)
+            string localDir = @"../The Sims/";
+            if (File.Exists(Path.Combine(localDir, "GameData", "Behavior.iff"))) return localDir;
+
+            // Check Windows Registry (original retail install)
+            using (var hklm = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32))
+            {
+                var softwareKey = hklm.OpenSubKey("SOFTWARE");
+                var maxisKey = softwareKey?.OpenSubKey("Maxis");
+                var ts1Key = maxisKey?.OpenSubKey("The Sims");
+                if (ts1Key != null)
+                {
+                    var installPath = ts1Key.GetValue("InstallPath") as string;
+                    if (!string.IsNullOrEmpty(installPath))
+                        return (installPath + "\\").Replace('\\', '/');
+                }
+            }
+
+            // Check Steam (Legacy Collection)
+            var steamPath = SteamGameLocator.GetGamePath(SteamGameLocator.TS1LegacyAppId);
+            if (steamPath != null) return steamPath;
+
+            return null;
         }
 
         private static bool is64BitProcess = (IntPtr.Size == 8);

@@ -75,7 +75,7 @@ namespace FSO.Files.Formats.IFF.Chunks
         {
             using (var io = IoWriter.FromStream(stream, ByteOrder.LITTLE_ENDIAN))
             {
-                if (IffFile.TargetTS1)
+                if (iff.TS1)
                 { //version 0x8002
                     io.WriteUInt16(0x8002);
                     io.WriteUInt16((ushort)Instructions.Length);

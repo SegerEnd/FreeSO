@@ -131,6 +131,18 @@ namespace FSO.Client
 
                 GlobalSettings.Default.StartupPath = path;
                 GlobalSettings.Default.ClientVersion = GetClientVersion();
+
+                // Auto-detect TS1 path if it's still the default Windows placeholder
+                if (GlobalSettings.Default.TS1HybridPath == "D:/Games/The Sims/")
+                {
+                    var ts1Path = gameLocator.FindTheSims1();
+                    if (ts1Path != null)
+                    {
+                        GlobalSettings.Default.TS1HybridPath = ts1Path;
+                        GlobalSettings.Default.Save();
+                    }
+                }
+
                 return true;
             }
             else

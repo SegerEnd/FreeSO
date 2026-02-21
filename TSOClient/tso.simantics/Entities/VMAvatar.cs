@@ -226,7 +226,7 @@ namespace FSO.SimAntics
         public VMAvatar(GameObject obj)
             : base(obj)
         {
-            var state = VM.GlobTS1?(VMAbstractEntityState)new VMTS1AvatarState():new VMTSOAvatarState();
+            var state = obj.IsTS1?(VMAbstractEntityState)new VMTS1AvatarState():new VMTSOAvatarState();
             PlatformState = state; //todo: ts1 switch
             AvatarState = (VMIAvatarState)state;
             BodyStrings = Object.Resource.Get<STR>(Object.OBJ.BodyStringID);

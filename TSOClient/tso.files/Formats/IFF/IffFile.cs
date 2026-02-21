@@ -21,6 +21,12 @@ namespace FSO.Files.Formats.IFF
         /// </summary>
         public static bool RETAIN_CHUNK_DATA = false;
         public static bool TargetTS1 = false;
+        /// <summary>
+        /// Whether this specific IFF file uses TS1 chunk format.
+        /// Defaults to the global TargetTS1 flag, but can be set per-instance
+        /// to allow TS1 and TSO IFFs to coexist (e.g. hybrid mode).
+        /// </summary>
+        public bool TS1 = TargetTS1;
         public bool TSBO = false;
         public bool RetainChunkData = RETAIN_CHUNK_DATA;
         public object CachedJITModule; //for JIT and AOT modes
@@ -556,7 +562,10 @@ namespace FSO.Files.Formats.IFF
                 }
                 else if(e.EntryType == PIFFEntryType.Patch)
                 {
-                    chunk.ChunkData = e.Apply(chunk.ChunkData ?? chunk.OriginalData);
+                    var patched = e.Apply(chunk.ChunkData ?? chunk.OriginalData);
+                    if (patched == null) continue; // patch not compatible with this chunk's data (e.g. version mismatch)
+
+                    chunk.ChunkData = patched;
                     chunk.ChunkProcessed = false;
                     if (e.ChunkLabel != "") chunk.ChunkLabel = e.ChunkLabel;
                     chunk.RuntimeInfo = ChunkRuntimeState.Patched;

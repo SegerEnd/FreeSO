@@ -119,7 +119,7 @@ namespace FSO.Files.Formats.IFF.Chunks
         {
             using (var io = IoWriter.FromStream(stream, ByteOrder.LITTLE_ENDIAN))
             {
-                if (IffFile.TargetTS1)
+                if (iff.TS1)
                 {
                     io.WriteUInt32(1000);
                     uint length = 0;

@@ -28,6 +28,7 @@ using FSO.Common.Model;
 using FSO.SimAntics.Model.TS1Platform;
 using FSO.SimAntics.Model.Platform;
 using FSO.Common.Utils;
+using FSO.Content;
 
 namespace FSO.SimAntics
 {
@@ -61,7 +62,8 @@ namespace FSO.SimAntics
         {
             get { return GlobalLink != null || Driver is VMFSORDriver; }
         }
-        public bool TS1;
+        public bool TS1; // true only in pure TS1 mode; controls high-level game logic (sim join, permissions, motive system)
+        public bool TS1Content; // true in TS1 and TS1Hybrid; controls BHAV execution for TS1 object opcodes
         public static bool GlobTS1; //I don't like this, but we don't pass VM to some things and this needs to be fast
         //we can assume one application won't be running TS1 and TSO at the same time.
         public bool Aborting = false;
@@ -152,7 +154,8 @@ namespace FSO.SimAntics
             Scheduler = new VMScheduler(this);
             GameTickRate = FSOEnvironment.RefreshRate;
 
-            TS1 = Content.Content.Get().TS1;
+            TS1 = Content.Content.Get().TS1; // false in hybrid (TSO game rules apply)
+            TS1Content = Content.Content.TS1Hybrid; // true in hybrid (TS1 BHAVs must execute)
             GlobTS1 = TS1;
         }
 
@@ -223,7 +226,7 @@ namespace FSO.SimAntics
         /// </summary>
         public void Init()
         {
-            PlatformState = (TS1)?(VMAbstractLotState)new VMTS1LotState():new VMTSOLotState();
+            PlatformState = (Content.Content.Target == FSOEngineMode.TS1)?(VMAbstractLotState)new VMTS1LotState():new VMTSOLotState();
             GlobalState = new short[38];
             GlobalState[20] = 255; //Game Edition. Basically, what "expansion packs" are running. Let's just say all of them.
             GlobalState[25] = 4; //as seen in EA-Land edith's simulator globals, this needs to be set for people to do their idle interactions.
