@@ -1,8 +1,9 @@
 {
   "gameLocation": "/game/",
-  "secret": "GENERATE",
+  "secret": "7fb41d171f3aa9f14ad94195318ac65cf5eef5d24c6dfe19b9c53de21f002c1d",
   "simNFS": "/nfs",
   "allOpenable": true,
+  "ts1Hybrid": false,
 
   "database": {
     "connectionString": "server=mariadb;uid=fsoserver;pwd=password;database=fso;"
@@ -79,7 +80,7 @@
         "id": 1,
         "binding": "0.0.0.0:33100",
         "internal_host": "127.0.0.1:33101",
-        "public_host": "localhost:33101",
+        "public_host": "dev.segerend.nl:33101",
         "neighborhoods": {
           "mayor_elegibility_limit": 4,
           "mayor_elegibility_falloff": 4,
@@ -94,7 +95,7 @@
         "call_sign": "europa",
         "binding": "0.0.0.0:34100",
         "internal_host": "127.0.0.1:34101",
-        "public_host": "localhost:34101",
+        "public_host": "dev.segerend.nl:34101",
         "max_lots": 25,
         "cities": [
           {

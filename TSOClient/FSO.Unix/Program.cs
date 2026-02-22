@@ -72,7 +72,7 @@ namespace FSO.Unix
                     var psi = new ProcessStartInfo
                     {
                         FileName = "zenity",
-                        Arguments = $"--error --title=\"{Escape(title)}\" --text=\"{Escape(text)}\"",
+                        Arguments = $"--error --no-markup --title=\"{Escape(title)}\" --text=\"{Escape(text)}\"",
                         UseShellExecute = false
                     };
                     Process.Start(psi)?.WaitForExit();
