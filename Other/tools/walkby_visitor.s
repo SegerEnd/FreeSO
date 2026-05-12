@@ -5,28 +5,47 @@ BHAV [4097] "visitor init" 0x8003 args=0 locals=0
   call_semiglobal 0x206A args=(0,0,0,0)                 -> return_true / return_true
 
 
-; Visitor "Walk Off Lot" interaction (registered in TTAB index 0).
-; Pushed onto the visitor by the controller after placement; runs via PersonGlobals
-; "person main" (8193). Uses global 0x0175 "find random portal" instead of hand-rolled
-; portal lookup so the same code works on any lot regardless of sidewalk GUID layout.
+; Visitor "Walk Off Lot" — routes the visitor near a sidewalk portal then deletes
+; the visitor object. Used as:
+;   - autonomous walk-off (main BHAV 4106 call_private 0x1002 when timer expires)
+;   - user-driven via Say Goodbye -> TTAB idx 5 push_interaction at Max priority.
+;
+; Why goto_relative instead of goto_routing_slot? goto_routing_slot reads
+; StackObject.Slots.Slots[3][data] (VMMemory.GetSlot:743) and NREs if the target
+; has no SLOT chunk. Sidewalk portals (GUID 0x81E6BEF9) don't declare slots.
+; goto_relative builds a slot dynamically (VMGotoRelativePosition.cs:24-43), so
+; it works for any target. Same primitive Helper - Approach Visitor uses.
+;
+; Why not call generic_call mode=25 (LeaveLot)? It despawns engine-side without
+; routing AND emits a hardcoded "X has left the lot" chat event in
+; LotServerGlobalLink.LeaveLot — not appropriate for autonomous walkbys.
 BHAV [4098] "visitor walkby" 0x8003 args=0 locals=0
 find:
-  call_global 0x0175 args=(0,0,0,0)                     -> check / die  ; Temps[0] := random portal
+  call_global 0x0175 args=(0,0,0,0)                     -> check / die  ; Temps[0] := random sidewalk portal (GUID 0x81E6BEF9)
 check:
-  Temps[0] == 0                                         -> die / grab  ; defensive: no portal -> remove without routing (avoids NRE in goto_routing_slot)
+  Temps[0] == 0                                         -> die / grab  ; defensive: no portal -> just remove
 grab:
-  StackObjID[0] := Temps[0]                             -> route / die
+  StackObjID[0] := Temps[0]                             -> route / die  ; StackObject := portal
 route:
-  goto_routing_slot data=0 type=1                       -> die / die
+  goto_relative loc=AnywhereNear dir=Facing flags=AllowDiffAlt  -> die / die  ; walk to a tile near the portal
 die:
-  remove_object target=0                                -> return_true / return_true
+  remove_object target=0                                -> return_true / return_true  ; delete Caller (= visitor)
 
 
-; Check tree for "Walk Off Lot": always returns false so the interaction never shows
-; in the pie menu. push_interaction sets FSOSkipPermissions, which makes VMThread skip
-; the check on queued runs — so the controller's push still executes the walkby.
+; Check tree for hidden interactions (TTAB idx 5 Immediate Walkby + idx 6 Internal
+; Idle). Canonical TSO pattern for "hide from pie but allow programmatic push":
+;
+;   - During pie-menu build (VMEntity.GetPieMenu), the test runs with Caller=player
+;     (the clicker). VMEntity:1016-1020 checks caller.ObjectData[HideInteraction]
+;     after the test and skips the pie entry if it's set.
+;   - During VMThread.AttemptPush, the test must return RETURN_TRUE; if it returns
+;     RETURN_FALSE the action is silently removed from the queue (AttemptPush:225)
+;     and never dispatches.
+;
+; So we set MyObj[50] (HideInteraction) := 1 and return_true: pie hides the entry,
+; AttemptPush sees TRUE and dispatches.
 BHAV [4099] "walkby pie hide" 0x8003 args=0 locals=0
-  StackObjID[0] := 0                                    -> return_false / return_false
+  MyObj[50] := 1                                        -> return_true / return_true
 
 
 ; Shared helper for pie-menu interactions: route the caller next to the visitor and
@@ -93,35 +112,33 @@ walkby:
 ; so 0x2025's animate primitives actually run.
 BHAV [4106] "visitor main" 0x8003 args=0 locals=1
 boot:
-  StackObjID[0] := MyObj[11]                                     -> init_check / init_check  ; StackObj=self (push_interaction's EnqueueAction reads StackObject.Thread)
-init_check:
-  MyAttrs[0] > 0                                                 -> top / start_timer  ; first run? then prime counter
-start_timer:
-  MyAttrs[0] := 30                                               -> top / top          ; ~30 idle cycles before autonomous walk-off
-top:
-  MyAttrs[0] -= 1                                                -> check_done / check_done
-check_done:
-  MyAttrs[0] > 0                                                 -> idle_setup / push_walkby  ; timer not yet expired -> idle; else walk off
-idle_setup:
-  Local[0] := MyObj[11]                                          -> push / push     ; capture self id for ObjInLocal push
-push:
-  push_interaction raw=[06,00,06,02,00,00,00,00]                 -> reset / reset   ; idx=6 Internal Idle, priority=Idle, obj=Local[0]
+  StackObjID[0] := MyObj[11]                                     -> check_init / check_init  ; StackObj=self for push_interaction (push_interaction enqueues on StackObject.Thread)
+check_init:
+  MyAttrs[0] > 0                                                 -> tick / init_timer        ; first run? prime counter
+init_timer:
+  MyAttrs[0] := 30                                               -> tick / tick              ; ~30 idle cycles before autonomous walk-off
+tick:
+  MyAttrs[0] -= 1                                                -> decide / decide
+decide:
+  MyAttrs[0] > 0                                                 -> push_idle / walkoff      ; timer not yet expired -> idle; else walk off (synchronous direct call)
+walkoff:
+  call_private 0x1002 args=(0,0,0,0)                             -> wait_gone / wait_gone    ; BHAV 4098 "visitor walkby" — runs in our context (Caller=self), so remove_object target=0 removes us. No TTAB indirection needed.
+wait_gone:
+  call_global 0x0118 args=(60,0,0,0)                             -> wait_gone / wait_gone    ; only reached if walkby returned without removing (no portal); spin
+push_idle:
+  Local[0] := MyObj[11]                                          -> idle_push / idle_push    ; self id for ObjInLocal push
+idle_push:
+  push_interaction raw=[06,00,06,02,00,00,00,00]                 -> reset / reset            ; idx=6 Internal Idle, Idle priority
 reset:
-  MyPerson[33] := 0                                              -> args / args     ; clear NPC priority so AttemptPush dispatches
+  MyPerson[33] := 0                                              -> args / args              ; clear NPC priority so AttemptPush dispatches
 args:
   Params[0] := 1                                                 -> wait / wait
 wait:
-  idle_for_input dec=Temps[0] allow_push=true                    -> tick / error    ; AttemptPush + yield
-tick:
+  idle_for_input dec=Temps[0] allow_push=true                    -> next / error             ; AttemptPush dispatches the pushed Internal Idle (idx 6)
+next:
   Temps[0] := 1                                                  -> sleep / sleep
 sleep:
-  call_global 0x0118 args=(1,0,0,0)                              -> init_check / init_check  ; brief yield, then next iteration
-push_walkby:
-  Local[0] := MyObj[11]                                          -> walkby / walkby
-walkby:
-  push_interaction raw=[05,00,01,02,00,00,00,00]                 -> wait_gone / wait_gone  ; idx=5 Immediate Walkby, priority=Max, obj=Local[0]
-wait_gone:
-  call_global 0x0118 args=(60,0,0,0)                             -> wait_gone / wait_gone  ; yield until walkby removes us
+  call_global 0x0118 args=(1,0,0,0)                              -> tick / tick              ; brief yield then loop. Goes to tick (not check_init) so counter doesn't reset.
 
 
 ; Internal Idle — the action body main pushes onto self at Idle priority.
@@ -139,9 +156,19 @@ reset:
   call_semiglobal 0x2064 args=(0,0,0,0)                          -> return_true / return_true  ; "reset idle" — clears idle state on exit
 
 
-; Controller init — sleep 0 ticks; main fires immediately.
+; Controller init — sleep ~2 seconds (60 ticks at 30/s) before main starts.
+; This is critical for the city-avatar identity picker. RequestCityAvatar in
+; LotServerGlobalLink filters eligible avatars against vm.Context.ObjectQueries
+; .Avatars (line 1334) — i.e. avatars currently registered on the lot. At lot
+; bootstrap the controller's main would fire before VMNetSimJoinCmd has created
+; the joining player's avatar, so the filter sees an empty set and the player's
+; own PersistID is eligible to be assigned to a spawned visitor. When the player
+; then joins, both avatars share a PersistID; AvatarsByPersist collisions cause
+; the player's UI to flicker to the visitor's caretaker outfit, and deleting the
+; visitor (its walkby) evicts the player's dict entry → kicked / lot crashes.
+; The 60-tick wait gives the join command time to be processed first.
 BHAV [5000] "controller init" 0x8003 args=0 locals=0
-  sleep ticks=Temps[0]                                  -> return_true / return_true
+  call_global 0x0118 args=(60,0,0,0)                    -> return_true / return_true  ; "Idle" — sleep 60 ticks
 
 
 ; Controller main: spawn upfront, then loop with a ~60s wait between visitors.
