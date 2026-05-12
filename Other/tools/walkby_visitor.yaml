@@ -1,0 +1,644 @@
+format: IFF
+identifier: "IFF FILE 2.5:TYPE FOLLOWED BY SIZE\0 JAMIE DOORNBOS & MAXIS 1"
+rsmp_offset: 0
+chunks:
+
+# Walkby Visitor Controller — invisible Normal-type, runs on every lot.
+- type: OBJD
+  id: 16807
+  flags: 0
+  label: Walkby Visitor Controller
+  body:
+    version: 142
+    stack_size: 0
+    base_graphic_id: 0
+    num_graphics: 0
+    bhav_main_id: 5001
+    bhav_gardening_id: 0
+    tree_table_id: 0
+    interaction_group_id: 0
+    object_type: 4
+    master_id: 0
+    sub_index: 0
+    bhav_wash_hands_id: 0
+    animation_table_id: 0
+    guid: 0xA0C81E60
+    disabled: 0
+    bhav_portal: 0
+    price: 0
+    body_string_id: 0
+    slot_id: 0
+    bhav_allow_intersection_id: 0
+    uses_fn_table: 0
+    bit_field1: 0
+    bhav_prepare_food_id: 0
+    bhav_cook_food_id: 0
+    bhav_place_surface_id: 0
+    bhav_dispose_id: 0
+    bhav_eat_id: 0
+    bhav_pickup_from_slot_id: 0
+    bhav_wash_dish_id: 0
+    bhav_eat_surface_id: 0
+    bhav_sit_id: 0
+    bhav_stand_id: 0
+    sale_price: 0
+    initial_depreciation: 0
+    daily_depreciation: 0
+    self_depreciating: 0
+    depreciation_limit: 0
+    room_flags: 0
+    function_flags: 0
+    catalog_strings_id: 0
+    global: 0
+    bhav_init: 5000
+    bhav_place: 0
+    bhav_user_pickup: 0
+    wall_style: 0
+    bhav_load: 0
+    bhav_user_place: 0
+    object_version: 0
+    bhav_room_change: 0
+    motive_effects_id: 0
+    bhav_cleanup: 0
+    bhav_level_info: 0
+    catalog_id: 0
+    bhav_serving_surface: 0
+    level_offset: 0
+    shadow: 0
+    num_attributes: 0
+    bhav_clean: 0
+    bhav_queue_skipped: 0
+    front_direction: 0
+    bhav_wall_adjacency_changed: 0
+    my_lead_object: 0
+    dynamic_sprite_base_id: 0
+    num_dynamic_sprites: 0
+    chair_entry_flags: 0
+    tile_width: 0
+    lot_categories: 0
+    build_mode_type: 0
+    original_guid1: 0
+    original_guid2: 0
+    suit_guid1: 0
+    suit_guid2: 0
+    bhav_pickup: 0
+    thumbnail_graphic: 0
+    shadow_flags: 0
+    footprint_mask: 0
+    bhav_dynamic_multi_tile_update: 0
+    shadow_brightness: 0
+    tail:
+      bhav_repair: 0
+      wall_style_sprite_id: 0
+      rating_hunger: 0
+      rating_comfort: 0
+      rating_hygiene: 0
+      rating_bladder: 0
+      rating_energy: 0
+      rating_fun: 0
+      rating_room: 0
+      rating_skill_flags: 0
+    type_attr:
+      num_type_attributes: 0
+      misc_flags: 0
+      type_attr_guid: 0xA0C81E60
+    function_subsort: 0
+    dt_subsort: 0
+    keep_buying: 0
+    v142:
+      vacation_subsort: 0
+      reset_lot_action: 0
+      community_subsort: 0
+      dream_flags: 0
+      render_flags: 0
+      vitaboy_flags: 0
+      st_subsort: 0
+      mt_subsort: 0
+    trailing: [0, 0]
+
+# Walkby Visitor — Person, modeled on npc_fso_pizzaman. Uses npc_service_semiglobal
+# (same as pizzaman) so PersonGlobals/NPC-service code resolves correctly.
+# animation_table_id=128 + tree_table_id=128 fall back to semi-global ANIM/TTAB 128.
+- type: OBJD
+  id: 16808
+  flags: 0
+  label: Walkby Visitor
+  body:
+    version: 142
+    stack_size: 0
+    base_graphic_id: 0
+    num_graphics: 0
+    bhav_main_id: 8193
+    bhav_gardening_id: 0
+    tree_table_id: 128
+    interaction_group_id: 0
+    object_type: 2
+    master_id: 0
+    sub_index: 0
+    bhav_wash_hands_id: 0
+    animation_table_id: 128
+    guid: 0xA0C81E61
+    disabled: 0
+    bhav_portal: 0
+    price: 0
+    body_string_id: 200
+    slot_id: 0
+    bhav_allow_intersection_id: 0
+    uses_fn_table: 0
+    bit_field1: 0
+    bhav_prepare_food_id: 0
+    bhav_cook_food_id: 0
+    bhav_place_surface_id: 0
+    bhav_dispose_id: 0
+    bhav_eat_id: 0
+    bhav_pickup_from_slot_id: 0
+    bhav_wash_dish_id: 0
+    bhav_eat_surface_id: 0
+    bhav_sit_id: 0
+    bhav_stand_id: 0
+    sale_price: 0
+    initial_depreciation: 0
+    daily_depreciation: 0
+    self_depreciating: 0
+    depreciation_limit: 0
+    room_flags: 0
+    function_flags: 0
+    catalog_strings_id: 0
+    global: 0
+    bhav_init: 4097
+    bhav_place: 0
+    bhav_user_pickup: 0
+    wall_style: 0
+    bhav_load: 0
+    bhav_user_place: 0
+    object_version: 0
+    bhav_room_change: 0
+    motive_effects_id: 0
+    bhav_cleanup: 0
+    bhav_level_info: 0
+    catalog_id: 0
+    bhav_serving_surface: 0
+    level_offset: 0
+    shadow: 0
+    num_attributes: 0
+    bhav_clean: 0
+    bhav_queue_skipped: 0
+    front_direction: 0
+    bhav_wall_adjacency_changed: 0
+    my_lead_object: 0
+    dynamic_sprite_base_id: 0
+    num_dynamic_sprites: 0
+    chair_entry_flags: 0
+    tile_width: 0
+    lot_categories: 0
+    build_mode_type: 0
+    original_guid1: 0
+    original_guid2: 0
+    suit_guid1: 0
+    suit_guid2: 0
+    bhav_pickup: 0
+    thumbnail_graphic: 0
+    shadow_flags: 0
+    footprint_mask: 0
+    bhav_dynamic_multi_tile_update: 0
+    shadow_brightness: 0
+    tail:
+      bhav_repair: 0
+      wall_style_sprite_id: 0
+      rating_hunger: 0
+      rating_comfort: 0
+      rating_hygiene: 0
+      rating_bladder: 0
+      rating_energy: 0
+      rating_fun: 0
+      rating_room: 0
+      rating_skill_flags: 0
+    type_attr:
+      num_type_attributes: 0
+      misc_flags: 0
+      type_attr_guid: 0xA0C81E61
+    function_subsort: 0
+    dt_subsort: 0
+    keep_buying: 0
+    v142:
+      vacation_subsort: 0
+      reset_lot_action: 0
+      community_subsort: 0
+      dream_flags: 0
+      render_flags: 0
+      vitaboy_flags: 0
+      st_subsort: 0
+      mt_subsort: 0
+    trailing: [0, 0]
+
+# npc_service_semiglobal — same as npc_fso_pizzaman uses. Provides NPC-specific
+# wrappers around PersonGlobals. Loaded from the game's original content.
+- type: GLOB
+  id: 1
+  flags: 0
+  label: Semi-Globals
+  body:
+    name: npc_service_semiglobal
+
+# Body strings — sim type, default outfits, name pool, gender, age, skin.
+- type: STR#
+  id: 200
+  flags: 0
+  label: Body Strings
+  body:
+    format_code: -4
+    language_sets:
+    - strings:
+      - {language: 0, value: adult,                comment: ''}
+      - {language: 0, value: '0x000003200000000D', comment: 'default body (caretaker outfit)'}
+      - {language: 0, value: '0x000003A50000000D', comment: 'default head (caretaker outfit)'}
+      - {language: 0, value: HEAD,                 comment: ''}
+      - {language: 0, value: Top,                  comment: ''}
+      - {language: 0, value: R_HAND,               comment: ''}
+      - {language: 0, value: Palm,                 comment: ''}
+      - {language: 0, value: '',                   comment: ''}
+      - {language: 0, value: '',                   comment: ''}
+      - {language: 0, value: '',                   comment: ''}
+      - {language: 0, value: '',                   comment: ''}
+      - {language: 0, value: Visitor,              comment: ''}
+      - {language: 0, value: male,                 comment: ''}
+      - {language: 0, value: '25',                 comment: ''}
+      - {language: 0, value: lgt,                  comment: ''}
+    - strings: []
+    - strings: []
+    - strings: []
+    - strings: []
+    - strings: []
+    - strings: []
+    - strings: []
+    - strings: []
+    - strings: []
+    - strings: []
+    - strings: []
+    - strings: []
+    - strings: []
+    - strings: []
+    - strings: []
+    - strings: []
+    - strings: []
+    - strings: []
+    - strings: []
+
+# One interaction (action=8194 "walkby"), no test function — always available, so the
+# controller can push it onto the visitor regardless of state. Overrides the semi-global
+# TTAB 128; the visitor is pure cosmetic so loosing semi-global NPC interactions is fine.
+- type: TTAB
+  id: 128
+  flags: 0
+  label: Walkby Visitor TTAB
+  body:
+    version: 10
+    compression: 0
+    interactions:
+    # Index 0: internal delayed walkby — pushed by the controller, hides from pie via test 4099.
+    # Sleeps ~60s then walks off. User-clicking "Say Goodbye" (index 4) preempts via higher priority.
+    - action_function: 4105
+      test_function: 4099
+      flags: 0
+      tta_index: 0
+      attenuation_code: 0
+      attenuation_value: 0.0
+      autonomy_threshold: 0
+      joining_index: 0
+      motive_entries:
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      flags2: 30
+    # Index 1: Wave — user-facing pie menu entry.
+    - action_function: 4101
+      test_function: 0
+      flags: 0
+      tta_index: 1
+      attenuation_code: 0
+      attenuation_value: 0.0
+      autonomy_threshold: 0
+      joining_index: 0
+      motive_entries:
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      flags2: 30
+    # Index 2: Greet.
+    - action_function: 4102
+      test_function: 0
+      flags: 0
+      tta_index: 2
+      attenuation_code: 0
+      attenuation_value: 0.0
+      autonomy_threshold: 0
+      joining_index: 0
+      motive_entries:
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      flags2: 30
+    # Index 3: Compliment.
+    - action_function: 4103
+      test_function: 0
+      flags: 0
+      tta_index: 3
+      attenuation_code: 0
+      attenuation_value: 0.0
+      autonomy_threshold: 0
+      joining_index: 0
+      motive_entries:
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      flags2: 30
+    # Index 4: Say Goodbye — user-clickable; triggers immediate walkby (no sleep wrapper).
+    - action_function: 4104
+      test_function: 0
+      flags: 0
+      tta_index: 4
+      attenuation_code: 0
+      attenuation_value: 0.0
+      autonomy_threshold: 0
+      joining_index: 0
+      motive_entries:
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      flags2: 30
+
+- type: TTAs
+  id: 128
+  flags: 0
+  label: Walkby Visitor TTAs
+  body:
+    format_code: -4
+    language_sets:
+    - strings:
+      - {language: 0, value: Delayed Walkby, comment: ''}
+      - {language: 0, value: Wave, comment: ''}
+      - {language: 0, value: Greet, comment: ''}
+      - {language: 0, value: Compliment, comment: ''}
+      - {language: 0, value: Say Goodbye, comment: ''}
+    - strings: []
+    - strings: []
+    - strings: []
+    - strings: []
+    - strings: []
+    - strings: []
+    - strings: []
+    - strings: []
+    - strings: []
+    - strings: []
+    - strings: []
+    - strings: []
+    - strings: []
+    - strings: []
+    - strings: []
+    - strings: []
+    - strings: []
+    - strings: []
+    - strings: []
+
+# BHAV bodies are patched in by build_walkby_visitor.sh.
+- type: BHAV
+  id: 4097
+  flags: 0
+  label: visitor init
+  body:
+    format: '0x8003'
+    type: 0
+    args: 0
+    locals: 0
+    version: 0
+    pad: [0, 0]
+    instructions:
+    - opcode: 0
+      true_ptr: 254
+      false_ptr: 254
+      operand: [0, 0, 0, 0, 0, 0, 0, 0]
+- type: BHAV
+  id: 5000
+  flags: 0
+  label: controller init
+  body:
+    format: '0x8003'
+    type: 0
+    args: 0
+    locals: 0
+    version: 0
+    pad: [0, 0]
+    instructions:
+    - opcode: 0
+      true_ptr: 254
+      false_ptr: 254
+      operand: [0, 0, 0, 0, 0, 0, 0, 0]
+- type: BHAV
+  id: 5001
+  flags: 0
+  label: controller main
+  body:
+    format: '0x8003'
+    type: 0
+    args: 0
+    locals: 0
+    version: 0
+    pad: [0, 0]
+    instructions:
+    - opcode: 0
+      true_ptr: 254
+      false_ptr: 254
+      operand: [0, 0, 0, 0, 0, 0, 0, 0]
+- type: BHAV
+  id: 4098
+  flags: 0
+  label: visitor walkby
+  body:
+    format: '0x8003'
+    type: 0
+    args: 0
+    locals: 0
+    version: 0
+    pad: [0, 0]
+    instructions:
+    - opcode: 0
+      true_ptr: 254
+      false_ptr: 254
+      operand: [0, 0, 0, 0, 0, 0, 0, 0]
+- type: BHAV
+  id: 4099
+  flags: 0
+  label: walkby pie hide
+  body:
+    format: '0x8003'
+    type: 0
+    args: 0
+    locals: 0
+    version: 0
+    pad: [0, 0]
+    instructions:
+    - opcode: 0
+      true_ptr: 255
+      false_ptr: 255
+      operand: [0, 0, 0, 0, 0, 0, 0, 0]
+- type: BHAV
+  id: 4100
+  flags: 0
+  label: Helper - Approach Visitor
+  body:
+    format: '0x8003'
+    type: 0
+    args: 0
+    locals: 0
+    version: 0
+    pad: [0, 0]
+    instructions:
+    - opcode: 0
+      true_ptr: 254
+      false_ptr: 254
+      operand: [0, 0, 0, 0, 0, 0, 0, 0]
+- type: BHAV
+  id: 4101
+  flags: 0
+  label: Interaction - Wave
+  body:
+    format: '0x8003'
+    type: 0
+    args: 0
+    locals: 0
+    version: 0
+    pad: [0, 0]
+    instructions:
+    - opcode: 0
+      true_ptr: 254
+      false_ptr: 254
+      operand: [0, 0, 0, 0, 0, 0, 0, 0]
+- type: BHAV
+  id: 4102
+  flags: 0
+  label: Interaction - Greet
+  body:
+    format: '0x8003'
+    type: 0
+    args: 0
+    locals: 0
+    version: 0
+    pad: [0, 0]
+    instructions:
+    - opcode: 0
+      true_ptr: 254
+      false_ptr: 254
+      operand: [0, 0, 0, 0, 0, 0, 0, 0]
+- type: BHAV
+  id: 4103
+  flags: 0
+  label: Interaction - Compliment
+  body:
+    format: '0x8003'
+    type: 0
+    args: 0
+    locals: 0
+    version: 0
+    pad: [0, 0]
+    instructions:
+    - opcode: 0
+      true_ptr: 254
+      false_ptr: 254
+      operand: [0, 0, 0, 0, 0, 0, 0, 0]
+- type: BHAV
+  id: 4104
+  flags: 0
+  label: Interaction - Say Goodbye
+  body:
+    format: '0x8003'
+    type: 0
+    args: 0
+    locals: 0
+    version: 0
+    pad: [0, 0]
+    instructions:
+    - opcode: 0
+      true_ptr: 254
+      false_ptr: 254
+      operand: [0, 0, 0, 0, 0, 0, 0, 0]
+- type: BHAV
+  id: 4105
+  flags: 0
+  label: Delayed Walkby
+  body:
+    format: '0x8003'
+    type: 0
+    args: 0
+    locals: 0
+    version: 0
+    pad: [0, 0]
+    instructions:
+    - opcode: 0
+      true_ptr: 254
+      false_ptr: 254
+      operand: [0, 0, 0, 0, 0, 0, 0, 0]

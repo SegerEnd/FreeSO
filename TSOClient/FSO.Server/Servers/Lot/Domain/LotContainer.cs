@@ -140,7 +140,10 @@ namespace FSO.Server.Servers.Lot.Domain
             0x699704D3, //fso vehicle controller
 
             0x865A6812, //car portal 1
-            0xD564C66B //car portal 2
+            0xD564C66B, //car portal 2
+
+            0xA0C81E60, //walkby visitor controller
+            0xA0C81E61  //walkby visitor (avatar)
         };
 
         private static HashSet<uint> RequiredGUIDs = new HashSet<uint>()
@@ -152,6 +155,8 @@ namespace FSO.Server.Servers.Lot.Domain
             0x2D583771, //winter weather controller
 
             0x48F32C7B, //au game controller
+
+            0xA0C81E60, //walkby visitor controller
         };
 
         private static HashSet<uint> InvalidGUIDs = new HashSet<uint>()

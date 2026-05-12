@@ -342,5 +342,10 @@ namespace FSO.SimAntics.Engine.TSOTransaction
         {
 
         }
+
+        public void RequestCityAvatar(VM vm, uint persistID, VMAsyncSimIdentityCallback callback)
+        {
+            callback(new VMSimIdentityState { Responded = true, Success = false });
+        }
     }
 }

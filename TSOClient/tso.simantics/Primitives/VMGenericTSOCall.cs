@@ -1,10 +1,12 @@
 ﻿using FSO.Files.Formats.IFF.Chunks;
 using FSO.Files.Utils;
 using FSO.SimAntics.Engine;
+using FSO.SimAntics.Entities;
 using FSO.SimAntics.Model;
 using FSO.SimAntics.Model.TSOPlatform;
 using FSO.SimAntics.NetPlay.Drivers;
 using FSO.SimAntics.NetPlay.Model.Commands;
+using FSO.Vitaboy;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
@@ -493,6 +495,44 @@ namespace FSO.SimAntics.Primitives
                         }
 
                         return VMPrimitiveExitCode.GOTO_FALSE;
+                    }
+                case VMGenericTSOCallMode.FSORequestCityAvatarTemp0:
+                    {
+                        if (context.Thread.BlockingState is VMSimIdentityState pending)
+                        {
+                            if (!pending.Responded) return VMPrimitiveExitCode.CONTINUE_NEXT_TICK;
+                            //leave cache in BlockingState for the Apply step
+                            return pending.Success ? VMPrimitiveExitCode.GOTO_TRUE : VMPrimitiveExitCode.GOTO_FALSE;
+                        }
+                        if (context.Thread.IsCheck) return VMPrimitiveExitCode.GOTO_FALSE;
+                        context.Thread.BlockingState = new VMSimIdentityState();
+                        if (context.VM.IsServer && context.VM.GlobalLink != null)
+                        {
+                            var threadObjID = context.Caller.ObjectID;
+                            var vm = context.VM;
+                            vm.GlobalLink.RequestCityAvatar(vm, (uint)context.Thread.TempXL[0], state =>
+                            {
+                                vm.SendCommand(new VMNetAsyncResponseCmd(threadObjID, state));
+                            });
+                        }
+                        return VMPrimitiveExitCode.CONTINUE_NEXT_TICK;
+                    }
+                case VMGenericTSOCallMode.FSOApplyCachedCityAvatarToStackObject:
+                    {
+                        if (!(context.StackObject is VMAvatar identityTarget)) return VMPrimitiveExitCode.GOTO_FALSE;
+                        if (!(context.Thread.BlockingState is VMSimIdentityState ident) || !ident.Responded)
+                            return VMPrimitiveExitCode.GOTO_FALSE;
+                        context.Thread.BlockingState = null;
+                        if (!ident.Success) return VMPrimitiveExitCode.GOTO_FALSE;
+
+                        identityTarget.Name = ident.Name;
+                        identityTarget.BodyOutfit = new VMOutfitReference(ident.BodyOutfit);
+                        identityTarget.HeadOutfit = new VMOutfitReference(ident.HeadOutfit);
+                        identityTarget.SkinTone = (AppearanceType)ident.SkinTone;
+                        identityTarget.SetPersonData(VMPersonDataVariable.Gender, ident.Gender);
+                        identityTarget.PersistID = ident.PersistID;
+                        context.Thread.TempXL[0] = (int)ident.PersistID;
+                        return VMPrimitiveExitCode.GOTO_TRUE;
                     }
                 default:
                     return VMPrimitiveExitCode.GOTO_TRUE;

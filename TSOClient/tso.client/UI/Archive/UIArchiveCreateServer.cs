@@ -56,6 +56,7 @@ namespace FSO.Client.UI.Archive
             new ServerFlag(ArchiveConfigFlags.AllowSimCreation, "Allow character creation", true),
             new ServerFlag(ArchiveConfigFlags.LockArchivedSims, "Lock archived characters", false, 1, ArchivedCharacterHelp),
             new ServerFlag(ArchiveConfigFlags.CityEditor, "City editor", false, 0, CityEditorHelp),
+            new ServerFlag(ArchiveConfigFlags.EnableVisitors, "Neighbour visitors", false, 0, EnableVisitorsHelp),
         };
 
         private UIButton ExportButton;
@@ -527,6 +528,11 @@ namespace FSO.Client.UI.Archive
         public static void CityEditorHelp()
         {
             UIAlert.Alert("City editor", GameFacade.Strings.GetString("f128", "121"), true);
+        }
+
+        public static void EnableVisitorsHelp()
+        {
+            UIAlert.Alert("Neighbour visitors", "When enabled, the server periodically walks an idle archive sim from another lot onto whichever lot is being played. They arrive as a normal visitor, wander around, and leave after a while.", true);
         }
     }
 }

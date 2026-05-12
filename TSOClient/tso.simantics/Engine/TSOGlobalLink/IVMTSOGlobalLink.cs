@@ -56,7 +56,13 @@ namespace FSO.SimAntics.Engine.TSOTransaction
 
         void Tick(VM vm);
         void FindLotAndValue(VM vm, uint persistID, List<uint> untradableGUIDs, VMAsyncFindLotCallback p);
+
+        //Returns a city avatar's identity (name, outfits, skin, gender) so a BHAV
+        //can populate any avatar with a real city sim. persistID 0 = random pick.
+        void RequestCityAvatar(VM vm, uint persistID, VMAsyncSimIdentityCallback callback);
     }
+
+    public delegate void VMAsyncSimIdentityCallback(VMSimIdentityState state);
 
     public delegate void VMAsyncTransactionCallback(bool success, int transferAmount, uint uid1, uint budget1, uint uid2, uint budget2);
     public delegate void VMAsyncAvatarCallback(uint persistID, VMTSOAvatarPermissions permissions); //TODO: VMPersistAvatarBlock

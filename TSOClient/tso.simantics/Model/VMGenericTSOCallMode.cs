@@ -85,6 +85,12 @@
         FSOSetStackObjectTransient = 139,
         FSOIsStackObjectPendingRoommateDeletion = 140,
         FSOIsStackObjectAllowedByLotCategory = 141,
-        FSOShowCheckTreeTooltipTemp0Temp1 = 142
+        FSOShowCheckTreeTooltipTemp0Temp1 = 142,
+        //TempXL[0] = persistID input (0 = random). Server fetches the city sim and caches the
+        //identity on the calling thread. Pair with FSOApplyCachedCityAvatarToStackObject so the
+        //avatar is created and identity-applied in the same tick (no default-look flash).
+        FSORequestCityAvatarTemp0 = 143,
+        //StackObject is the avatar to populate. Consumes the cache from FSORequestCityAvatarTemp0.
+        FSOApplyCachedCityAvatarToStackObject = 144
     }
 }

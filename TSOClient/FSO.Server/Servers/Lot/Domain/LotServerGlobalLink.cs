@@ -1316,5 +1316,38 @@ namespace FSO.Server.Servers.Lot.Domain
                 }
             });
         }
+
+        private static readonly Random _identityRng = new Random();
+
+        public void RequestCityAvatar(VM vm, uint persistID, VMAsyncSimIdentityCallback callback)
+        {
+            //avoid picking sims already present on the lot when persistID==0
+            var present = new HashSet<uint>(vm.Context.ObjectQueries.Avatars.Select(a => a.PersistID));
+            Host.InBackground(() =>
+            {
+                using (var db = DAFactory.Get())
+                {
+                    Database.DA.Avatars.DbAvatar pick = null;
+                    if (persistID != 0) pick = db.Avatars.Get(persistID);
+                    else
+                    {
+                        var eligible = db.Avatars.All().Where(a => !present.Contains(a.avatar_id)).ToList();
+                        if (eligible.Count > 0) pick = eligible[_identityRng.Next(eligible.Count)];
+                    }
+                    if (pick == null) { callback(new VMSimIdentityState { Responded = true, Success = false }); return; }
+                    callback(new VMSimIdentityState
+                    {
+                        Responded = true,
+                        Success = true,
+                        PersistID = pick.avatar_id,
+                        Name = string.IsNullOrEmpty(pick.name) ? "Visitor" : pick.name,
+                        BodyOutfit = pick.body_current == 0 ? pick.body : pick.body_current,
+                        HeadOutfit = pick.head,
+                        SkinTone = pick.skin_tone,
+                        Gender = (short)pick.gender,
+                    });
+                }
+            });
+        }
     }
 }

@@ -15,8 +15,8 @@ namespace FSO.SimAntics.Model.TSOPlatform
             { VMAsyncStateType.TransferFunds, typeof(VMTransferFundsState) },
             { VMAsyncStateType.DialogResult, typeof(VMDialogResult) },
             { VMAsyncStateType.PluginState, typeof(VMEODPluginThreadState) },
-            { VMAsyncStateType.InventoryOp, typeof(VMInventoryOpState) }
-
+            { VMAsyncStateType.InventoryOp, typeof(VMInventoryOpState) },
+            { VMAsyncStateType.SimIdentity, typeof(VMSimIdentityState) }
         };
         public static Dictionary<Type, VMAsyncStateType> TypeMarshal = TypeResolve.ToDictionary(x => x.Value, x => x.Key);
 
@@ -58,6 +58,7 @@ namespace FSO.SimAntics.Model.TSOPlatform
         TransferFunds = 0,
         DialogResult = 1,
         PluginState = 2,
-        InventoryOp = 3
+        InventoryOp = 3,
+        SimIdentity = 4
     }
 }
