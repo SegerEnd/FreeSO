@@ -116,9 +116,10 @@ chunks:
       mt_subsort: 0
     trailing: [0, 0]
 
-# Walkby Visitor — Person, modeled on npc_fso_pizzaman. Uses npc_service_semiglobal
-# (same as pizzaman) so PersonGlobals/NPC-service code resolves correctly.
-# animation_table_id=128 + tree_table_id=128 fall back to semi-global ANIM/TTAB 128.
+# Walkby Visitor — Person, modeled on npc_fso_witch. Uses PersonGlobals directly.
+# bhav_main_id points at our own local main (4106): a minimal sleep-loop so the
+# avatar yields each tick and queued interactions can preempt. Semi-global 8193
+# ("person main") expects DB-backed avatar state our visitor doesn't have.
 - type: OBJD
   id: 16808
   flags: 0
@@ -128,7 +129,7 @@ chunks:
     stack_size: 0
     base_graphic_id: 0
     num_graphics: 0
-    bhav_main_id: 8193
+    bhav_main_id: 4106
     bhav_gardening_id: 0
     tree_table_id: 128
     interaction_group_id: 0
@@ -231,14 +232,15 @@ chunks:
       mt_subsort: 0
     trailing: [0, 0]
 
-# npc_service_semiglobal — same as npc_fso_pizzaman uses. Provides NPC-specific
-# wrappers around PersonGlobals. Loaded from the game's original content.
+# PersonGlobals — same binding npc_fso_witch uses. Gives us direct access to the
+# core person trees (init NPC 0x206A, person main 8193, find random portal 0x0175,
+# wait-for-notify 0x0119, etc.) without the npc_service_semiglobal wrapper.
 - type: GLOB
   id: 1
   flags: 0
   label: Semi-Globals
   body:
-    name: npc_service_semiglobal
+    name: PersonGlobals
 
 # Body strings — sim type, default outfits, name pool, gender, age, skin.
 - type: STR#
@@ -431,6 +433,63 @@ chunks:
       - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
       - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
       flags2: 30
+    # Index 5: Immediate Walkby — internal target for Say Goodbye's push_interaction.
+    # Hidden from pie via always-false test 4099.
+    - action_function: 4098
+      test_function: 4099
+      flags: 0
+      tta_index: 5
+      attenuation_code: 0
+      attenuation_value: 0.0
+      autonomy_threshold: 0
+      joining_index: 0
+      motive_entries:
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      flags2: 30
+    # Index 6: Internal Idle — main loop pushes this at Idle priority on self.
+    # Wraps PersonGlobals "do idle core" so animations play inside an ActionTree.
+    # Hidden from pie via always-false test 4099.
+    - action_function: 4107
+      test_function: 4099
+      flags: 0
+      tta_index: 6
+      attenuation_code: 0
+      attenuation_value: 0.0
+      autonomy_threshold: 0
+      joining_index: 0
+      motive_entries:
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      flags2: 30
 
 - type: TTAs
   id: 128
@@ -445,6 +504,8 @@ chunks:
       - {language: 0, value: Greet, comment: ''}
       - {language: 0, value: Compliment, comment: ''}
       - {language: 0, value: Say Goodbye, comment: ''}
+      - {language: 0, value: Immediate Walkby, comment: ''}
+      - {language: 0, value: Internal Idle, comment: ''}
     - strings: []
     - strings: []
     - strings: []
@@ -630,6 +691,38 @@ chunks:
   id: 4105
   flags: 0
   label: Delayed Walkby
+  body:
+    format: '0x8003'
+    type: 0
+    args: 0
+    locals: 0
+    version: 0
+    pad: [0, 0]
+    instructions:
+    - opcode: 0
+      true_ptr: 254
+      false_ptr: 254
+      operand: [0, 0, 0, 0, 0, 0, 0, 0]
+- type: BHAV
+  id: 4106
+  flags: 0
+  label: visitor main
+  body:
+    format: '0x8003'
+    type: 0
+    args: 0
+    locals: 0
+    version: 0
+    pad: [0, 0]
+    instructions:
+    - opcode: 0
+      true_ptr: 254
+      false_ptr: 254
+      operand: [0, 0, 0, 0, 0, 0, 0, 0]
+- type: BHAV
+  id: 4107
+  flags: 0
+  label: Internal Idle
   body:
     format: '0x8003'
     type: 0
