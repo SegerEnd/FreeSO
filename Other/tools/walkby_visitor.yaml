@@ -490,6 +490,34 @@ chunks:
       - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
       - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
       flags2: 30
+    # Index 7: Receive Social — pushed onto visitor by social BHAVs at UserDriven.
+    # Visitor head-tracks + plays a brief reaction animation. Hidden via test 4099.
+    - action_function: 4108
+      test_function: 4099
+      flags: 0
+      tta_index: 7
+      attenuation_code: 0
+      attenuation_value: 0.0
+      autonomy_threshold: 0
+      joining_index: 0
+      motive_entries:
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      - {effect_range_minimum: 0, effect_range_delta: 0, personality_modifier: 0}
+      flags2: 30
 
 - type: TTAs
   id: 128
@@ -506,6 +534,7 @@ chunks:
       - {language: 0, value: Say Goodbye, comment: ''}
       - {language: 0, value: Immediate Walkby, comment: ''}
       - {language: 0, value: Internal Idle, comment: ''}
+      - {language: 0, value: Receive Social, comment: ''}
     - strings: []
     - strings: []
     - strings: []
@@ -608,22 +637,6 @@ chunks:
       false_ptr: 255
       operand: [0, 0, 0, 0, 0, 0, 0, 0]
 - type: BHAV
-  id: 4100
-  flags: 0
-  label: Helper - Approach Visitor
-  body:
-    format: '0x8003'
-    type: 0
-    args: 0
-    locals: 0
-    version: 0
-    pad: [0, 0]
-    instructions:
-    - opcode: 0
-      true_ptr: 254
-      false_ptr: 254
-      operand: [0, 0, 0, 0, 0, 0, 0, 0]
-- type: BHAV
   id: 4101
   flags: 0
   label: Interaction - Wave
@@ -723,6 +736,22 @@ chunks:
   id: 4107
   flags: 0
   label: Internal Idle
+  body:
+    format: '0x8003'
+    type: 0
+    args: 0
+    locals: 0
+    version: 0
+    pad: [0, 0]
+    instructions:
+    - opcode: 0
+      true_ptr: 254
+      false_ptr: 254
+      operand: [0, 0, 0, 0, 0, 0, 0, 0]
+- type: BHAV
+  id: 4108
+  flags: 0
+  label: Receive Social
   body:
     format: '0x8003'
     type: 0

@@ -530,7 +530,6 @@ namespace FSO.SimAntics.Primitives
                         identityTarget.HeadOutfit = new VMOutfitReference(ident.HeadOutfit);
                         identityTarget.SkinTone = (AppearanceType)ident.SkinTone;
                         identityTarget.SetPersonData(VMPersonDataVariable.Gender, ident.Gender);
-                        identityTarget.PersistID = ident.PersistID;
                         context.Thread.TempXL[0] = (int)ident.PersistID;
                         return VMPrimitiveExitCode.GOTO_TRUE;
                     }

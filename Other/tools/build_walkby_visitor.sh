@@ -9,7 +9,7 @@ asm="$here/walkby_visitor.s"
 
 sims-iff from-yaml "$yaml" -o "$out"
 
-ids=(4097 4098 4099 4100 4101 4102 4103 4104 4105 4106 4107 5000 5001)
+ids=(4097 4098 4099 4101 4102 4103 4104 4105 4106 4107 4108 5000 5001)
 
 tmpdir="$(mktemp -d)"
 trap 'rm -rf "$tmpdir"' EXIT
