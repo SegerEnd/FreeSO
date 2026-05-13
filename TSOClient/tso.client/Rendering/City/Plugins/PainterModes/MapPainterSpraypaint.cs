@@ -26,14 +26,14 @@ namespace FSO.Client.Rendering.City.Plugins.PainterModes
 
         public float GetSpraypaint(int index, float strength)
         {
-            var dat = Noise[index];
+            var dat = Noise[((index % Noise.Length) + Noise.Length) % Noise.Length];
 
             return Math.Min(strength, (MinimumSpray + dat) * Divisor * strength);
         }
 
         public float GetRoughEdge(int index, float strength, float brushSize)
         {
-            var dat = Noise[index];
+            var dat = Noise[((index % Noise.Length) + Noise.Length) % Noise.Length];
 
             var middleDist = 0.5f - Math.Abs(0.5f - strength);
 

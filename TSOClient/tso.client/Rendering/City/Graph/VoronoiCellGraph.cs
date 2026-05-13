@@ -10,6 +10,8 @@ namespace FSO.Client.Rendering.City.Graph
 {
     public class VoronoiCellGraph
     {
+        private int _MapSize;
+
         //  Graph modelled as list of edges
         int[,] graph =
             {
@@ -22,9 +24,14 @@ namespace FSO.Client.Rendering.City.Graph
 
         public List<CompleteVCell> Result;
 
-        public VoronoiCellGraph(List<Vector2> verts)
+        public VoronoiCellGraph(List<Vector2> verts) : this(verts, FSO.Common.Domain.Realestate.MapCoordinates.MapWidth)
         {
-            var mesh = VoronoiLib.FortunesAlgorithm.Run(verts.Select(x => new VoronoiLib.Structures.FortuneSite(x.X, x.Y)).ToList(), -512, -512, 1024, 1024);
+        }
+
+        public VoronoiCellGraph(List<Vector2> verts, int mapSize)
+        {
+            var mesh = VoronoiLib.FortunesAlgorithm.Run(verts.Select(x => new VoronoiLib.Structures.FortuneSite(x.X, x.Y)).ToList(), -mapSize, -mapSize, mapSize * 2, mapSize * 2);
+            _MapSize = mapSize;
 
             var ptDict = new Dictionary<Vector2, int>();
             var pts = new List<Vector2>();
@@ -289,13 +296,7 @@ namespace FSO.Client.Rendering.City.Graph
 
         public Vector2 LimitPosition(Vector2 value)
         {
-            var trans = new Vector2((value.X + value.Y) / 2, (value.Y - value.X) / 2);
-
-            trans.X = Math.Max(153.5f, Math.Min(358.5f, trans.X));
-            trans.Y = Math.Max(-152, Math.Min(152, trans.Y));
-
-            value = new Vector2(trans.X - trans.Y, trans.X + trans.Y);
-            return value;
+            return FSO.Common.Domain.Realestate.MapCoordinates.ClampToDiamond(value, _MapSize);
         }
     }
 

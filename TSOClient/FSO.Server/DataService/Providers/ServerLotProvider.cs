@@ -69,7 +69,8 @@ namespace FSO.Server.DataService.Providers
                 City_TopTenNeighborhoodsVector = ImmutableList.Create<uint>()
             };
 
-            AllLotsBitmap = new CityEditBitmap(512, 512);
+            var map = Realestate.GetMap();
+            AllLotsBitmap = new CityEditBitmap(map.Width, map.Height);
         }
 
         protected override void PreLoad(Callback<uint, Lot> appender)

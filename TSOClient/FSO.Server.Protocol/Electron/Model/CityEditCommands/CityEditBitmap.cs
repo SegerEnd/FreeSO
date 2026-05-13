@@ -8,8 +8,8 @@ namespace FSO.Server.Protocol.Electron.Model.CityEditCommands
 {
     public class CityEditBitmap
     {
-        public const int MaxWidth = 512;
-        public const int MaxHeight = 512;
+        public const int MaxWidth = 4096;
+        public const int MaxHeight = 4096;
         private const int BitsPerItem = 64;
         private const ulong AllBits = 0xFFFF_FFFF_FFFF_FFFF;
 
@@ -241,7 +241,7 @@ namespace FSO.Server.Protocol.Electron.Model.CityEditCommands
 
         public CityEditBitmap Trim()
         {
-            int minX = 512, minY = 512, maxX = 0, maxY = 0;
+            int minX = Width, minY = Height, maxX = 0, maxY = 0;
 
             foreach (var line in GetSetLines())
             {

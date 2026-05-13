@@ -17,7 +17,9 @@ namespace FSO.Client.Rendering.City
 {
     public class CityCamera3D : BasicCamera, ICityCamera, I3DRotate, ITouchable
     {
-        public Vector2 CenterTile = new Vector2(184, 328);
+        public Vector2 CenterTile = new Vector2(
+            FSO.Common.Domain.Realestate.MapCoordinates.MapWidth * 184f / 512f,
+            FSO.Common.Domain.Realestate.MapCoordinates.MapHeight * 328f / 512f);
         private Point LastMouse;
         private bool MouseWasDown;
         private UILotControlTouchHelper Touch;
@@ -140,7 +142,10 @@ namespace FSO.Client.Rendering.City
             }
         }
 
-        public CityCamera3D() : base(GameFacade.GraphicsDevice, new Vector3(256, 0, 256), new Vector3(256, 0, 256), Vector3.Up)
+        public CityCamera3D() : base(GameFacade.GraphicsDevice,
+            new Vector3(FSO.Common.Domain.Realestate.MapCoordinates.MapWidth / 2f, 0, FSO.Common.Domain.Realestate.MapCoordinates.MapHeight / 2f),
+            new Vector3(FSO.Common.Domain.Realestate.MapCoordinates.MapWidth / 2f, 0, FSO.Common.Domain.Realestate.MapCoordinates.MapHeight / 2f),
+            Vector3.Up)
         {
             NearPlane = 0.25f;
             Touch = new UILotControlTouchHelper(this, false);
@@ -156,7 +161,9 @@ namespace FSO.Client.Rendering.City
 
         public Vector2 CalculateRShadow()
         {
-            return new Vector2(256, 256);
+            return new Vector2(
+                FSO.Common.Domain.Realestate.MapCoordinates.MapWidth / 2f,
+                FSO.Common.Domain.Realestate.MapCoordinates.MapHeight / 2f);
         }
 
         private float _lotSquish;
@@ -190,10 +197,12 @@ namespace FSO.Client.Rendering.City
                     var x = id >> 16;
                     var y = id & 0xFFFF;
 
-                    if (x >= 512 || y >= 512)
+                    var mapW = (uint)parent.MapData.Width;
+                    var mapH = (uint)parent.MapData.Height;
+                    if (x >= mapW || y >= mapH)
                     {
-                        x = 255;
-                        y = 255;
+                        x = mapW / 2 - 1;
+                        y = mapH / 2 - 1;
                     }
 
                     float elev = parent.GetElevationAt((int)x, (int)y);
@@ -505,12 +514,7 @@ namespace FSO.Client.Rendering.City
 
         public void LimitCenter()
         {
-            var trans = new Vector2((CenterTile.X + CenterTile.Y) / 2, (CenterTile.Y - CenterTile.X) / 2);
-
-            trans.X = Math.Max(153.5f, Math.Min(358.5f, trans.X));
-            trans.Y = Math.Max(-152, Math.Min(152, trans.Y));
-
-            CenterTile = new Vector2(trans.X - trans.Y, trans.X + trans.Y);
+            CenterTile = FSO.Common.Domain.Realestate.MapCoordinates.ClampToDiamond(CenterTile, FSO.Common.Domain.Realestate.MapCoordinates.MapWidth);
         }
 
         private float _RotationX = -(float)(Math.PI * 3 / 4);
@@ -577,6 +581,7 @@ namespace FSO.Client.Rendering.City
                         _RotationY = rotY;// - (float)Math.PI/2;
                         CenterTile += new Vector2(relative.X, relative.Z);
                         FPCamHeight = relative.Y;
+                        LimitCenter();
                     }
                     else
                     {
@@ -585,6 +590,7 @@ namespace FSO.Client.Rendering.City
                         CenterTile -= new Vector2(relative.X, relative.Z);
 
                         _CamHeight -= relative.Y - FPCamHeight;
+                        LimitCenter();
 
                     }
                 }

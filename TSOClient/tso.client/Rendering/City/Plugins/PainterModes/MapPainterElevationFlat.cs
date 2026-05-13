@@ -32,7 +32,7 @@ namespace FSO.Client.Rendering.City.Plugins.PainterModes
             var elevations = new List<byte>();
             IMapPainterMode.BrushFunc(Painter.BrushSize, (x, y, strength) =>
             {
-                var index = ePos.X + x + (ePos.Y + y) * 512;
+                var index = ePos.X + x + (ePos.Y + y) * City.MapData.Width;
                 if (index < 0 || index > City.MapData.ElevationData.Length) return;
                 elevations.Add(City.MapData.ElevationData[index]);
             });
@@ -52,7 +52,7 @@ namespace FSO.Client.Rendering.City.Plugins.PainterModes
                 if (strength > 0)
                 {
                     var multiplier = (Painter.Accelerate) ? 2 : 1;
-                    var index = ePos.X + x + (ePos.Y + y) * 512;
+                    var index = ePos.X + x + (ePos.Y + y) * City.MapData.Width;
                     if (index < 0 || index > City.MapData.ElevationData.Length) return;
                     var elev = City.MapData.ElevationData[index];
 
@@ -77,7 +77,7 @@ namespace FSO.Client.Rendering.City.Plugins.PainterModes
                 var elevations = new List<byte>();
                 IMapPainterMode.BrushFunc(size, (x, y, strength) =>
                 {
-                    var index = wallPos.X + x + (wallPos.Y + y) * 512;
+                    var index = wallPos.X + x + (wallPos.Y + y) * City.MapData.Width;
                     if (index < 0 || index > City.MapData.ElevationData.Length) return;
                     elevations.Add(City.MapData.ElevationData[index]);
                 });
@@ -91,7 +91,7 @@ namespace FSO.Client.Rendering.City.Plugins.PainterModes
                 {
                     if (strength > 0)
                     {
-                        var index = wallPos.X + x + (wallPos.Y + y) * 512;
+                        var index = wallPos.X + x + (wallPos.Y + y) * City.MapData.Width;
                         if (index < 0 || index > City.MapData.ElevationData.Length) return;
                         var elev = City.MapData.ElevationData[index];
 

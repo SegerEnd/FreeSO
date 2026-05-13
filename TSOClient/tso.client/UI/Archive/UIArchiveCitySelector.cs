@@ -100,7 +100,12 @@ namespace FSO.Client.UI.Archive
 
         private UITextBox NameInput;
         private UITextEdit DescriptionInput;
+        private UITextBox SizeInput;
         private bool AutoName = true;
+
+        private const int MinMapSize = 1;
+        private const int MaxMapSize = 2048;
+        private const int DefaultMapSize = 512;
 
         private readonly ArchiveManifest Template;
         private readonly Dictionary<int, Dictionary<string, string>> CityCST = [];
@@ -180,7 +185,7 @@ namespace FSO.Client.UI.Archive
 
             saveVbox.Add(DescriptionInput = new UITextEdit()
             {
-                Size = new Microsoft.Xna.Framework.Vector2(166, 158),
+                Size = new Microsoft.Xna.Framework.Vector2(166, 100),
                 CurrentText = "",
                 BackgroundTextureReference = UITextBox.StandardBackground,
                 ScrollbarImage = GetTexture(0x4AB00000001),
@@ -189,7 +194,38 @@ namespace FSO.Client.UI.Archive
                 MaxChars = 4096,
             });
 
+            UIButton StepBtn(ulong tex, int dir)
+            {
+                var b = new UIButton(GetTexture(tex));
+                b.OnButtonClick += (_) => StepSize(dir);
+                return b;
+            }
+
+            var spinner = new UIVBoxContainer() { Spacing = 0 };
+            spinner.Add(StepBtn(0x31200000001, +1));
+            spinner.Add(StepBtn(0x31100000001, -1));
+            spinner.AutoSize();
+
+            var sizeRow = new UIHBoxContainer() { Spacing = 4, VerticalAlignment = UIContainerVerticalAlignment.Middle };
+            sizeRow.Add(new UILabel() { Caption = "Map size:" });
+            sizeRow.Add(SizeInput = new UITextBox()
+            {
+                Size = new Microsoft.Xna.Framework.Vector2(60, 25),
+                CurrentText = DefaultMapSize.ToString(),
+                MaxChars = 4,
+                Tooltip = $"Map size ({MinMapSize}-{MaxMapSize})",
+            });
+            sizeRow.Add(spinner);
+            sizeRow.AutoSize();
+            saveVbox.Add(sizeRow);
+
             saveVbox.AutoSize();
+            var slack = (CityListBox.Position.Y + CityListBox.Size.Y) - (saveVbox.Position.Y + saveVbox.Size.Y) - 14;
+            if (slack > 0)
+            {
+                DescriptionInput.SetSize(DescriptionInput.Size.X, DescriptionInput.Size.Y + slack);
+                saveVbox.AutoSize();
+            }
 
             Add(saveVbox);
 
@@ -212,6 +248,16 @@ namespace FSO.Client.UI.Archive
             if (CityListBox.Items.Count > 0) {
                 CityListBox.SelectedIndex = 0;
             }
+        }
+
+        private void StepSize(int dir)
+        {
+            if (!int.TryParse(SizeInput.CurrentText, out int v)) v = DefaultMapSize;
+            v = Math.Clamp(v, MinMapSize, MaxMapSize);
+            int next = dir > 0
+                ? 1 << (32 - System.Numerics.BitOperations.LeadingZeroCount((uint)v))
+                : 1 << System.Numerics.BitOperations.Log2((uint)Math.Max(2, v) - 1);
+            SizeInput.CurrentText = Math.Clamp(next, MinMapSize, MaxMapSize).ToString();
         }
 
         private void NameChange(UIElement element)
@@ -326,9 +372,20 @@ namespace FSO.Client.UI.Archive
             string name = NameInput.CurrentText;
             string description = DescriptionInput.CurrentText;
 
+            if (!int.TryParse(SizeInput.CurrentText, out int mapSize) || mapSize < MinMapSize || mapSize > MaxMapSize)
+            {
+                UIAlert.Alert("Invalid map size", $"Map size must be a whole number between {MinMapSize} and {MaxMapSize}.", true);
+                return;
+            }
+
             var dstFolder = GetPath(name);
 
             CopyDirectory(srcFolder, dstFolder);
+
+            if (mapSize != DefaultMapSize)
+            {
+                ReplaceMapBitmaps(Path.Combine(dstFolder, "data"), mapSize);
+            }
 
             var newTemplate = new ArchiveManifest(Path.Combine(dstFolder, "archive.ini"))
             {
@@ -377,6 +434,39 @@ namespace FSO.Client.UI.Archive
             {
                 CopyDirectory(dir, Path.Combine(dst, Path.GetFileName(dir)));
             }
+        }
+
+        private static void ReplaceMapBitmaps(string dataDir, int size)
+        {
+            var shardDir = Path.Combine(dataDir, "City1");
+            Directory.CreateDirectory(shardDir);
+
+            int pixels = size * size;
+
+            var grass = new Color[pixels];
+            var black = new Color[pixels];
+            for (int i = 0; i < pixels; i++)
+            {
+                grass[i] = new Color((byte)0, (byte)255, (byte)0, (byte)255);
+                black[i] = new Color((byte)0, (byte)0, (byte)0, (byte)255);
+            }
+
+            WritePng(Path.Combine(shardDir, "terraintype.png"), grass, size, size);
+            WritePng(Path.Combine(shardDir, "elevation.png"), black, size, size);
+            WritePng(Path.Combine(shardDir, "roadmap.png"), black, size, size);
+            WritePng(Path.Combine(shardDir, "forestdensity.png"), black, size, size);
+            WritePng(Path.Combine(shardDir, "foresttype.png"), black, size, size);
+        }
+
+        private static void WritePng(string path, Color[] data, int width, int height)
+        {
+            var tex = new Texture2D(GameFacade.GraphicsDevice, width, height);
+            tex.SetData(data);
+            using (var fs = File.Open(path, FileMode.Create, FileAccess.Write, FileShare.None))
+            {
+                tex.SaveAsPng(fs, width, height);
+            }
+            tex.Dispose();
         }
 
         public string SelectedMap

@@ -114,11 +114,11 @@ namespace FSO.Server.Domain
 
             // Save all aspects
 
-            SaveTex(target, "terraintype", baseMap.TerrainTypeColorData, savePNG);
-            SaveTex(target, "elevation", baseMap.ElevationColorData, savePNG);
-            SaveTex(target, "roadmap", baseMap.RoadColorData, savePNG);
-            SaveTex(target, "forestdensity", baseMap.ForestDensityColorData, savePNG);
-            SaveTex(target, "foresttype", baseMap.ForestTypeColorData, savePNG);
+            SaveTex(target, "terraintype", baseMap.TerrainTypeColorData, savePNG, baseMap.Width, baseMap.Height);
+            SaveTex(target, "elevation", baseMap.ElevationColorData, savePNG, baseMap.Width, baseMap.Height);
+            SaveTex(target, "roadmap", baseMap.RoadColorData, savePNG, baseMap.Width, baseMap.Height);
+            SaveTex(target, "forestdensity", baseMap.ForestDensityColorData, savePNG, baseMap.Width, baseMap.Height);
+            SaveTex(target, "foresttype", baseMap.ForestTypeColorData, savePNG, baseMap.Width, baseMap.Height);
 
             var thumbImage = baseMap.Thumbnail.GetImage();
             SaveTex(target, "thumbnail", GetImageColor(thumbImage), savePNG, thumbImage.Width, thumbImage.Height);
@@ -161,9 +161,14 @@ namespace FSO.Server.Domain
             return result;
         }
 
-        private static void SaveTex(string baseDir, string filename, Color[] data, Action<Color[], int, int, Stream> savePNG, int width = 512, int height = 512)
+        private static void SaveTex(string baseDir, string filename, Color[] data, Action<Color[], int, int, Stream> savePNG, int width, int height)
         {
             string filePath = Path.Combine(baseDir, $"{filename}.png");
+
+            if (File.Exists(filePath))
+            {
+                return;
+            }
 
             Directory.CreateDirectory(baseDir);
 

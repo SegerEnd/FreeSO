@@ -47,16 +47,19 @@ namespace FSO.Client.Rendering.City
 
         private void Init(GraphicsDevice gd)
         {
-            Normal = new RenderTarget2D(gd, 512, 512, false, SurfaceFormat.Color, DepthFormat.None, 0, RenderTargetUsage.PreserveContents);
-            VertexColor = new RenderTarget2D(gd, 512, 512, false, SurfaceFormat.Color, DepthFormat.None, 0, RenderTargetUsage.PreserveContents);
-            VertexColorTemp = new RenderTarget2D(gd, 512, 512, false, SurfaceFormat.Color, DepthFormat.None, 0, RenderTargetUsage.PreserveContents);
-            GaussianWorking = new RenderTarget2D(gd, 512, 512, false, SurfaceFormat.Color, DepthFormat.None, 0, RenderTargetUsage.PreserveContents);
-            JumpFlood = new RenderTarget2D(gd, 512, 512);
-            JumpFloodAlt = new RenderTarget2D(gd, 512, 512);
-            TerrainType = new Texture2D(gd, 512, 512, false, SurfaceFormat.Alpha8);
-            Elevation = new Texture2D(gd, 512, 512, false, SurfaceFormat.Alpha8);
-            ForestDensity = new RenderTarget2D(gd, 512, 512, false, SurfaceFormat.Color, DepthFormat.None, 0, RenderTargetUsage.PreserveContents);
-            TerrainEdge = new RenderTarget2D(gd, 512, 512, false, SurfaceFormat.Alpha8, DepthFormat.None);
+            int w = Parent.MapData.Width;
+            int h = Parent.MapData.Height;
+
+            Normal = new RenderTarget2D(gd, w, h, false, SurfaceFormat.Color, DepthFormat.None, 0, RenderTargetUsage.PreserveContents);
+            VertexColor = new RenderTarget2D(gd, w, h, false, SurfaceFormat.Color, DepthFormat.None, 0, RenderTargetUsage.PreserveContents);
+            VertexColorTemp = new RenderTarget2D(gd, w, h, false, SurfaceFormat.Color, DepthFormat.None, 0, RenderTargetUsage.PreserveContents);
+            GaussianWorking = new RenderTarget2D(gd, w, h, false, SurfaceFormat.Color, DepthFormat.None, 0, RenderTargetUsage.PreserveContents);
+            JumpFlood = new RenderTarget2D(gd, w, h);
+            JumpFloodAlt = new RenderTarget2D(gd, w, h);
+            TerrainType = new Texture2D(gd, w, h, false, SurfaceFormat.Alpha8);
+            Elevation = new Texture2D(gd, w, h, false, SurfaceFormat.Alpha8);
+            ForestDensity = new RenderTarget2D(gd, w, h, false, SurfaceFormat.Color, DepthFormat.None, 0, RenderTargetUsage.PreserveContents);
+            TerrainEdge = new RenderTarget2D(gd, w, h, false, SurfaceFormat.Alpha8, DepthFormat.None);
             WaterGradient = GenerateGradient(gd, [
                 new(new Color(0xffFFEA45), 0.0f),
                 new(new Color(0xffFFEA45), 0.1f),
@@ -146,7 +149,7 @@ namespace FSO.Client.Rendering.City
 
             Blit(edge, JumpFlood);
 
-            int stepSize = 512;
+            int stepSize = Math.Max(TerrainType.Width, TerrainType.Height);
             int i = 0;
 
             while (stepSize > 0)
@@ -323,7 +326,7 @@ namespace FSO.Client.Rendering.City
             if (VertexColor != null)
             {
                 sb.Draw(VertexColor, new Vector2(), Color.White);
-                sb.Draw(Normal, new Vector2(0, 512), Color.White);
+                sb.Draw(Normal, new Vector2(0, VertexColor.Height), Color.White);
             }
         }
 

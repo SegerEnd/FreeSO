@@ -149,7 +149,7 @@ namespace FSO.Server.DataService.Providers
                 name = "Default",
                 description = "The default neighborhood.",
                 shard_id = ShardId,
-                location = (256 << 16) | 256,
+                location = (uint)((FSO.Common.Domain.Realestate.MapCoordinates.MapWidth / 2) << 16) | (uint)(FSO.Common.Domain.Realestate.MapCoordinates.MapHeight / 2),
                 color = 0,
                 guid = Guid.NewGuid().ToString()
             });

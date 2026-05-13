@@ -129,9 +129,11 @@ namespace FSO.Client.Rendering.City
         private static readonly int[] TreeCounts = [1, 4, 7, 15];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static int O(int x, int y)
+        private int O(int x, int y)
         {
-            return (Math.Max(0, Math.Min(511, y)) * 512 + Math.Max(0, Math.Min(511, x)));
+            int w = MapData.Width;
+            int h = MapData.Height;
+            return (Math.Max(0, Math.Min(h - 1, y)) * w + Math.Max(0, Math.Min(w - 1, x)));
         }
 
         public void InvalidateChunks(Rectangle rect)
@@ -157,13 +159,15 @@ namespace FSO.Client.Rendering.City
         {
             var camPos = terrain.Camera.CalculateR();
 
-            var cx = (int)Math.Round(camPos.X / 16);
-            var cy = (int)Math.Round(camPos.Y / 16);
+            var cx = (int)Math.Round(camPos.X / ChunkSize);
+            var cy = (int)Math.Round(camPos.Y / ChunkSize);
+
+            var chunksPerRow = Math.Max(1, MapData.Width / ChunkSize);
 
             var invalid = Chunks.Keys.Where(i =>
             {
-                var x = i % 32;
-                var y = i / 32;
+                var x = i % chunksPerRow;
+                var y = i / chunksPerRow;
                 return (x < cx - 2) || (x > cx + 2) || (y < cy - 2) || (y > cy + 2);
             }).ToList();
 
@@ -193,11 +197,11 @@ namespace FSO.Client.Rendering.City
 
             HashSet<int> copy = terrain.OccupiedTiles;
 
-            for (int y = Math.Max(0, cy-size); y<= Math.Min(31, cy + size); y++)
+            for (int y = Math.Max(0, cy-size); y<= Math.Min(chunksPerRow - 1, cy + size); y++)
             {
-                for (int x = Math.Max(0, cx - size); x<= Math.Min(31, cx + size); x++)
+                for (int x = Math.Max(0, cx - size); x<= Math.Min(chunksPerRow - 1, cx + size); x++)
                 {
-                    var ind = y * 32 + x;
+                    var ind = y * chunksPerRow + x;
                     CityFoliageChunk chunk;
                     if (!Chunks.TryGetValue(ind, out chunk))
                     {
@@ -246,7 +250,7 @@ namespace FSO.Client.Rendering.City
             {
                 for (int ox = startx; ox < endx; ox++)
                 {
-                    var ind = oy * 512 + ox;
+                    var ind = oy * MapData.Width + ox;
                     var forestType = forestTypeData[ind];
                     if (forestType != ForestType.NULL && !noTrees.Contains(ind))
                     {
@@ -383,16 +387,17 @@ namespace FSO.Client.Rendering.City
 
         public CityFoliageChunk GenerateChunk(GraphicsDevice gd, int x, int y, HashSet<int> noTrees)
         {
+            var chunksPerRow = Math.Max(1, MapData.Width / ChunkSize);
             var chunk = new CityFoliageChunk
             {
-                Bounds = new BoundingBox(new Vector3(x * ChunkSize, 0, y * ChunkSize), new Vector3((x + 1) * 32, 255 / 12f, (y + 1) * 32))
+                Bounds = new BoundingBox(new Vector3(x * ChunkSize, 0, y * ChunkSize), new Vector3((x + 1) * ChunkSize, 255 / 12f, (y + 1) * ChunkSize))
             };
 
             RegenerateChunk(chunk, gd, x, y, noTrees);
 
             chunk.X = x;
             chunk.Y = y;
-            chunk.Ind = y * 32 + x;
+            chunk.Ind = y * chunksPerRow + x;
 
             return chunk;
         }

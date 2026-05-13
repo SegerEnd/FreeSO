@@ -252,7 +252,7 @@ namespace FSO.Client.Rendering.City
 
             ViewMatrix *= Matrix.CreateRotationY((45.0f / 180.0f) * (float)Math.PI);
             ViewMatrix *= Matrix.CreateRotationX((30.0f / 180.0f) * (float)Math.PI); //render in pseudo-isometric: http://en.wikipedia.org/wiki/Isometric_graphics_in_video_games_and_pixel_art
-            ViewMatrix *= Matrix.CreateTranslation(new Vector3(-360f, 0f, -262f)); //move model to center of screen.
+            ViewMatrix *= Matrix.CreateTranslation(new Vector3(-FSO.Common.Domain.Realestate.MapCoordinates.MapWidth * 360f / 512f, 0f, -FSO.Common.Domain.Realestate.MapCoordinates.MapHeight * 262f / 512f)); //move model to center of screen.
             return ViewMatrix;
         }
 
@@ -291,8 +291,8 @@ namespace FSO.Client.Rendering.City
             double sin = Math.Sin((-45.0 / 180.0) * Math.PI);
             ReturnM.X = (float)(cos * ReturnM.X + sin * ReturnM.Y);
             ReturnM.Y = (float)(cos * ReturnM.Y - sin * temp);
-            ReturnM.X += 254.55844122715712f;
-            ReturnM.Y += 254.55844122715712f;
+            ReturnM.X += FSO.Common.Domain.Realestate.MapCoordinates.MapWidth * 254.55844122715712f / 512f;
+            ReturnM.Y += FSO.Common.Domain.Realestate.MapCoordinates.MapHeight * 254.55844122715712f / 512f;
             return ReturnM;
         }
 
@@ -312,10 +312,12 @@ namespace FSO.Client.Rendering.City
                     var x = id >> 16;
                     var y = id & 0xFFFF;
 
-                    if (x >= 512 || y >= 512)
+                    var mapW = (uint)parent.MapData.Width;
+                    var mapH = (uint)parent.MapData.Height;
+                    if (x >= mapW || y >= mapH)
                     {
-                        x = 255;
-                        y = 255;
+                        x = mapW / 2 - 1;
+                        y = mapH / 2 - 1;
                     }
 
                     float elev = parent.GetElevationAt((int)x, (int)y);

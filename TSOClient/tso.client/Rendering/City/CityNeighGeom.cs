@@ -57,7 +57,7 @@ namespace FSO.Client.Rendering.City
                 Data.Add(new CityNeighbourhood()
                 {
                     Name = "Rand" + i,
-                    Location = new Point(random.Next(512), random.Next(512))
+                    Location = new Point(random.Next(City.MapData.Width), random.Next(City.MapData.Height))
                 }
             );
             }
@@ -71,9 +71,9 @@ namespace FSO.Client.Rendering.City
 
             var pts = Data.Select(x => x.Location.ToVector2() + new Vector2(0.5f, 0.5f)).ToList();
 
-            int mapSize = 512;
+            int mapSize = City.MapData.Width;
             int halfMapSize = mapSize / 2;
-            int margin = 512;
+            int margin = mapSize;
 
             // These points stop the neighbourhood geometry from going too far out of bounds, which would cause visual issues.
 
@@ -88,10 +88,10 @@ namespace FSO.Client.Rendering.City
             pts.Add(new Vector2(-margin, mapSize + margin));
             pts.Add(new Vector2(mapSize + margin, mapSize + margin));
 
-            int tLOffset = 306;
-            int brOffset = 205;
+            int tLOffset = mapSize * 306 / 512;
+            int brOffset = mapSize * 205 / 512;
 
-            Cells = new VoronoiCellGraph(pts).Result;
+            Cells = new VoronoiCellGraph(pts, mapSize).Result;
             NHoodToCell.Clear();
             var index = 0;
             foreach (var cell in Cells)
@@ -487,7 +487,7 @@ namespace FSO.Client.Rendering.City
                 var pos = City.EstTileAtPosWithScroll(state.MouseState.Position.ToVector2() / FSOEnvironment.DPIScaleFactor, null);
 
                 // Neighbourhoods are only interactive if there's more than one.
-                if (City.HandleMouse && City.NeighGeom.Cells.Count > 1)
+                if (City.HandleMouse && Data.Count > 1)
                 {
                     HoverNHood = NhoodNearest(pos);
                     if (HoverNHood > -1 && !HoverPct.ContainsKey(HoverNHood))
@@ -562,7 +562,8 @@ namespace FSO.Client.Rendering.City
             var nhoodID = ToID(nhoodDBID);
             var nhood = Data[nhoodID];
             if (Cells.Count == 0) return;
-            var cell = Cells[NHoodToCell[nhoodID]];
+            if (!NHoodToCell.TryGetValue(nhoodID, out int cellIndex)) return;
+            var cell = Cells[cellIndex];
             var camSize = 2 - (float)Math.Sqrt(cell.Size) / 7;
             var center = new CityCameraCenter()
             {

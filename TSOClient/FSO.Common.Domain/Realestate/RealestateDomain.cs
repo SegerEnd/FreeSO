@@ -101,6 +101,10 @@ namespace FSO.Common.Domain.Realestate
         {
             _Map = map;
             ID = shard.Id;
+
+            MapCoordinates.MapWidth = map.Width;
+            MapCoordinates.MapHeight = map.Height;
+
             if (Dynamic)
             {
                 _Map = new(map);
@@ -312,7 +316,7 @@ namespace FSO.Common.Domain.Realestate
             // TODO: combine all bounds before with all bounds now to get the range to invalidate.
 
             _PreTempMap?.Set(_Map);
-            ApplyTempCommands(new Rectangle(0, 0, 512, 512));
+            ApplyTempCommands(new Rectangle(0, 0, _Map.Width, _Map.Height));
         }
 
         public bool HandleUserCommand(CityUpdateCommand command, HashSet<uint> reservedTiles = null, HashSet<uint> toUpdate = null, HashSet<uint> blockedTiles = null)

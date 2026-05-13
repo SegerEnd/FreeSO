@@ -41,7 +41,7 @@ namespace FSO.Client.Rendering.City.Plugins
 
             if (Selected != null)
             {
-                var targ = City.GetHoverSquare(new double[] { 0.0, 0.0, 512.0, 512.0 });
+                var targ = City.GetHoverSquare(new double[] { 0.0, 0.0, City.MapData.Width, City.MapData.Height });
                 if (targ != null)
                 {
                     Selected.Location = targ.Value.ToPoint();
@@ -99,7 +99,7 @@ namespace FSO.Client.Rendering.City.Plugins
                     {
                         var neigh = new CityNeighbourhood()
                         {
-                            Location = new Point(256, 256),
+                            Location = new Point(City.MapData.Width / 2, City.MapData.Height / 2),
                             Name = "Neigh" + EditTarget.Count
                         };
                         EditTarget.Add(neigh);

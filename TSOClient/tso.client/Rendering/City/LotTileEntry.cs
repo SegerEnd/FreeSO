@@ -1,5 +1,6 @@
 ﻿using FSO.Common.DataService;
 using FSO.Common.DataService.Model;
+using FSO.Common.Domain.Realestate;
 using Microsoft.Xna.Framework;
 
 namespace FSO.Client.Rendering.City
@@ -37,7 +38,7 @@ namespace FSO.Client.Rendering.City
 
         private static int GetOccupiedTileId(LotTileEntry tile)
         {
-            return (int)tile.y * 512 + (int)tile.x;
+            return (int)tile.y * MapCoordinates.MapWidth + (int)tile.x;
         }
 
         public bool UpdateWithCity(Common.DataService.Model.City city, IClientDataService dataService)

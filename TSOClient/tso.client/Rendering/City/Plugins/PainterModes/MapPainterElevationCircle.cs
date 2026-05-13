@@ -28,9 +28,9 @@ namespace FSO.Client.Rendering.City.Plugins.PainterModes
             Spray.NewSeed();
         }
 
-        private static bool InBounds(Point loc)
+        private bool InBounds(Point loc)
         {
-            return loc.X >= 0 && loc.Y >= 0 && loc.X < 512 && loc.Y < 512;
+            return loc.X >= 0 && loc.Y >= 0 && loc.X < City.MapData.Width && loc.Y < City.MapData.Height;
         }
 
         public void Draw(SpriteBatch sb)
@@ -62,7 +62,7 @@ namespace FSO.Client.Rendering.City.Plugins.PainterModes
 
                     if (rough)
                     {
-                        strength = Spray.GetRoughEdge(loc.X * 512 + loc.Y, strength, Painter.BrushSize);
+                        strength = Spray.GetRoughEdge(loc.X * City.MapData.Width + loc.Y, strength, Painter.BrushSize);
                     }
 
                     City.DrawSpike(loc.ToVector2(), strength * multiplier * 1.5f, sb, 196, color * alpha);
@@ -98,7 +98,7 @@ namespace FSO.Client.Rendering.City.Plugins.PainterModes
 
                         if (rough && InBounds(loc))
                         {
-                            strength = Spray.GetRoughEdge(loc.X * 512 + loc.Y, strength, Painter.BrushSize);
+                            strength = Spray.GetRoughEdge(loc.X * City.MapData.Width + loc.Y, strength, Painter.BrushSize);
                         }
 
                         if (ElevationMod.ContainsKey(loc)) ElevationMod[loc] += ((Painter.Erasing) ? -1 : 1) * strength * multiplier * frameMul / 5;

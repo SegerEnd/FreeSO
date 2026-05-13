@@ -18,9 +18,11 @@ namespace FSO.Server.Servers.City.Handlers
 {
     internal class CityUpdateHandler : IDisposable
     {
-        private struct CityUpdate(int shardId, Color[] roads, Color[] elevation, Color[] forestDensity, Color[] forestType, Color[] terrainType)
+        private struct CityUpdate(int shardId, int width, int height, Color[] roads, Color[] elevation, Color[] forestDensity, Color[] forestType, Color[] terrainType)
         {
             public readonly int ShardID = shardId;
+            public readonly int Width = width;
+            public readonly int Height = height;
             public readonly Color[] Roads = roads;
             public readonly Color[] Elevation = elevation;
             public readonly Color[] ForestDensity = forestDensity;
@@ -100,6 +102,8 @@ namespace FSO.Server.Servers.City.Handlers
                 {
                     var update = new CityUpdate(
                         shardId,
+                        map.Width,
+                        map.Height,
                         dirty.HasFlag(CityMapAspects.Road) ? [.. map.RoadData.Select(x => new Color(x, x, x, (byte)255))] : null,
                         dirty.HasFlag(CityMapAspects.Elevation) ? [.. map.ElevationData.Select(x => new Color(x, x, x, (byte)255))] : null,
                         dirty.HasFlag(CityMapAspects.Forest) ? [.. map.ForestDensityData.Select(x => new Color(x, x, x, (byte)255))] : null,
@@ -134,14 +138,14 @@ namespace FSO.Server.Servers.City.Handlers
         {
             var baseDir = NFS.GetShardMapDirectory(update.ShardID);
 
-            SaveTex(baseDir, "roadmap", update.Roads);
+            SaveTex(baseDir, "roadmap", update.Roads, update.Width, update.Height);
 
-            SaveTex(baseDir, "elevation", update.Elevation);
+            SaveTex(baseDir, "elevation", update.Elevation, update.Width, update.Height);
 
-            SaveTex(baseDir, "forestdensity", update.ForestDensity);
-            SaveTex(baseDir, "foresttype", update.ForestType);
+            SaveTex(baseDir, "forestdensity", update.ForestDensity, update.Width, update.Height);
+            SaveTex(baseDir, "foresttype", update.ForestType, update.Width, update.Height);
 
-            SaveTex(baseDir, "terraintype", update.TerrainType);
+            SaveTex(baseDir, "terraintype", update.TerrainType, update.Width, update.Height);
 
             lock (UpdateByShard)
             {
@@ -356,7 +360,7 @@ namespace FSO.Server.Servers.City.Handlers
             });
         }
 
-        private static void SaveTex(string baseDir, string filename, Color[] data)
+        private static void SaveTex(string baseDir, string filename, Color[] data, int width, int height)
         {
             // Save as a temp file, then rename over the existing one.
             // This avoids the target file ever being half written.
@@ -373,7 +377,7 @@ namespace FSO.Server.Servers.City.Handlers
 
             using (FileStream fs = File.Open(tempPath, FileMode.Create, FileAccess.Write, FileShare.None))
             {
-                CoreImageLoader.SavePNG(data, 512, 512, fs);
+                CoreImageLoader.SavePNG(data, width, height, fs);
             }
 
             File.Move(tempPath, filePath, true);

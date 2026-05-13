@@ -1,4 +1,4 @@
-﻿using FSO.Common.Serialization;
+using FSO.Common.Serialization;
 using Mina.Core.Buffer;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -7,8 +7,10 @@ namespace FSO.Server.Protocol.Electron.Model
 {
     public class CityData : ICompressedContainerItem
     {
-        public const int Width = 512;
-        public const int Height = 512;
+        public const int DefaultSize = 512;
+
+        public int Width = DefaultSize;
+        public int Height = DefaultSize;
 
         public byte[] Elevation;
         public byte[] ForestDensity;
@@ -18,6 +20,9 @@ namespace FSO.Server.Protocol.Electron.Model
 
         public void Deserialize(IoBuffer input, ISerializationContext context)
         {
+            Width = input.GetInt32();
+            Height = input.GetInt32();
+
             int pixelCount = Width * Height;
 
             Elevation = input.GetSlice(pixelCount).GetBytes();
@@ -47,6 +52,9 @@ namespace FSO.Server.Protocol.Electron.Model
             {
                 throw new Exception($"Invalid pixel count for city map - expected {Width}x{Height}");
             }
+
+            output.PutInt32(Width);
+            output.PutInt32(Height);
 
             output.Put(Elevation);
             output.Put(ForestDensity);

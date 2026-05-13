@@ -16,8 +16,10 @@ namespace FSO.Content.Model
         private static Color FOREST_CACTI = new Color(255, 0, 0);
         private static Color FOREST_PALM = new Color(255, 0xFC, 0);
 
-        public int Width => 512;
-        public int Height => 512;
+        public const int DefaultSize = 512;
+
+        public int Width { get; private set; }
+        public int Height { get; private set; }
 
         private string _Directory;
 
@@ -60,6 +62,8 @@ namespace FSO.Content.Model
         {
             _Directory = other._Directory;
             VertexColour = other.VertexColour;
+            Width = other.Width;
+            Height = other.Height;
 
             _TerrainType = new(other._TerrainType);
             _ElevationMap = new(other._ElevationMap);
@@ -68,15 +72,18 @@ namespace FSO.Content.Model
             _ForestDensity = new(other._ForestDensity);
             _ForestType = new(other._ForestType);
         }
-        
+
         public CityMap(CityMapMarshal marshal)
         {
-            _TerrainType = new TextureValueMap<TerrainType>([.. MemoryMarshal.Cast<byte, TerrainType>(marshal.TerrainType)], TerrainTypeToColor);
-            _ElevationMap = new TextureValueMap<byte>(marshal.ElevationMap, ToGrayscale);
-            _RoadMap = new TextureValueMap<byte>(marshal.RoadMap, ToGrayscale);
+            Width = marshal.Width;
+            Height = marshal.Height;
 
-            _ForestDensity = new TextureValueMap<byte> (marshal.ForestDensity, ToGrayscale);
-            _ForestType = new TextureValueMap<ForestType>([.. MemoryMarshal.Cast<byte, ForestType>(marshal.TerrainType)], ForestTypeToColor);
+            _TerrainType = new TextureValueMap<TerrainType>([.. MemoryMarshal.Cast<byte, TerrainType>(marshal.TerrainType)], Width, Height, TerrainTypeToColor);
+            _ElevationMap = new TextureValueMap<byte>(marshal.ElevationMap, Width, Height, ToGrayscale);
+            _RoadMap = new TextureValueMap<byte>(marshal.RoadMap, Width, Height, ToGrayscale);
+
+            _ForestDensity = new TextureValueMap<byte>(marshal.ForestDensity, Width, Height, ToGrayscale);
+            _ForestType = new TextureValueMap<ForestType>([.. MemoryMarshal.Cast<byte, ForestType>(marshal.ForestType)], Width, Height, ForestTypeToColor);
         }
 
         private static Color TerrainTypeToColor(TerrainType type)
@@ -121,9 +128,13 @@ namespace FSO.Content.Model
             var RoadMap = new FileTextureRef(Path.Combine(directory, "roadmap." + ext));
             var TerrainTypeTex = new FileTextureRef(Path.Combine(directory, "terraintype." + ext));
 
+            var elevationBitmap = Elevation.GetImage();
+            Width = elevationBitmap.Width;
+            Height = elevationBitmap.Height;
+
             // Load from the files
 
-            _TerrainType = new TextureValueMap<Model.TerrainType>(TerrainTypeTex, x =>
+            _TerrainType = new TextureValueMap<Model.TerrainType>(TerrainTypeTex, Width, Height, x =>
             {
                 if (x == TERRAIN_GRASS)
                 {
@@ -149,10 +160,10 @@ namespace FSO.Content.Model
                 return Model.TerrainType.NULL;
             }, TerrainTypeToColor);
 
-            _ElevationMap = new TextureValueMap<byte>(Elevation, Red, ToGrayscale);
-            _RoadMap = new TextureValueMap<byte>(RoadMap, Red, ToGrayscale);
+            _ElevationMap = new TextureValueMap<byte>(Elevation, Width, Height, Red, ToGrayscale);
+            _RoadMap = new TextureValueMap<byte>(RoadMap, Width, Height, Red, ToGrayscale);
 
-            _ForestType = new TextureValueMap<ForestType>(ForestType, x =>
+            _ForestType = new TextureValueMap<ForestType>(ForestType, Width, Height, x =>
             {
                 if (x == FOREST_HEAVY)
                 {
@@ -174,7 +185,7 @@ namespace FSO.Content.Model
                 return Model.ForestType.NULL;
             }, ForestTypeToColor);
 
-            _ForestDensity = new TextureValueMap<byte>(ForestDensity, x => x.R, ToGrayscale);
+            _ForestDensity = new TextureValueMap<byte>(ForestDensity, Width, Height, x => x.R, ToGrayscale);
         }
 
         public CityMapAspects ConsumeDirty()
@@ -249,27 +260,27 @@ namespace FSO.Content.Model
             TerrainType sample;
             TerrainType t;
 
-            var edges = new TerrainType[] { Model.TerrainType.NULL, Model.TerrainType.NULL, Model.TerrainType.NULL, Model.TerrainType.NULL,
-                Model.TerrainType.NULL, Model.TerrainType.NULL, Model.TerrainType.NULL, Model.TerrainType.NULL};
+            Span<TerrainType> edges = [Model.TerrainType.NULL, Model.TerrainType.NULL, Model.TerrainType.NULL, Model.TerrainType.NULL,
+                Model.TerrainType.NULL, Model.TerrainType.NULL, Model.TerrainType.NULL, Model.TerrainType.NULL];
             sample = GetTerrain(x, y);
 
             t = GetTerrain(x, y - 1);
             if ((y - 1 >= 0) && (t > sample)) edges[0] = t;
 
             t = GetTerrain(x + 1, y - 1);
-            if ((y - 1 >= 0) && (x + 1 < 512) && (t > sample)) edges[1] = t;
+            if ((y - 1 >= 0) && (x + 1 < Width) && (t > sample)) edges[1] = t;
 
             t = GetTerrain(x + 1, y);
-            if ((x + 1 < 512) && (t > sample)) edges[2] = t;
+            if ((x + 1 < Width) && (t > sample)) edges[2] = t;
 
             t = GetTerrain(x + 1, y + 1);
-            if ((x + 1 < 512) && (y + 1 < 512) && (t > sample)) edges[3] = t;
+            if ((x + 1 < Width) && (y + 1 < Height) && (t > sample)) edges[3] = t;
 
             t = GetTerrain(x, y + 1);
-            if ((y + 1 < 512) && (t > sample)) edges[4] = t;
+            if ((y + 1 < Height) && (t > sample)) edges[4] = t;
 
             t = GetTerrain(x - 1, y + 1);
-            if ((y + 1 < 512) && (x - 1 >= 0) && (t > sample)) edges[5] = t;
+            if ((y + 1 < Height) && (x - 1 >= 0) && (t > sample)) edges[5] = t;
 
             t = GetTerrain(x - 1, y);
             if ((x - 1 >= 0) && (t > sample)) edges[6] = t;
@@ -308,6 +319,8 @@ namespace FSO.Content.Model
         {
             return new CityMapMarshal()
             {
+                Width = Width,
+                Height = Height,
                 TerrainType = [.. MemoryMarshal.Cast<TerrainType, byte>(_TerrainType.GetRaw())],
                 ElevationMap = [.. _ElevationMap.GetRaw()],
                 RoadMap = [.. _RoadMap.GetRaw()],
@@ -366,19 +379,23 @@ namespace FSO.Content.Model
 
     public class TextureValueMap<T>
     {
-        private const int Width = 512;
-        private const int Height = 512;
+        public int Width { get; }
+        public int Height { get; }
         private readonly T[] Values;
         private readonly Func<T, Color> ReverseConverter;
 
-        public TextureValueMap(T[] values, Func<T, Color> reverseConverter)
+        public TextureValueMap(T[] values, int width, int height, Func<T, Color> reverseConverter)
         {
+            Width = width;
+            Height = height;
             Values = values;
             ReverseConverter = reverseConverter;
         }
 
-        public TextureValueMap(ITextureRef texture, Func<Color, T> converter, Func<T, Color> reverseConverter)
+        public TextureValueMap(ITextureRef texture, int width, int height, Func<Color, T> converter, Func<T, Color> reverseConverter)
         {
+            Width = width;
+            Height = height;
             Values = new T[Width * Height];
             ReverseConverter = reverseConverter;
 
@@ -391,9 +408,9 @@ namespace FSO.Content.Model
             var index = 0;
 
             int i = 0;
-            for (var y = 0; y < 512; y++)
+            for (var y = 0; y < Height; y++)
             {
-                for (var x = 0; x < 512; x++)
+                for (var x = 0; x < Width; x++)
                 {
                     var a = pixelSize == 3 ? 255 : bytes[index + 3];
                     var r = bytes[index + 2];
@@ -428,11 +445,13 @@ namespace FSO.Content.Model
 
         public Color[] GetColor()
         {
-            return Values.Select(x => ReverseConverter(x)).ToArray();
+            return Array.ConvertAll(Values, x => ReverseConverter(x));
         }
 
         public TextureValueMap(TextureValueMap<T> other)
         {
+            Width = other.Width;
+            Height = other.Height;
             Values = other.Values.ToArray();
             ReverseConverter = other.ReverseConverter;
         }

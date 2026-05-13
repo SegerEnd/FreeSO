@@ -56,9 +56,9 @@ namespace FSO.Client.Rendering.City.Plugins.PainterModes
                 {
                     int ix = (int)LastPos.X + x;
                     int iy = (int)LastPos.Y + y;
-                    if (ix >= 0 && iy >= 0 && ix < 512 && iy < 512)
+                    if (ix >= 0 && iy >= 0 && ix < City.MapData.Width && iy < City.MapData.Height)
                     {
-                        var sprayIntensity = Spray.GetSpraypaint(iy * 512 + ix, strength);
+                        var sprayIntensity = Spray.GetSpraypaint(iy * City.MapData.Width + ix, strength);
                         City.PathTile(ix, iy, iScale, new Color(selColor, Math.Min(0.5f, sprayIntensity * (intensity + 0.2f) * multiplier * 0.4f)));
                     }
                 }
@@ -121,7 +121,7 @@ namespace FSO.Client.Rendering.City.Plugins.PainterModes
                 int targetX = newPt.X + x;
                 int targetY = newPt.Y + y;
 
-                if (targetX < 0 || targetX >= 512 || targetY < 0 || targetY >= 512)
+                if (targetX < 0 || targetX >= City.MapData.Width || targetY < 0 || targetY >= City.MapData.Height)
                 {
                     return;
                 }
@@ -129,7 +129,7 @@ namespace FSO.Client.Rendering.City.Plugins.PainterModes
                 if (spray)
                 {
                     var key = new Point(targetX, targetY);
-                    var sprayIntensity = Spray.GetSpraypaint(targetY * 512 + targetX, strength);
+                    var sprayIntensity = Spray.GetSpraypaint(targetY * City.MapData.Width + targetX, strength);
 
                     SprayIntensities.TryGetValue(key, out float acc);
                     acc += sprayIntensity * frameMul * intensity;

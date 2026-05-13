@@ -1,4 +1,5 @@
-﻿using FSO.Common.Utils;
+﻿using FSO.Common.Domain.Realestate;
+using FSO.Common.Utils;
 using FSO.Content.Model;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -31,9 +32,9 @@ namespace FSO.Client.Rendering.City
         private bool MeshDirty;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static float GetElevationPoint(byte[] elevationData, int x, int y)
+        private float GetElevationPoint(byte[] elevationData, int x, int y)
         {
-            return elevationData[(y * 512 + x)] / 6.0f;
+            return elevationData[Math.Clamp(y * MapData.Width + x, 0, elevationData.Length - 1)] / 6.0f;
         }
 
         private Blend GetBlend(TerrainType[] TerrainTypeData, int i, int j)
@@ -41,17 +42,15 @@ namespace FSO.Client.Rendering.City
             Span<int> edges = [-1, -1, -1, -1];
             int sample;
             int t;
+            int w = MapData.Width;
+            int h = MapData.Height;
 
-            sample = (int)TerrainTypeData[i * 512 + j];
-            t = (int)TerrainTypeData[Math.Abs((i - 1) * 512 + j)];
+            sample = (int)TerrainTypeData[i * w + j];
 
-            if ((i - 1 >= 0) && (t > sample) && t != -1) edges[0] = t;
-            t = (int)TerrainTypeData[i * 512 + j + 1];
-            if ((j + 1 < 512) && (t > sample) && t != -1) edges[1] = t;
-            t = (int)TerrainTypeData[Math.Min((i + 1), 511) * 512 + j];
-            if ((i + 1 < 512) && (t > sample) && t != -1) edges[2] = t;
-            t = (int)TerrainTypeData[i * 512 + j - 1];
-            if ((j - 1 >= 0) && (t > sample) && t != -1) edges[3] = t;
+            if (i - 1 >= 0) { t = (int)TerrainTypeData[(i - 1) * w + j]; if (t > sample && t != -1) edges[0] = t; }
+            if (j + 1 < w) { t = (int)TerrainTypeData[i * w + j + 1]; if (t > sample && t != -1) edges[1] = t; }
+            if (i + 1 < h) { t = (int)TerrainTypeData[(i + 1) * w + j]; if (t > sample && t != -1) edges[2] = t; }
+            if (j - 1 >= 0) { t = (int)TerrainTypeData[i * w + j - 1]; if (t > sample && t != -1) edges[3] = t; }
 
 
             int binary =
@@ -84,7 +83,7 @@ namespace FSO.Client.Rendering.City
 
             float myElevation = GetElevationPoint(elevationData, x, y);
 
-            if (x < 511)
+            if (x < MapData.Width - 1)
             {
                 sum.X -= GetElevationPoint(elevationData, x + 1, y) - myElevation;
                 sum.Y += 1;
@@ -96,7 +95,7 @@ namespace FSO.Client.Rendering.City
                 sum.Y += 1;
             }
 
-            if (y < 511)
+            if (y < MapData.Height - 1)
             {
                 sum.Z -= GetElevationPoint(elevationData, x, y + 1) - myElevation;
                 sum.Y += 1;
@@ -167,9 +166,9 @@ namespace FSO.Client.Rendering.City
 
             int chunkSize = 16;
 
-            int yStart = 0, yEnd = 512;
+            int yStart = 0, yEnd = MapData.Height;
 
-            var chunkWidth = 512 / chunkSize;
+            var chunkWidth = (MapData.Width + chunkSize - 1) / chunkSize;
             var chunkCount = chunkWidth * chunkWidth;
 
             int[][] newLayerSubPrims = new int[LayerSubPrims.Length][];
@@ -182,6 +181,8 @@ namespace FSO.Client.Rendering.City
                 TerrainType[] terrainType = MapData.TerrainType;
                 byte[] roadData = MapData.RoadData;
                 byte[] elevationData = MapData.ElevationData;
+                int mapW = MapData.Width;
+                int hMax = MapData.Height - 1;
 
                 var ci = 0;
                 for (int cy = 0; cy < chunkWidth; cy++)
@@ -189,25 +190,19 @@ namespace FSO.Client.Rendering.City
                     for (int cx = 0; cx < chunkWidth; cx++)
                     {
                         yStart = cy * chunkSize;
-                        yEnd = (cy + 1) * chunkSize;
+                        yEnd = Math.Min((cy + 1) * chunkSize, MapData.Height);
                         var xLim = cx * chunkSize;
-                        var xLimEnd = (cx + 1) * chunkSize;
+                        var xLimEnd = Math.Min((cx + 1) * chunkSize, MapData.Width);
 
                         for (int i = yStart; i < yEnd; i++)
                         {
-                            if (i < 306) xStart = 306 - i;
-                            else xStart = i - 306;
-                            if (i < 205) xEnd = 307 + i;
-                            else xEnd = 512 - (i - 205);
+                            (xStart, xEnd) = DiamondBounds(i);
                             var rXE = xEnd;
                             var rXS = xStart;
 
-                            int rXE2, rXS2;
                             int i2 = i + 1;
-                            if (i2 < 306) rXS2 = 306 - i2;
-                            else rXS2 = i2 - 306;
-                            if (i2 < 205) rXE2 = 307 + i2;
-                            else rXE2 = 512 - (i2 - 205);
+                            var (rXS2, rXE2) = DiamondBounds(i2);
+                            int iNext = Math.Min(hMax, i2);
 
                             var fadeRange = 10;
                             var fR = 1 / 9f;
@@ -220,8 +215,8 @@ namespace FSO.Client.Rendering.City
                             { //where the magic happens
                                 var ex = Math.Min(Math.Max(rXS, j), rXE - 1);
                                 var blendData = GetBlend(terrainType, i, ex); //gets information on what this tile blends into and what blend image to use for the alpha.
-                                var type = (byte)terrainType[((i * 512) + ex)];
-                                byte roadByte = roadData[(i * 512 + ex)];
+                                var type = (byte)terrainType[((i * mapW) + ex)];
+                                byte roadByte = roadData[(i * mapW + ex)];
 
                                 if (type == 255)
                                 {
@@ -231,13 +226,13 @@ namespace FSO.Client.Rendering.City
                                 //huge segment of code for generating triangles incoming
                                 var norm1 = GetNormalAt(elevationData, Math.Min(rXE, Math.Max(rXS, j)), i);
                                 var norm2 = GetNormalAt(elevationData, Math.Min(rXE, Math.Max(rXS, j + 1)), i);
-                                var norm3 = GetNormalAt(elevationData, Math.Min(rXE2, Math.Max(rXS2, j + 1)), Math.Min(511, i + 1));
-                                var norm4 = GetNormalAt(elevationData, Math.Min(rXE2, Math.Max(rXS2, j)), Math.Min(511, i + 1));
+                                var norm3 = GetNormalAt(elevationData, Math.Min(rXE2, Math.Max(rXS2, j + 1)), iNext);
+                                var norm4 = GetNormalAt(elevationData, Math.Min(rXE2, Math.Max(rXS2, j)), iNext);
 
-                                var pos1 = new Vector3(j, elevationData[(i * 512 + Math.Min(rXE, Math.Max(rXS, j)))] / 12.0f, i);
-                                var pos2 = new Vector3(j + 1, elevationData[(i * 512 + Math.Min(rXE, Math.Max(rXS, j + 1)))] / 12.0f, i);
-                                var pos3 = new Vector3(j + 1, elevationData[(Math.Min(511, i + 1) * 512 + Math.Min(rXE2, Math.Max(rXS2, j + 1)))] / 12.0f, i + 1);
-                                var pos4 = new Vector3(j, elevationData[(Math.Min(511, i + 1) * 512 + Math.Min(rXE2, Math.Max(rXS2, j)))] / 12.0f, i + 1);
+                                var pos1 = new Vector3(j, GetElevationPoint(elevationData, Math.Min(rXE, Math.Max(rXS, j)), i) * 0.5f, i);
+                                var pos2 = new Vector3(j + 1, GetElevationPoint(elevationData, Math.Min(rXE, Math.Max(rXS, j + 1)), i) * 0.5f, i);
+                                var pos3 = new Vector3(j + 1, GetElevationPoint(elevationData, Math.Min(rXE2, Math.Max(rXS2, j + 1)), iNext) * 0.5f, i + 1);
+                                var pos4 = new Vector3(j, GetElevationPoint(elevationData, Math.Min(rXE2, Math.Max(rXS2, j)), iNext) * 0.5f, i + 1);
 
                                 var trans1 = Math.Min(1, Math.Max(0, Math.Max(rXS - j, j - rXE) * fR));
                                 var trans2 = Math.Min(1, Math.Max(0, Math.Max(rXS - (j + 1), (j + 1) - rXE) * fR));
@@ -529,9 +524,15 @@ namespace FSO.Client.Rendering.City
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private (int xStart, int xEnd) DiamondBounds(int y)
+        {
+            return MapCoordinates.DiamondBounds(y, MapData.Width, MapData.Height);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private int O(int x, int y, int minx, int maxx)
         {
-            return (Math.Max(0, Math.Min(511, y)) * 512 + Math.Max(minx, Math.Min(maxx, x)));
+            return (Math.Max(0, Math.Min(MapData.Height - 1, y)) * MapData.Width + Math.Max(0, Math.Min(MapData.Width - 1, Math.Max(minx, Math.Min(maxx, x)))));
         }
 
         public void SubRegenMeshVerts(GraphicsDevice gd, Rectangle? range, int subdiv, int cpos)
@@ -555,7 +556,7 @@ namespace FSO.Client.Rendering.City
             int xStart, xEnd;
 
             int index = 0;
-            int yStart = 0, yEnd = 512;
+            int yStart = 0, yEnd = MapData.Height;
             int subd1 = subdiv + 1;
             float subd1f = 1f / subdiv;
             int vertCount = subd1 * subd1;
@@ -571,27 +572,19 @@ namespace FSO.Client.Rendering.City
                 TerrainType[] terrainType = MapData.TerrainType;
                 byte[] roadData = MapData.RoadData;
                 byte[] elevationData = MapData.ElevationData;
+                int mapW = MapData.Width;
+                int hMax = MapData.Height - 1;
 
                 for (int i = yStart; i < yEnd; i++)
                 {
-                    if (i < 306)
-                        xStart = 306 - i;
-                    else
-                        xStart = i - 306;
-                    if (i < 205)
-                        xEnd = 307 + i;
-                    else
-                        xEnd = 512 - (i - 205);
+                    (xStart, xEnd) = DiamondBounds(i);
 
                     var rXE = xEnd;
                     var rXS = xStart;
 
-                    int rXE2, rXS2;
                     int i2 = i + 1;
-                    if (i2 < 306) rXS2 = 306 - i2;
-                    else rXS2 = i2 - 306;
-                    if (i2 < 205) rXE2 = 307 + i2;
-                    else rXE2 = 512 - (i2 - 205);
+                    var (rXS2, rXE2) = DiamondBounds(i2);
+                    int iNext = Math.Min(hMax, i2);
 
                     var fadeRange = 10;
                     var fR = 1 / 9f;
@@ -609,8 +602,8 @@ namespace FSO.Client.Rendering.City
                     { //where the magic happens
                         var ex = Math.Min(Math.Max(rXS, j), rXE - 1);
                         var blendData = GetBlend(terrainType, i, ex); //gets information on what this tile blends into and what blend image to use for the alpha.
-                        var type = (byte)terrainType[((i * 512) + ex)];
-                        byte roadByte = roadData[(i * 512 + ex)];
+                        var type = (byte)terrainType[((i * mapW) + ex)];
+                        byte roadByte = roadData[(i * mapW + ex)];
 
                         if (type == 255)
                         {
@@ -620,8 +613,8 @@ namespace FSO.Client.Rendering.City
                         //huge segment of code for generating triangles incoming
                         var norm1 = GetNormalAt(elevationData, Math.Min(rXE, Math.Max(rXS, j)), i);
                         var norm2 = GetNormalAt(elevationData, Math.Min(rXE, Math.Max(rXS, j + 1)), i);
-                        var norm3 = GetNormalAt(elevationData, Math.Min(rXE2, Math.Max(rXS2, j + 1)), Math.Min(511, i + 1));
-                        var norm4 = GetNormalAt(elevationData, Math.Min(rXE2, Math.Max(rXS2, j)), Math.Min(511, i + 1));
+                        var norm3 = GetNormalAt(elevationData, Math.Min(rXE2, Math.Max(rXS2, j + 1)), iNext);
+                        var norm4 = GetNormalAt(elevationData, Math.Min(rXE2, Math.Max(rXS2, j)), iNext);
 
                         var trans1 = Math.Min(1, Math.Max(0, Math.Max(rXS - j, j - rXE) * fR));
                         var trans2 = Math.Min(1, Math.Max(0, Math.Max(rXS - (j + 1), (j + 1) - rXE) * fR));
@@ -929,7 +922,8 @@ namespace FSO.Client.Rendering.City
         {
             //assume a lot of the parameters have already been set
             //we just need to switch the textures and draw all the different buffers
-            if (ind == -1)
+            var chunkWidth = (MapData.Width + chunkSize - 1) / chunkSize;
+            if (ind == -1 || chunkWidth < 2)
             {
                 DrawAll(gd, content, vs, ps, vsn, psn);
                 return;
@@ -939,8 +933,6 @@ namespace FSO.Client.Rendering.City
             ps.Parameters["VertexColorTex"].SetValue(content.VertexColor);
             ps.Parameters["UseVertexColor"].SetValue(true);
             vs.Parameters["DepthBias"].SetValue(0f);
-
-            var chunkWidth = 512 / chunkSize;
 
             for (int i = 0; i < 5; i++)
             {

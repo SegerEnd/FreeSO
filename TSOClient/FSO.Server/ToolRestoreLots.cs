@@ -1,4 +1,5 @@
-﻿using FSO.Common.Enum;
+﻿using FSO.Common.Domain.Realestate;
+using FSO.Common.Enum;
 using FSO.Server.Database.DA;
 using FSO.Server.Database.DA.Lots;
 using FSO.Server.Database.DA.Objects;
@@ -172,7 +173,7 @@ namespace FSO.Server
                     var existingLocation = da.Lots.GetByLocation(Options.ShardId, lot.location);
                     while (existingLocation != null)
                     {
-                        lot.location = (uint)(random.Next(512) | (random.Next(512) << 16));
+                        lot.location = (uint)(random.Next(MapCoordinates.MapWidth) | (random.Next(MapCoordinates.MapHeight) << 16));
                         Console.WriteLine($"Lot already exists at location {existingLocation.location}. Placing at random location {lot.location}.");
                         existingLocation = da.Lots.GetByLocation(Options.ShardId, lot.location);
                     }
