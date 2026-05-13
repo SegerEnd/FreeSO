@@ -1,6 +1,29 @@
-; Init: PersonGlobals "init NPC" (PersonType=2, MyPerson init).
+; Init: PersonGlobals "init NPC" sets PersonType + base person data. VMAvatar
+; SetMotiveData (VMAvatar.cs:995) clamps motives to [-100, max(old, tuning_limit
+; ?? 100)], so write ~mid values, not 1000s. Goal: spread "wants" across all
+; motives so find_best_action has real signal to score with. Permission ACL
+; (VMThread.cs:1009-1040) still blocks anything not tagged AllowVisitors, so
+; on residential lots the eligible set will skew maid-chore-shaped regardless.
 BHAV [4097] "visitor init" 0x8003 args=0 locals=0
-  call_semiglobal 0x206A args=(0,0,0,0)                 -> return_true / return_true
+  call_semiglobal 0x206A args=(0,0,0,0)                 -> social / social
+social:
+  MyMotives[14] := 50                                   -> fun / fun
+fun:
+  MyMotives[15] := 50                                   -> comfort / comfort
+comfort:
+  MyMotives[6] := 50                                    -> energy / energy
+energy:
+  MyMotives[5] := 80                                    -> hunger / hunger
+hunger:
+  MyMotives[7] := 70                                    -> hygiene / hygiene
+hygiene:
+  MyMotives[8] := 80                                    -> bladder / bladder
+bladder:
+  MyMotives[9] := 80                                    -> room / room
+room:
+  MyMotives[13] := 60                                   -> mood / mood
+mood:
+  MyMotives[3] := 70                                    -> return_true / return_true
 
 
 ; Walk to the *opposite* walkby portal from where we spawned, then despawn.
@@ -31,7 +54,7 @@ BHAV [4099] "walkby pie hide" 0x8003 args=0 locals=0
 ; walk over, then notify_out_of_idle so visitor's Wait for Notify wakes — both
 ; animate in sync (canonical 2-sim pattern, see PG 8654 carrying put-down).
 BHAV [4101] "Interaction - Wave" 0x8003 args=0 locals=1
-  StackAttrs[0] := 2                                    -> save_visitor / save_visitor  ; visitor linger
+  StackAttrs[0] := 50                                   -> save_visitor / save_visitor  ; visit duration (main-loop iters)
 save_visitor:
   Local[0] := StackObjID[0]                             -> push_react / push_react  ; push_interaction reads Local[0]
 push_react:
@@ -44,7 +67,7 @@ anim:
   animate raw=[8A,01,00,00,03,00,00,00]                 -> return_true / anim  ; id=394 source=Misc
 
 BHAV [4102] "Interaction - Greet" 0x8003 args=0 locals=1
-  StackAttrs[0] := 2                                    -> save_visitor / save_visitor
+  StackAttrs[0] := 50                                   -> save_visitor / save_visitor
 save_visitor:
   Local[0] := StackObjID[0]                             -> push_react / push_react
 push_react:
@@ -57,7 +80,7 @@ anim:
   animate raw=[8A,01,00,00,03,00,00,00]                 -> return_true / anim
 
 BHAV [4103] "Interaction - Compliment" 0x8003 args=0 locals=1
-  StackAttrs[0] := 2                                    -> save_visitor / save_visitor
+  StackAttrs[0] := 50                                   -> save_visitor / save_visitor
 save_visitor:
   Local[0] := StackObjID[0]                             -> push_react / push_react
 push_react:
@@ -86,24 +109,30 @@ walkby:
   call_private 0x1002 args=(0,0,0,0)                    -> return_true / return_false
 
 
-; Main: walkby is the default. If MyAttrs[0] > 0 (linger counter set by a social),
-; push Internal Idle and decrement instead. Both at Idle priority; idle_for_input
-; AttemptPushes them.
+; Main: default behaviour is the cross-lot walkby. Once greeted (MyAttrs[0]>0,
+; set by a social), tick down and try find_best_action. The autonomy scorer
+; only sees AllowVisitors-tagged interactions (mostly chores), so the visitor
+; behaves maid-flavoured on a residential lot — that's a TSO permission-ACL
+; limit, not a tuning one. On TRUE the chore is queued at Autonomous and runs
+; via idle_for_input handover; on FALSE we push Internal Idle so the visitor
+; head-tracks + animates instead of standing inert.
 BHAV [4106] "visitor main" 0x8003 args=0 locals=1
 boot:
   StackObjID[0] := MyObj[11]                            -> top / top
 top:
-  MyAttrs[0] > 0                                        -> linger_dec / push_walkby
-linger_dec:
-  MyAttrs[0] -= 1                                       -> push_idle / push_idle
-push_idle:
+  MyAttrs[0] > 0                                        -> tick_visit / push_walkby
+tick_visit:
+  MyAttrs[0] -= 1                                       -> try_auto / try_auto
+try_auto:
+  find_best_action raw=[00,00,00,00,00,00,00,00]        -> reset / fallback_idle
+fallback_idle:
   Local[0] := MyObj[11]                                 -> idle_push / idle_push
 idle_push:
-  push_interaction raw=[06,00,06,02,00,00,00,00]        -> reset / reset  ; idx=6 Internal Idle, priority=Idle
+  push_interaction raw=[06,00,06,02,00,00,00,00]        -> reset / reset  ; idx=6 Internal Idle
 push_walkby:
   Local[0] := MyObj[11]                                 -> walkby_push / walkby_push
 walkby_push:
-  push_interaction raw=[05,00,06,02,00,00,00,00]        -> reset / reset  ; idx=5 Immediate Walkby, priority=Idle
+  push_interaction raw=[05,00,06,02,00,00,00,00]        -> reset / reset  ; idx=5 Immediate Walkby
 reset:
   MyPerson[33] := 0                                     -> args / args
 args:
