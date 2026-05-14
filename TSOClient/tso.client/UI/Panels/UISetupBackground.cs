@@ -59,7 +59,12 @@ namespace FSO.Client.UI.Panels
                 // Just attempt to load the regular setup.png.
             }
 
-            if (splashes != null && splashes.Length > 0)
+            var packSetup = Content.Content.Get().UIPacks.Provider.Get((ulong)FileIDs.UIFileIDs.setup);
+            if (packSetup != null)
+            {
+                setupTex = packSetup.Get(GameFacade.GraphicsDevice);
+            }
+            else if (splashes != null && splashes.Length > 0)
             {
                 Random rng = new Random();
                 using (var logostrm = File.Open(splashes[rng.Next(splashes.Length)], FileMode.Open, FileAccess.Read, FileShare.Read))

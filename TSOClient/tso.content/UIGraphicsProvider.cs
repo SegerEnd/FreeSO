@@ -5,6 +5,7 @@ using FSO.Content.Codecs;
 using Microsoft.Xna.Framework;
 using System.Text.RegularExpressions;
 using FSO.Content.Model;
+using FSO.Content.UIPacks;
 using System.IO;
 using FSO.Files;
 
@@ -27,6 +28,12 @@ namespace FSO.Content
         //For some reason, the rack eod has a graphic id that we don't, but the file does exist under another iD.
         //Can't see any problem with file parser so putting in a mapping for now
         private Dictionary<ulong, ulong> Pointers = new Dictionary<ulong, ulong>();
+
+        /// <summary>
+        /// Optional override source consulted before falling back to the stock
+        /// FAR3 archive. Set by <see cref="Content"/> at construction time.
+        /// </summary>
+        public UIPackProvider PackOverride;
 
         public UIGraphicsProvider(Content contentManager)
             : base(contentManager, new TextureCodec(MASK_COLORS), new Regex("uigraphics/.*\\.dat"))
@@ -67,6 +74,8 @@ namespace FSO.Content
             if (Pointers.ContainsKey(id)){
                 id = Pointers[id];
             }
+            var packOverride = PackOverride?.Get(id);
+            if (packOverride != null) return packOverride;
             if (Files.ContainsKey(id))
             {
                 //Non far3 file

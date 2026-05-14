@@ -49,5 +49,11 @@ namespace FSO.Common
         public static bool MSAASupport = true;
 
         public static string Args = "";
+
+        /// <summary>
+        /// Id of the UI pack to activate on startup. Empty = stock UI.
+        /// Matches the Id field in the pack's pack.ini (falls back to filename).
+        /// </summary>
+        public static string ActiveUIPack = "";
     }
 }

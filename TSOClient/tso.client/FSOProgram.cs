@@ -67,6 +67,7 @@ namespace FSO.Client
                         GlobalSettings.Default.LanguageCode = byte.Parse(cmd.Substring(4));
                     }
                     else if (cmd.StartsWith("hz")) GlobalSettings.Default.TargetRefreshRate = int.Parse(cmd.Substring(2));
+                    else if (cmd.StartsWith("uipack=")) FSOEnvironment.ActiveUIPack = cmd.Substring("uipack=".Length);
                     else
                     {
                         //normal style param

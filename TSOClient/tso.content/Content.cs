@@ -11,6 +11,7 @@ using FSO.Content.Model;
 using FSO.Content.Interfaces;
 using FSO.Content.TS1;
 using FSO.Content.Framework;
+using FSO.Content.UIPacks;
 using FSO.Vitaboy;
 using FSO.Content.Upgrades;
 
@@ -103,10 +104,11 @@ namespace FSO.Content
 
             ImageLoader.PremultiplyPNG = 1;// (FSOEnvironment.DirectX)?0:1;
 
+            UIPacks = new UIPackManager();
             if (device != null)
             {
                 RCMeshes = new RCMeshProvider(device);
-                UIGraphics = new UIGraphicsProvider(this);
+                UIGraphics = new UIGraphicsProvider(this) { PackOverride = UIPacks.Provider };
                 IffFile.TargetTS1 = TS1;
                 if (TS1)
                 {
@@ -124,7 +126,7 @@ namespace FSO.Content
                 AbstractTextureRef.ImageFetchFunction = AbstractTextureRef.ImageFetchWithDevice;
             }
             Changes = new ChangeManager();
-            CustomUI = new CustomUIProvider(this);
+            CustomUI = new CustomUIProvider(this) { PackOverride = UIPacks.Provider };
 
             if (TS1)
             {
@@ -205,6 +207,7 @@ namespace FSO.Content
             _ScanFiles("Content/", contentFiles, "Content/");
             ContentFiles = contentFiles.ToArray();
             CustomUI.Init();
+            UIPacks.Discover();
             if (!TS1)
             {
                 var allFiles = new List<string>();
@@ -390,6 +393,7 @@ namespace FSO.Content
 
         public UIGraphicsProvider UIGraphics;
         public CustomUIProvider CustomUI;
+        public UIPackManager UIPacks;
         
         /** Avatar **/
         public IContentProvider<Mesh> AvatarMeshes;
