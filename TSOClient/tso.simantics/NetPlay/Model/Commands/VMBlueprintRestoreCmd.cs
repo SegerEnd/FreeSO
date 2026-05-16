@@ -6,6 +6,7 @@ using FSO.SimAntics.Utils;
 using FSO.Files.Formats.IFF;
 using FSO.Files.Formats.IFF.Chunks;
 using FSO.SimAntics.Marshals;
+using FSO.SimAntics.Model.Family;
 
 namespace FSO.SimAntics.NetPlay.Model.Commands
 {
@@ -63,7 +64,9 @@ namespace FSO.SimAntics.NetPlay.Model.Commands
                     nobj.ExecuteEntryPoint(2, vm.Context, true);
                 }
 
-                vm.TS1State.VerifyFamily(vm);
+                //Route through IVMFamilyLotState so Family City (VMTSOFamilyLotState) gets its
+                //family members spawned too, not only Simitone's VMTS1LotState path.
+                (vm.PlatformState as IVMFamilyLotState)?.Family.VerifyFamily(vm);
             }
             else
             {
@@ -78,6 +81,10 @@ namespace FSO.SimAntics.NetPlay.Model.Commands
                 activator.Offset = new Microsoft.Xna.Framework.Point(OffsetX, OffsetY);
                 activator.TargetSize = TargetSize;
                 activator.LoadFromXML(lotInfo);
+
+                //Family City lots load via the XML path (default blueprint), not the IFF path.
+                //Spawn the family's members through the same VerifyFamily mechanism Simitone uses.
+                (vm.PlatformState as IVMFamilyLotState)?.Family.VerifyFamily(vm);
             }
 
             return true;

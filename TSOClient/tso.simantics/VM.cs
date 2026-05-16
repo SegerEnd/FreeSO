@@ -223,7 +223,10 @@ namespace FSO.SimAntics
         /// </summary>
         public void Init()
         {
-            PlatformState = (TS1)?(VMAbstractLotState)new VMTS1LotState():new VMTSOLotState();
+            // A caller may have pre-set PlatformState (e.g. Archive/Sandbox using VMTSOFamilyLotState
+            // for family hosting). In that case respect it; otherwise pick the default for the platform.
+            if (PlatformState == null)
+                PlatformState = (TS1)?(VMAbstractLotState)new VMTS1LotState():new VMTSOLotState();
             GlobalState = new short[38];
             GlobalState[20] = 255; //Game Edition. Basically, what "expansion packs" are running. Let's just say all of them.
             GlobalState[25] = 4; //as seen in EA-Land edith's simulator globals, this needs to be set for people to do their idle interactions.

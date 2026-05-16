@@ -501,6 +501,15 @@ namespace FSO.Client
             });
         }
 
+        public void EnterFamilyCity(Model.FamilyCity.FamilyCity city, ushort familyId, int lotId)
+        {
+            ChangeState<FamilyCityGameScreen>((screen) =>
+            {
+                screen.EnterCity(city, familyId, lotId);
+                DiscordRpcEngine.SendFSOPresence("Playing Family City: " + city.Name);
+            });
+        }
+
         public void ShowCredits()
         {
             var screen = Kernel.Get<Credits>();

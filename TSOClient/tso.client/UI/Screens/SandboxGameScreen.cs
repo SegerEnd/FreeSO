@@ -427,7 +427,19 @@ namespace FSO.Client.UI.Screens
             }
         }
 
-        public void InitializeLot(string lotName, bool external)
+        /// <summary>
+        /// Override to pre-set <see cref="VM.PlatformState"/> before <see cref="VM.Init"/> runs.
+        /// Sandbox itself does nothing here — Init's if-null guard picks the default state.
+        /// </summary>
+        protected virtual void BeforeVMInit(VM vm) { }
+
+        /// <summary>
+        /// Override to do platform-state activation immediately after <see cref="VM.Init"/>
+        /// (e.g. <c>Family.ActivateFamily</c> for a Family City lot).
+        /// </summary>
+        protected virtual void AfterVMInit(VM vm) { }
+
+        public virtual void InitializeLot(string lotName, bool external)
         {
             if (lotName == "") return;
             var recording = lotName.ToLowerInvariant().EndsWith(".fsor");
@@ -502,7 +514,11 @@ namespace FSO.Client.UI.Screens
 
             vm = new VM(new VMContext(World), Driver, new UIHeadlineRendererProvider());
             vm.ListenBHAVChanges();
+            // Hooks let subclasses (e.g. FamilyCityGameScreen) inject a custom PlatformState
+            // before Init() runs and activate state (e.g. family) immediately after.
+            BeforeVMInit(vm);
             vm.Init();
+            AfterVMInit(vm);
 
             LotControl = new UILotControl(vm, World);
             this.AddAt(0, LotControl);

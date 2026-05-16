@@ -120,6 +120,19 @@ namespace FSO.Client.UI.Screens
             };
             this.Add(gameplayButton);
             gameplayButton.OnButtonClick += new ButtonClickDelegate(gameplayButton_OnButtonClick);
+
+            var familyCityButton = new UIButton()
+            {
+                Caption = "Family City",
+                Y = 10,
+                Width = 125,
+                X = 145
+            };
+            this.Add(familyCityButton);
+            familyCityButton.OnButtonClick += (btn) =>
+            {
+                UIScreen.GlobalShowDialog(new UI.Panels.UIFamilyCityLandingDialog(), true);
+            };
             
             Regulator.OnError += AuthRegulator_OnError;
             Regulator.OnTransition += AuthRegulator_OnTransition;
