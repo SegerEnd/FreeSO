@@ -3,14 +3,13 @@
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
-        <TargetFramework>net9.0</TargetFramework>
+        <TargetFramework>net10.0</TargetFramework>
         <RootNamespace>FSO.Unix</RootNamespace>
         <AssemblyName>FreeSO</AssemblyName>
         <ApplicationIcon>fso.ico</ApplicationIcon>
         <PublishReadyToRun>false</PublishReadyToRun>
         <PublishSingleFile>true</PublishSingleFile>
         <TieredPGO>true</TieredPGO>
-        <_EnableMacOSCodeSign>false</_EnableMacOSCodeSign>
         <PublishAot>false</PublishAot>
         <PublishTrimmed>false</PublishTrimmed>
     </PropertyGroup>
@@ -36,21 +35,24 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.5" />
-        <PackageReference Include="System.IO.FileSystem.Primitives" Version="4.3.0" />
+        <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.5.1" />
         <ProjectReference Include="..\FSO.Patcher.Unix\FSO.Patcher.Unix.csproj" />
         <ProjectReference Include="..\tso.client\FSO.Client.csproj" />
         <ProjectReference Include="..\tso.common\FSO.Common.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="SixLabors.ImageSharp" Version="3.1.11" />
+        <PackageReference Include="SixLabors.ImageSharp" Version="3.1.12" />
     </ItemGroup>
 
     <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
 
-    <Target Name="UpdaterPublish" BeforeTargets="Publish"> 
-        <Exec Command="dotnet publish ../FSO.Patcher.Unix -c Release -r $(RuntimeIdentifier) -o &quot;$(PublishDir)&quot;" />
+    <Target Name="UpdaterPublish" BeforeTargets="Publish">
+        <Exec Command="dotnet publish ../FSO.Patcher.Unix -c Release -r $(RuntimeIdentifier) -o &quot;$(IntermediateOutputPath)updater&quot;" />
+        <ItemGroup>
+            <UpdaterFiles Include="$(IntermediateOutputPath)updater/**" />
+        </ItemGroup>
+        <Copy SourceFiles="@(UpdaterFiles)" DestinationFiles="@(UpdaterFiles->'$(PublishDir)%(RecursiveDir)%(Filename)%(Extension)')" />
     </Target>
 
     <!-- Override SDK target to prevent it from deleting native dylibs on repeated publishes -->
@@ -64,7 +66,7 @@
         <MakeDir Directories="$(PublishDir)/FreeSO.app/Contents/MacOS" />
         <MakeDir Directories="$(PublishDir)/FreeSO.app/Contents/Resources" />
 
-        <Exec Command="codesign --force -s - &quot;$(PublishDir)/FreeSO&quot;" Condition="'$(ForceSign)' == 'true'"/> 
+        <Exec Command="codesign --force -s - &quot;$(PublishDir)/FreeSO&quot;" Condition="'$(ForceSign)' == 'true'"/>
 
         <Copy SourceFiles="$(PublishDir)/FreeSO" DestinationFolder="$(PublishDir)/FreeSO.app/Contents/MacOS" />
         <Copy SourceFiles="$(PublishDir)/update" DestinationFolder="$(PublishDir)/FreeSO.app/Contents/MacOS" />

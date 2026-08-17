@@ -12,9 +12,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MonoGame.Framework.Content.Pipeline" Version="3.8.5" />
+    <PackageReference Include="MonoGame.Framework.Content.Pipeline" Version="3.8.5.1" />
     <PackageReference Include="RoyT.TrueType" Version="0.2.0" />
-    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.11" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.12" />
   </ItemGroup>
 
   <ItemGroup>
@@ -22,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="$(NuGetPackageRoot)sixlabors.imagesharp/3.1.11/lib/net6.0/SixLabors.ImageSharp.dll">
+    <None Include="$(NuGetPackageRoot)sixlabors.imagesharp/3.1.12/lib/net6.0/SixLabors.ImageSharp.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="$(NuGetPackageRoot)royt.truetype/0.2.0/lib/netstandard2.0/RoyT.TrueType.dll">

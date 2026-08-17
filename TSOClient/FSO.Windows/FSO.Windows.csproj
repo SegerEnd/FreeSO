@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net9.0-windows</TargetFramework>
+    <TargetFramework>net10.0-windows</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>disable</Nullable>
     <OutputType>WinExe</OutputType>
@@ -41,10 +41,14 @@
     </EmbeddedResource>
   </ItemGroup>
 
+  <PropertyGroup>
+    <MonoGameVersion>3.8.5.1</MonoGameVersion>
+  </PropertyGroup>
+
   <ItemGroup>
-    <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.5" />
-    <PackageReference Include="MonoGame.Framework.WindowsDX" Version="3.8.5" />
-    <PackageReference Include="System.Speech" Version="9.0.9" />
+    <PackageReference Include="MonoGame.Framework.DesktopGL" Version="$(MonoGameVersion)" />
+    <PackageReference Include="MonoGame.Framework.WindowsDX" Version="$(MonoGameVersion)" />
+    <PackageReference Include="System.Speech" Version="10.0.11" />
   </ItemGroup>
 
   <ItemGroup>
@@ -71,13 +75,13 @@
 
     <MakeDir Directories="$(OutputPath)Monogame\Windows" />
     <ItemGroup>
-      <MGWindowsDX Include="$(NuGetGlobalPackages)\monogame.framework.windowsdx\3.8.5\lib\**\MonoGame.Framework.dll" />
+      <MGWindowsDX Include="$(NuGetGlobalPackages)\monogame.framework.windowsdx\$(MonoGameVersion)\lib\**\MonoGame.Framework.dll" />
     </ItemGroup>
     <Copy SourceFiles="@(MGWindowsDX)" DestinationFolder="$(OutputPath)Monogame\Windows" SkipUnchangedFiles="true" />
 
     <MakeDir Directories="$(OutputPath)Monogame\WindowsGL" />
     <ItemGroup>
-      <MGDesktopGL Include="$(NuGetGlobalPackages)\monogame.framework.desktopgl\3.8.5\lib\**\MonoGame.Framework.dll" />
+      <MGDesktopGL Include="$(NuGetGlobalPackages)\monogame.framework.desktopgl\$(MonoGameVersion)\lib\**\MonoGame.Framework.dll" />
     </ItemGroup>
     <Copy SourceFiles="@(MGDesktopGL)" DestinationFolder="$(OutputPath)Monogame\WindowsGL" SkipUnchangedFiles="true" />
   </Target>

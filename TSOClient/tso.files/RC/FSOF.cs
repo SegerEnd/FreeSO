@@ -415,7 +415,7 @@ namespace FSO.Files.RC
         public static T[] ReadArray<T>(IoBuffer reader, int size) where T : unmanaged
         {
             var result = new T[size];
-            var bytes = MemoryMarshal.Cast<T, byte>(result);
+            var bytes = MemoryMarshal.Cast<T, byte>(result.AsSpan());
 
             reader.ReadBytes(bytes);
 

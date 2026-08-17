@@ -9,7 +9,7 @@
 dotnet publish -c Release -r osx-arm64 --self-contained true
 ```
 
-This will generate a .app bundle in: bin/Release/net9.0/osx-arm64/publish folder.
+This will generate a .app bundle in: bin/Release/net10.0/osx-arm64/publish folder.
 You can then copy the app to your Applications folder.
 
 ### Linux

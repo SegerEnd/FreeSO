@@ -25,7 +25,6 @@ namespace FSO.Server.Api.Core.Services
             {
                 RegionEndpoint = RegionEndpoint.GetBySystemName(region),
                 Timeout = new TimeSpan(1, 0, 0),
-                ReadWriteTimeout = new TimeSpan(1, 0, 0),
                 MaxErrorRetry = 512
             };
 

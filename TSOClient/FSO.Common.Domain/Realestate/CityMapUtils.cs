@@ -507,8 +507,8 @@ namespace FSO.Common.Domain.Realestate
         {
             return type switch
             {
-                CityEditPaintType.TerrainType => System.Runtime.InteropServices.MemoryMarshal.Cast<TerrainType, byte>(map.TerrainType),
-                CityEditPaintType.ForestType => System.Runtime.InteropServices.MemoryMarshal.Cast<ForestType, byte>(map.ForestTypeData),
+                CityEditPaintType.TerrainType => System.Runtime.InteropServices.MemoryMarshal.Cast<TerrainType, byte>(map.TerrainType.AsSpan()),
+                CityEditPaintType.ForestType => System.Runtime.InteropServices.MemoryMarshal.Cast<ForestType, byte>(map.ForestTypeData.AsSpan()),
                 CityEditPaintType.ForestDensity => map.ForestDensityData,
                 _ => null
             };
